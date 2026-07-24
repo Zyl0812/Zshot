@@ -89,8 +89,18 @@ public sealed partial class UpdateWindow : WindowEx
         var progress = new Progress<(int percent, string bytesText)>(p =>
         {
             ProgressValue = p.percent;
-            ProgressPercentText = p.percent + "%";
-            ProgressBytesText = p.bytesText;
+            // 多层 delta：bytesText 格式 "1/3  2MB / 5MB"，百分比位置显示层号
+            var sep = p.bytesText.IndexOf("  ");
+            if (sep > 0 && p.bytesText.Contains('/'))
+            {
+                ProgressPercentText = p.bytesText[..sep];
+                ProgressBytesText = p.bytesText[(sep + 2)..];
+            }
+            else
+            {
+                ProgressPercentText = p.percent + "%";
+                ProgressBytesText = p.bytesText;
+            }
         });
         try
         {

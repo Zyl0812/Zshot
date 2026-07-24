@@ -193,14 +193,22 @@ public static class UpdateService
             var link = chain[i];
             _logger?.LogInformation("Delta layer {Index}: {From} -> {To}", i + 1, link.FromTag, link.ToTag);
 
-            // 进度：按链层数均分（每层占等比例）
-            int basePercent = (int)((double)i / chain.Count * 100);
-            int nextPercent = (int)((double)(i + 1) / chain.Count * 100);
-            var layerProgress = new Progress<(int percent, string bytesText)>(p =>
+            // 进度：单层直接用原始百分比；多层进度条按层均分，右边显示层号
+            IProgress<(int percent, string bytesText)> layerProgress;
+            if (chain.Count == 1)
             {
-                int pct = basePercent + (int)((double)p.percent / 100 * (nextPercent - basePercent));
-                progress.Report((pct, p.bytesText));
-            });
+                layerProgress = progress;
+            }
+            else
+            {
+                int basePercent = (int)((double)i / chain.Count * 100);
+                int nextPercent = (int)((double)(i + 1) / chain.Count * 100);
+                layerProgress = new Progress<(int percent, string bytesText)>(p =>
+                {
+                    int pct = basePercent + (int)((double)p.percent / 100 * (nextPercent - basePercent));
+                    progress.Report((pct, $"{i + 1}/{chain.Count}  {p.bytesText}"));
+                });
+            }
 
             // 解压 delta.zip 到 root（覆盖变化文件 + manifest.json + version.ini）
             await ExtractToDirectoryAsync(link.DeltaUrl, root, layerProgress, ct);
