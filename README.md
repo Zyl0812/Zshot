@@ -242,7 +242,8 @@ Displays the logo + tagline on startup. Delays 700ms then fades out over 400ms. 
 ### Check for Updates
 
 - Throttled check on startup (≥24h + toggle on) against GitHub Releases latest version, or manual check from the About page.
-- Updates use SharpCompress true streaming decompression (network stream direct, no zip file saved to disk). Entries are written directly to the root directory entry by entry. On failure, the previous state is restored. On success, restarts the launcher with `--clean` to remove old versions.
+- Updates prefer chained delta packages (only changed files, a few MB vs ~80MB full package); matches layer by layer from the current version upward, up to 5 layers (adjustable in Settings → Advanced); falls back to the full package if too many versions behind or no match is found.
+- Both full and delta packages use SharpCompress true streaming extraction (direct network stream, no zip saved to disk), writing each entry directly to the root directory. On failure, the previous state is restored. On success, restarts the launcher with `--clean` to remove old versions.
 - Only checks CI/CD releases (reads `version.ini` version number). Local builds (no `version.ini`, `AppVersion = Local`) are treated as 0.0.0, so they can update to any CI/CD release.
 - Version case convention: the GitHub tag, zip name, and `app-{version}/` dir are all lowercase (e.g. `0.3.1-preview`); `version.ini` keeps the original case (`0.3.1-Preview`, shown on the About page), and the launcher lowercases it when locating the dir.
 
