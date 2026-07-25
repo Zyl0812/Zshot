@@ -119,6 +119,7 @@ public static class UpdateService
             // fallback：删残缺 app-{new}/（差分可能创建了半成品）
             try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
 
+            _logger?.LogInformation("Falling back to full package update");
             await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
         }
 
@@ -157,15 +158,27 @@ public static class UpdateService
             var eq = line.IndexOf('=');
             if (eq >= 0) currentTag = line[(eq + 1)..].Trim().ToLowerInvariant();
         }
-        if (string.IsNullOrEmpty(currentTag)) return false;
+        if (string.IsNullOrEmpty(currentTag))
+        {
+            _logger?.LogInformation("Delta skipped: no version.ini, falling back to full package");
+            return false;
+        }
 
         // 本地构建（Local）没有 GitHub release 对应的 delta，直接走整包
-        if (currentTag == "local") return false;
+        if (currentTag == "local")
+        {
+            _logger?.LogInformation("Delta skipped: Local build, falling back to full package");
+            return false;
+        }
 
         // 查 delta 链
         int maxLayers = AppConfig.DeltaUpdateMaxLayers;
         var chain = await ReleaseClient.GetDeltaChainAsync(currentTag, info.TagName, maxLayers, ct);
-        if (chain is null || chain.Count == 0) return false;
+        if (chain is null || chain.Count == 0)
+        {
+            _logger?.LogInformation("Delta skipped: no chain found from {From} to {To} (max {Max} layers), falling back to full package", currentTag, info.TagName, maxLayers);
+            return false;
+        }
 
         // 当前 app 目录
         string currentAppDir = Path.Combine(root, "app-" + currentTag);
@@ -177,7 +190,11 @@ public static class UpdateService
                     Path.GetFileName(d)["app-".Length..],
                     currentTag,
                     StringComparison.OrdinalIgnoreCase));
-            if (found is null) return false;
+            if (found is null)
+            {
+                _logger?.LogInformation("Delta skipped: current app dir not found for tag {Tag}, falling back to full package", currentTag);
+                return false;
+            }
             currentAppDir = found;
         }
 
