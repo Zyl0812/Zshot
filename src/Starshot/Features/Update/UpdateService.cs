@@ -94,7 +94,7 @@ public static class UpdateService
     }
 
 
-    public static async Task StartUpdateAsync(ReleaseInfo info, IProgress<(int percent, string bytesText)> progress, CancellationToken ct = default)
+    public static async Task StartUpdateAsync(ReleaseInfo info, IProgress<(int percent, string bytesText)> progress, CancellationToken ct = default, bool forceFull = false)
     {
         string root = AppConfig.UserDataFolder;
         string versionIni = Path.Combine(root, "version.ini");
@@ -108,16 +108,19 @@ public static class UpdateService
         try { if (File.Exists(versionIni)) File.Copy(versionIni, versionIniBak, overwrite: true); } catch { }
         try { if (File.Exists(launcherExe)) File.Copy(launcherExe, launcherBak, overwrite: true); } catch { }
 
-        // 尝试差分更新（链式 delta）；失败自动 fallback 整包
+        // 尝试差分更新（链式 delta）；失败自动 fallback 整包。forceFull=true 跳过 delta 直接整包
         bool deltaOK = false;
-        try
+        if (!forceFull)
         {
-            deltaOK = await TryDeltaUpdateAsync(info, root, appNewDir, progress, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
-            deltaOK = false;
+            try
+            {
+                deltaOK = await TryDeltaUpdateAsync(info, root, appNewDir, progress, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
+                deltaOK = false;
+            }
         }
         if (!deltaOK)
         {

@@ -76,7 +76,12 @@ public sealed partial class UpdateWindow : WindowEx
 
 
     [RelayCommand]
-    private async Task UpdateNow()
+    private Task UpdateNow() => RunUpdateAsync(forceFull: false);
+
+    [RelayCommand]
+    private Task UpdateFull() => RunUpdateAsync(forceFull: true);
+
+    private async Task RunUpdateAsync(bool forceFull)
     {
         if (_release is null) return;
         Button_Update.IsEnabled = false;
@@ -106,7 +111,7 @@ public sealed partial class UpdateWindow : WindowEx
         });
         try
         {
-            await UpdateService.StartUpdateAsync(_release, progress, _cts.Token);
+            await UpdateService.StartUpdateAsync(_release, progress, _cts.Token, forceFull: forceFull);
         }
         catch (Exception ex)
         {

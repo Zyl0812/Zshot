@@ -141,14 +141,22 @@
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal"
                         Spacing="24">
-                <Button x:Name="Button_Update"
-                        Height="40"
-                        Padding="24,0,24,0"
-                        BorderThickness="0"
-                        Command="{x:Bind UpdateNowCommand}"
-                        Content="{x:Bind lang:Lang.Starshot_UpdateNow}"
-                        CornerRadius="20"
-                        Style="{ThemeResource AccentButtonStyle}" />
+                <SplitButton x:Name="Button_Update"
+                             Height="40"
+                             Padding="24,0,24,0"
+                             Background="{ThemeResource AccentFillColorDefaultBrush}"
+                             BorderThickness="0"
+                             Command="{x:Bind UpdateNowCommand}"
+                             CornerRadius="20"
+                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}">
+                    <TextBlock Text="{x:Bind lang:Lang.Starshot_UpdateDelta}" />
+                    <SplitButton.Flyout>
+                        <MenuFlyout Placement="Top">
+                            <MenuFlyoutItem Command="{x:Bind UpdateFullCommand}"
+                                            Text="{x:Bind lang:Lang.Starshot_UpdateFull}" />
+                        </MenuFlyout>
+                    </SplitButton.Flyout>
+                </SplitButton>
                 <SplitButton x:Name="Button_Remind"
                              Height="40"
                              BorderThickness="0"
