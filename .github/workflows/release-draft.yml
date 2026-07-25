@@ -118,29 +118,33 @@ jobs:
             exit 0
           }
           Expand-Archive $oldZip -DestinationPath old/ -Force
-          $oldAppDir = "old/app-$oldTag"
-          $newAppDir = "old/app-$newTag"
-          if (Test-Path $oldAppDir) { Move-Item $oldAppDir $newAppDir -Force }
-          $oldRoot = (Resolve-Path "old/").Path
-          $newRoot = (Resolve-Path "build/release/").Path
+          $oldApp = "old/app-$oldTag"
+          $newApp = "build/release/app-$newTag"
+          if (!(Test-Path $oldApp) -or !(Test-Path $newApp)) {
+            Write-Host "App folder not found, skipping delta"
+            exit 0
+          }
+          $oldRoot = (Resolve-Path $oldApp).Path
+          $newRoot = (Resolve-Path $newApp).Path
           $deletedFiles = @()
           $changedFiles = @()
           Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
             $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
-            if (!(Test-Path (Join-Path $newRoot $rel))) { $deletedFiles += $rel }
+            if (!(Test-Path (Join-Path $newRoot $rel))) { $deletedFiles += "app-$newTag/$rel" }
           }
           Get-ChildItem $newRoot -Recurse -File | ForEach-Object {
-            $rel = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
-            $oldFile = Join-Path $oldRoot $rel
+            $relApp = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
+            $oldFile = Join-Path $oldRoot $relApp
             $newHash = (Get-FileHash $_.FullName).Hash
             if (!(Test-Path $oldFile)) {
-              $changedFiles += [PSCustomObject]@{ Path = $rel; FullPath = $_.FullName }
+              $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName }
             } else {
               $oldHash = (Get-FileHash $oldFile).Hash
-              if ($oldHash -ne $newHash) { $changedFiles += [PSCustomObject]@{ Path = $rel; FullPath = $_.FullName } }
+              if ($oldHash -ne $newHash) { $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName } }
             }
           }
-          if ($changedFiles.Count -eq 0 -and $deletedFiles.Count -eq 0) { Write-Host "No changes, skipping delta"; exit 0 }
+          $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
+          $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
           Write-Host "Changed: $($changedFiles.Count), Deleted: $($deletedFiles.Count)"
           $manifest = @{ deletedFiles = $deletedFiles }
           $manifestPath = "build/release/manifest.json"

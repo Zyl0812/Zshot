@@ -105,7 +105,6 @@ jobs:
         run: |
           $newTag = "${{ needs.version.outputs.vl }}"
           $arch = "${{ matrix.platform }}"
-          # 上个 release tag（最新一条 release 的 tag）
           $oldTag = (gh api repos/${{ github.repository }}/releases --jq '.[0].tag_name' 2>$null)
           if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($oldTag) -or $oldTag -eq $newTag) {
             Write-Host "No previous release found (or same tag), skipping delta"
@@ -113,7 +112,6 @@ jobs:
           }
           Write-Host "Generating delta: $oldTag -> $newTag ($arch)"
 
-          # 下载上个 release 整包
           $oldZip = "old-full.zip"
           gh release download $oldTag --pattern "Starshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
           if ($LASTEXITCODE -ne 0 -or !(Test-Path $oldZip)) {
@@ -121,66 +119,57 @@ jobs:
             exit 0
           }
 
-          # 解压上个 release
           Expand-Archive $oldZip -DestinationPath old/ -Force
-          # 对齐 app 目录名：old/app-{oldTag} -> old/app-{newTag}
-          $oldAppDir = "old/app-$oldTag"
-          $newAppDir = "old/app-$newTag"
-          if (Test-Path $oldAppDir) {
-            Move-Item $oldAppDir $newAppDir -Force
-          }
 
-          # 对比 old/ vs build/release/，收集变化 + 删除
-          $oldRoot = (Resolve-Path "old/").Path
-          $newRoot = (Resolve-Path "build/release/").Path
+          # 只对比两个 app 文件夹内容（不管目录名），外层 launcher + version.ini 每次都变直接放 delta
+          $oldApp = "old/app-$oldTag"
+          $newApp = "build/release/app-$newTag"
+          if (!(Test-Path $oldApp) -or !(Test-Path $newApp)) {
+            Write-Host "App folder not found (old: $(Test-Path $oldApp), new: $(Test-Path $newApp)), skipping delta"
+            exit 0
+          }
+          $oldRoot = (Resolve-Path $oldApp).Path
+          $newRoot = (Resolve-Path $newApp).Path
+
           $deletedFiles = @()
           $changedFiles = @()
 
-          # 删除文件（old 有 new 没有）
+          # 删除文件（old app 有 new app 没有，路径相对 app 目录）
           Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
             $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
-            if (!(Test-Path (Join-Path $newRoot $rel))) {
-              $deletedFiles += $rel
-            }
+            if (!(Test-Path (Join-Path $newRoot $rel))) { $deletedFiles += "app-$newTag/$rel" }
           }
 
-          # 变化/新增文件（hash 不同或 new 独有）
+          # 变化/新增文件（hash 不同，路径相对 release 根目录）
           Get-ChildItem $newRoot -Recurse -File | ForEach-Object {
-            $rel = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
-            $oldFile = Join-Path $oldRoot $rel
+            $relApp = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
+            $oldFile = Join-Path $oldRoot $relApp
             $newHash = (Get-FileHash $_.FullName).Hash
             if (!(Test-Path $oldFile)) {
-              $changedFiles += [PSCustomObject]@{ Path = $rel; FullPath = $_.FullName }
+              $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName }
             } else {
               $oldHash = (Get-FileHash $oldFile).Hash
-              if ($oldHash -ne $newHash) {
-                $changedFiles += [PSCustomObject]@{ Path = $rel; FullPath = $_.FullName }
-              }
+              if ($oldHash -ne $newHash) { $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName } }
             }
           }
 
-          if ($changedFiles.Count -eq 0 -and $deletedFiles.Count -eq 0) {
-            Write-Host "No changes detected, skipping delta"
-            exit 0
-          }
+          # launcher + version.ini 每次都变（C++ 构建元数据 + 版本号），无条件放 delta
+          $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
+          $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
 
-          Write-Host "Changed files: $($changedFiles.Count), Deleted files: $($deletedFiles.Count)"
+          Write-Host "Changed: $($changedFiles.Count), Deleted: $($deletedFiles.Count)"
 
-          # 生成 manifest.json
           $manifest = @{ deletedFiles = $deletedFiles }
           $manifestPath = "build/release/manifest.json"
           $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
 
-          # 打包 delta.zip（只含变化文件 + manifest.json，保持 release 相对路径结构）
           $deltaZip = "Starshot-${newTag}-from-${oldTag}-win-${arch}-delta.zip"
           Add-Type -AssemblyName System.IO.Compression
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           if (Test-Path $deltaZip) { Remove-Item $deltaZip }
           $zipArchive = [System.IO.Compression.ZipFile]::Open($deltaZip, 'Create')
           try {
-            # manifest.json
             [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $manifestPath, "manifest.json", [System.IO.Compression.CompressionLevel]::SmallestSize)
-            # 变化文件
             foreach ($f in $changedFiles) {
               [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $f.FullPath, $f.Path, [System.IO.Compression.CompressionLevel]::SmallestSize)
             }
