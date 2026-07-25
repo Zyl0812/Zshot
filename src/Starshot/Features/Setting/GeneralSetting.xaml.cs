@@ -63,16 +63,21 @@ public sealed partial class GeneralSetting : PageBase
     private static int s_extractPercent;
     private static string s_extractStatus = "";
 
+    // 当前活动实例：progress handler 通过它刷新当前页面（切 tab 回来新实例能收到更新）
+    private static GeneralSetting? s_activeInstance;
+
 
     public GeneralSetting()
     {
         InitializeComponent();
+        s_activeInstance = this;
     }
 
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+        s_activeInstance = this;
         RefreshExtractState();
     }
 
@@ -237,7 +242,7 @@ public sealed partial class GeneralSetting : PageBase
         {
             s_extractPercent = p.percent;
             s_extractStatus = $"{p.percent}%  {p.stage}";
-            try { RefreshExtractState(); } catch { }
+            try { s_activeInstance?.RefreshExtractState(); } catch { }
         });
         try
         {
@@ -253,7 +258,7 @@ public sealed partial class GeneralSetting : PageBase
         }
         finally
         {
-            try { RefreshExtractState(); } catch { }
+            try { s_activeInstance?.RefreshExtractState(); } catch { }
         }
     }
 
