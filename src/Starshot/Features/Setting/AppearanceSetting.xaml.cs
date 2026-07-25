@@ -150,9 +150,9 @@ public sealed partial class AppearanceSetting : PageBase
 
     public string WallpaperValue => AppConfig.WallpaperMode switch
     {
-        2 => string.IsNullOrWhiteSpace(AppConfig.WallpaperVideoFile) ? Lang.Starshot_WallpaperNone : AppConfig.WallpaperVideoFile!,
-        3 => string.IsNullOrWhiteSpace(AppConfig.WallpaperFolder) ? Lang.Starshot_WallpaperNone : AppConfig.WallpaperFolder!,
-        _ => string.IsNullOrWhiteSpace(AppConfig.WallpaperFile) ? Lang.Starshot_WallpaperNone : AppConfig.WallpaperFile!,
+        2 => string.IsNullOrWhiteSpace(AppConfig.WallpaperVideoFile) ? Lang.Starshot_PathNone : AppConfig.WallpaperVideoFile!,
+        3 => string.IsNullOrWhiteSpace(AppConfig.WallpaperFolder) ? Lang.Starshot_PathNone : AppConfig.WallpaperFolder!,
+        _ => string.IsNullOrWhiteSpace(AppConfig.WallpaperFile) ? Lang.Starshot_PathNone : AppConfig.WallpaperFile!,
     };
 
 
