@@ -67,7 +67,7 @@ SDR 顯示器上，Starshot 自動走標準 SDR 截圖路徑，是一款通用�
 ## 系統需求
 
 - Windows 10 / 11，首選 Windows 11 以獲得最佳體驗
-- x64 架構
+- x64 / arm64 架構
 - **HDR 截圖功能需要 HDR 顯示器**（SDR 顯示器上自動走 SDR 路徑）
 
 ## 下載
@@ -245,6 +245,7 @@ HDR 截圖可同時儲存一份 Ultra HDR JPEG（SDR 基圖 + HDR gain map），
 
 - 啟動時節流檢查（≥24h + 開關開啟）GitHub Releases 最新版，或 About 頁手動檢查
 - **差分優先**：優先用鏈式差分包（只含變更檔案，數 MB 相比整包 80MB）；從當前版本逐層向上匹配，最多 5 層（設定 → 進階可調）；跨版本太多或匹配不到則自動回退整包
+- **手動全量**：更新視窗主按鈕下拉可選「全量更新」，跳過差分直接下整包
 - 整包與差分包皆用 SharpCompress 真流式解壓（網路流直連，不落 zip），逐 entry 直接寫到根目錄
 - 失敗還原，成功重啟啟動器帶 `--clean` 清舊
 - 僅 CI/CD release 檢查（讀 `version.ini` 版本號）；本機建構（無 `version.ini`，`AppVersion = Local`）按 0.0.0 處理，可更新到任意 CI/CD release

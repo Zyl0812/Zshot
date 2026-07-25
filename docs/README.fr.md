@@ -67,7 +67,7 @@ Sur un écran SDR, Starshot emprunte automatiquement le chemin de capture SDR st
 ## Configuration requise
 
 - Windows 10 / 11, Windows 11 recommandé pour une expérience optimale
-- Architecture x64
+- Architecture x64 / arm64
 - **Un écran HDR est requis pour la capture HDR** (bascule automatiquement en mode SDR sur les écrans SDR)
 
 ## Téléchargement
@@ -245,6 +245,7 @@ Affiche le logo + le slogan au lancement. Délai de 700ms puis fondu en 400ms. S
 
 - Vérification limitée au démarrage (≥24h + option activée) de la dernière version sur GitHub Releases, ou vérification manuelle depuis la page À propos
 - Les mises à jour privilégient les paquets delta chaînés (uniquement les fichiers modifiés, quelques Mo contre ~80 Mo pour le paquet complet) ; correspondance couche par couche depuis la version actuelle vers le haut, jusqu'à 5 couches (réglable dans Paramètres → Avancé) ; repli vers le paquet complet si trop de versions de retard ou aucune correspondance trouvée
+- **Mise à jour complète manuelle** : Le menu déroulant du bouton principal de la fenêtre de mise à jour permet de choisir « Mise à jour complète » pour ignorer delta et télécharger le paquet complet directement.
 - Les paquets complet et delta utilisent tous deux la décompression en streaming véritable de SharpCompress (flux réseau directement connecté, sans sauvegarde du zip sur disque), écrivant chaque entrée directement dans le répertoire racine. En cas d'échec, l'état précédent est restauré. En cas de succès, le lanceur redémarre avec `--clean` pour nettoyer les anciennes versions
 - Vérifie uniquement les releases CI/CD (lit le numéro de version dans `version.ini`). Les builds locaux (sans `version.ini`, `AppVersion = Local`) sont traités comme 0.0.0 et peuvent se mettre à jour vers n'importe quel release CI/CD
 - Convention de casse de version : le tag GitHub, le nom du zip et le répertoire `app-{version}/` sont en minuscules (ex. `0.3.1-preview`) ; `version.ini` conserve la casse d'origine (`0.3.1-Preview`, affiché dans À propos), et le lanceur le passe en minuscules pour localiser le répertoire.

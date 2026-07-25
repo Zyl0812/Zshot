@@ -67,7 +67,7 @@ En pantallas SDR, Starshot usa automáticamente la ruta de captura SDR estándar
 ## Requisitos del sistema
 
 - Windows 10 / 11; se recomienda Windows 11 para la mejor experiencia
-- Arquitectura x64
+- Arquitectura x64 / arm64
 - **Se requiere una pantalla HDR para la captura HDR** (en pantallas SDR se usa automáticamente la ruta SDR)
 
 ## Descarga
@@ -245,6 +245,7 @@ Muestra el logo + eslogan al iniciar. Retraso de 700 ms y luego se desvanece en 
 
 - Verificación limitada al inicio (≥24h + interruptor activado) de la última versión en GitHub Releases, o verificación manual desde la página Acerca de
 - Las actualizaciones priorizan paquetes delta encadenados (solo los archivos cambiados, unos pocos MB frente a ~80MB del paquete completo); empareja capa por capa desde la versión actual hacia arriba, hasta 5 capas (ajustable en Configuración → Avanzado); si hay demasiadas versiones de diferencia o no encuentra coincidencia, recurre al paquete completo
+- **Actualización completa manual**: El menú desplegable del botón principal de la ventana de actualización permite elegir «Actualización completa» para omitir delta y descargar el paquete completo directamente.
 - Tanto el paquete completo como los delta usan descompresión por streaming real de SharpCompress (flujo de red directo, sin guardar zip en disco); cada entrada se escribe directamente en el directorio raíz. En caso de error, se restaura el estado anterior. En caso de éxito, reinicia el lanzador con `--clean` para limpiar versiones antiguas
 - Solo verifica releases CI/CD (lee el número de versión de `version.ini`). Las compilaciones locales (sin `version.ini`, `AppVersion = Local`) se tratan como 0.0.0, por lo que pueden actualizarse a cualquier release CI/CD
 - Convención de mayúsculas/minúsculas de versión: el tag de GitHub, el nombre del zip y el directorio `app-{version}/` van en minúsculas (p. ej. `0.3.1-preview`); `version.ini` mantiene el uso original de mayúsculas (`0.3.1-Preview`, se muestra en Acerca de), y el lanzador lo convierte a minúsculas al localizar el directorio.
