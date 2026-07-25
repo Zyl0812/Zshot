@@ -377,7 +377,7 @@ public static partial class AppConfig
     /// </summary>
     public static string ScreenshotFileNamePattern
     {
-        get => GetValue("{process}_{time}");
+        get => GetValue("{title}_{process}_{width}x{height}_{timestamp}");
         set => SetValue(value);
     }
 
@@ -387,7 +387,7 @@ public static partial class AppConfig
     /// </summary>
     public static string RegionScreenshotFileNamePattern
     {
-        get => GetValue("{process}_region_{time}");
+        get => GetValue("{title}_region_{width}x{height}_{timestamp}");
         set => SetValue(value);
     }
 
