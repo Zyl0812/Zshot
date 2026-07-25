@@ -6,6 +6,7 @@ using Starshot.Features.Codec;
 using Starshot.Features.Update;
 using Starshot.Frameworks;
 using Starshot.Helpers;
+using Starshot.Language;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -20,21 +21,39 @@ public sealed partial class GeneralSetting : PageBase
 
     private readonly ILogger<GeneralSetting> _logger = AppConfig.GetLogger<GeneralSetting>();
 
-    // 调试目标路径进程级保存：切走设置页再回来不丢
-    private static string? s_debugDest;
-
     public string? DebugDest
     {
-        get => s_debugDest;
+        get => AppConfig.GetValue<string?>();
         set
         {
-            s_debugDest = value;
+            AppConfig.SetValue(value);
             OnPropertyChanged(nameof(DebugDest));
             OnPropertyChanged(nameof(DebugDestDisplay));
         }
     }
 
-    public string DebugDestDisplay => string.IsNullOrWhiteSpace(DebugDest) ? "（未选择）" : DebugDest!;
+    public string DebugDestDisplay
+    {
+        get
+        {
+            string? dest = DebugDest;
+            return string.IsNullOrWhiteSpace(dest) ? Lang.Starshot_PathNone : dest!;
+        }
+    }
+
+
+    // 禁用证书校验：调试流式解压用（自签测试服务器），进程级不写 DB
+    private static bool s_disableCert;
+
+    public bool DisableCert
+    {
+        get => s_disableCert;
+        set
+        {
+            s_disableCert = value;
+            OnPropertyChanged(nameof(DisableCert));
+        }
+    }
 
 
     // 解压状态进程级：切走设置页再回来恢复（后台任务继续跑）
@@ -222,7 +241,7 @@ public sealed partial class GeneralSetting : PageBase
         });
         try
         {
-            await UpdateService.ExtractToDirectoryAsync(url, dest, progress);
+            await UpdateService.ExtractToDirectoryAsync(url, dest, progress, disableCert: DisableCert);
             s_extractState = ExtractState.Completed;
             s_extractPercent = 100;
             s_extractStatus = "完成！";

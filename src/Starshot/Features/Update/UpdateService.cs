@@ -41,13 +41,18 @@ public static class UpdateService
     /// 真流式解压：网络流直连 SharpCompress Reader，逐 entry 写到 destDir。不落 zip、不依赖中央目录。
     /// 进度按网络已读字节 / Content-Length 计算（流式下载解压一体）。
     /// </summary>
-    public static async Task ExtractToDirectoryAsync(string zipUrl, string destDir, IProgress<(int percent, string bytesText)>? progress, CancellationToken ct = default)
+    public static async Task ExtractToDirectoryAsync(string zipUrl, string destDir, IProgress<(int percent, string bytesText)>? progress, CancellationToken ct = default, bool disableCert = false)
     {
         string destFull = Path.GetFullPath(destDir).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
         progress?.Report((0, ""));
 
-        using var http = new HttpClient();
+        var handler = new HttpClientHandler();
+        if (disableCert)
+        {
+            handler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
+        }
+        using var http = new HttpClient(handler);
         http.DefaultRequestHeaders.UserAgent.ParseAdd("Starshot");
         // ResponseHeadersRead：只读响应头，拿 Content-Length 后直接拿流（不缓冲整个响应体）
         using var resp = await http.GetAsync(zipUrl, HttpCompletionOption.ResponseHeadersRead, ct);
