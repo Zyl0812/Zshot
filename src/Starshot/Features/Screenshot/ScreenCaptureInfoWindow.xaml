@@ -13,7 +13,7 @@
 
     <Grid x:Name="RootGrid"
           Padding="10"
-          Background="#D0202020"
+          Background="{ThemeResource SmokeFillColorDefaultBrush}"
           ColumnSpacing="16"
           CornerRadius="8,0,0,8"
           Translation="320,0,0">
