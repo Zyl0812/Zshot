@@ -119,9 +119,9 @@ public static class ReleaseClient
     }
 
 
-    // delta asset 名格式：Starshot-{toTag}-from-{fromTag}-win-{arch}-delta.zip
+    // diff asset 名格式：diff-{toTag}-from-{fromTag}-win-{arch}.zip
     private static readonly Regex DeltaAssetPattern = new(
-        @"^Starshot-(.+)-from-(.+)-win-(.+)-delta\.zip$",
+        @"^diff-(.+)-from-(.+)-win-(.+)\.zip$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 

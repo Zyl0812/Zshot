@@ -163,7 +163,7 @@ jobs:
           $manifestPath = "build/release/manifest.json"
           $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
 
-          $deltaZip = "Starshot-${newTag}-from-${oldTag}-win-${arch}-delta.zip"
+          $deltaZip = "diff-${newTag}-from-${oldTag}-win-${arch}.zip"
           Add-Type -AssemblyName System.IO.Compression
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           if (Test-Path $deltaZip) { Remove-Item $deltaZip }
@@ -193,7 +193,7 @@ jobs:
           name: Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}
           path: |
             Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}.zip
-            Starshot-${{ needs.version.outputs.vl }}-from-*-win-${{ matrix.platform }}-delta.zip
+            diff-*-win-${{ matrix.platform }}.zip
 
 
   release:
@@ -221,7 +221,7 @@ jobs:
           files: |
             x64/Starshot-${{ needs.version.outputs.vl }}-win-x64.zip
             arm64/Starshot-${{ needs.version.outputs.vl }}-win-arm64.zip
-            x64/Starshot-${{ needs.version.outputs.vl }}-from-*-win-x64-delta.zip
-            arm64/Starshot-${{ needs.version.outputs.vl }}-from-*-win-arm64-delta.zip
+            x64/diff-*-win-x64.zip
+            arm64/diff-*-win-arm64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
