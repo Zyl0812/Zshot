@@ -94,7 +94,9 @@ public sealed partial class UpdateWindow : WindowEx
             if (sep > 0 && p.bytesText.Contains('/'))
             {
                 ProgressPercentText = p.bytesText[..sep];
-                ProgressBytesText = p.bytesText[(sep + 2)..];
+                var size = p.bytesText[(sep + 2)..];
+                // 层切换过渡帧（空大小）：保留上一层最后的大小直到本层数据到达，避免"消失再出现"的空档
+                if (size.Length > 0) ProgressBytesText = size;
             }
             else
             {
