@@ -78,7 +78,7 @@ internal partial class ScreenCaptureHelper
         using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeoutCts.CancelAfter(TimeSpan.FromSeconds(10));
         timeoutCts.Token.Register(() => completionSource.TrySetException(new TimeoutException("Screen capture timed out after 10 seconds")));
-        framePool.FrameArrived += (s, _) =>
+        Windows.Foundation.TypedEventHandler<Direct3D11CaptureFramePool, object> frameArrived = (s, _) =>
         {
             if (s.TryGetNextFrame() is Direct3D11CaptureFrame frame)
             {
@@ -86,8 +86,18 @@ internal partial class ScreenCaptureHelper
                 completionSource.TrySetResult(frame);
             }
         };
+        framePool.FrameArrived += frameArrived;
         session.StartCapture();
-        return await completionSource.Task.ConfigureAwait(false);
+        try
+        {
+            return await completionSource.Task.ConfigureAwait(false);
+        }
+        finally
+        {
+            // 显式取消订阅：匿名 lambda 每次是新委托实例，-= 减不掉。具名后才能正确解除，
+            // 否则 FrameArrived 闭包（持有 session/completionSource）钉住整组截图对象不释放。
+            framePool.FrameArrived -= frameArrived;
+        }
     }
 
 
