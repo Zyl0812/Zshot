@@ -313,8 +313,8 @@ public sealed partial class RegionCaptureWindow : WindowEx
             // hover rect 可能含标题栏/阴影（位置负，超画布），只挖与画布的交集，避免 sourceRect 越出 bitmap 边界被拉伸
             double cx = Math.Max(rect.X, 0);
             double cy = Math.Max(rect.Y, 0);
-            double cw = Math.Min(rect.X + rect.Width, _lockedW) - cx;
-            double ch = Math.Min(rect.Y + rect.Height, _lockedH) - cy;
+            double cw = Math.Max(0, Math.Min(rect.X + rect.Width, _lockedW) - cx);
+            double ch = Math.Max(0, Math.Min(rect.Y + rect.Height, _lockedH) - cy);
             var clip = new Rect(cx, cy, cw, ch);
             if (clip.Width > 0 && clip.Height > 0)
             {
