@@ -144,11 +144,25 @@
                 <SplitButton x:Name="Button_Update"
                              Height="40"
                              Padding="24,0,24,0"
-                             Background="{ThemeResource AccentFillColorDefaultBrush}"
                              BorderThickness="0"
                              Command="{x:Bind UpdateNowCommand}"
-                             CornerRadius="20"
-                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}">
+                             CornerRadius="20">
+                    <SplitButton.Resources>
+                        <ResourceDictionary>
+                            <StaticResource x:Key="SplitButtonBackground" ResourceKey="AccentFillColorDefaultBrush" />
+                            <StaticResource x:Key="SplitButtonBackgroundPointerOver" ResourceKey="AccentFillColorSecondary" />
+                            <StaticResource x:Key="SplitButtonBackgroundPressed" ResourceKey="AccentFillColorTertiary" />
+                            <StaticResource x:Key="SplitButtonForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                            <StaticResource x:Key="SplitButtonForegroundPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                            <StaticResource x:Key="SplitButtonForegroundPressed" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                            <StaticResource x:Key="SplitButtonSecondaryBackground" ResourceKey="AccentFillColorDefaultBrush" />
+                            <StaticResource x:Key="SplitButtonSecondaryBackgroundPointerOver" ResourceKey="AccentFillColorSecondary" />
+                            <StaticResource x:Key="SplitButtonSecondaryBackgroundPressed" ResourceKey="AccentFillColorTertiary" />
+                            <StaticResource x:Key="SplitButtonSecondaryForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                            <StaticResource x:Key="SplitButtonSecondaryForegroundPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                            <StaticResource x:Key="SplitButtonSecondaryForegroundPressed" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+                        </ResourceDictionary>
+                    </SplitButton.Resources>
                     <TextBlock Text="{x:Bind lang:Lang.Starshot_UpdateDelta}" />
                     <SplitButton.Flyout>
                         <MenuFlyout Placement="Top">
