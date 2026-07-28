@@ -206,7 +206,7 @@ internal class ScreenCaptureService
 
             // 并行捕获所有显示器（同时启动所有 GraphicsCaptureSession，等全部帧到达）
             var device = CanvasDevice.GetSharedDevice();
-            var captureTasks = new Task<(int ox, int oy, CanvasBitmap bmp, bool isHDR)>[displays.Count];
+            var captureTasks = new Task<(int ox, int oy, CanvasBitmap bmp, bool isHDR, Direct3D11CaptureFrame frame)>[displays.Count];
             for (int i = 0; i < displays.Count; i++)
             {
                 var d = displays[i];
@@ -216,9 +216,11 @@ internal class ScreenCaptureService
                 bool isHDR = isHdrDisplay[i];
                 captureTasks[i] = Task.Run(async () =>
                 {
-                    using var frame = await ScreenCaptureHelper.CaptureMonitorAsync((nint)d.DisplayId.Value, pixelFormat);
+                    // frame 不 using：CreateFromDirect3D11Surface 包同一块 D3D 纹理（非深拷贝），
+                    // frame 提前 Dispose 会让 bmp 持有的 surface 引用计数不清零。frame 延迟到 bmp Dispose 后释放。
+                    var frame = await ScreenCaptureHelper.CaptureMonitorAsync((nint)d.DisplayId.Value, pixelFormat);
                     var bmp = CanvasBitmap.CreateFromDirect3D11Surface(device, frame.Surface, 96);
-                    return (ox, oy, bmp, isHDR);
+                    return (ox, oy, bmp, isHDR, frame);
                 });
             }
             var results = await Task.WhenAll(captureTasks);
@@ -248,6 +250,7 @@ internal class ScreenCaptureService
                     }
                 }
                 r.bmp.Dispose();
+                r.frame.Dispose();
             }
 
             // DPI scale
