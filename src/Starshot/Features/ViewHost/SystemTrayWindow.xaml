@@ -51,6 +51,7 @@
                     <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Starshot_HotkeyRegionCopy}" />
                 </StackPanel>
             </Button>
+            <MenuFlyoutSeparator />
             <Button Height="36"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Left"
