@@ -166,6 +166,30 @@ public sealed partial class SystemTrayWindow : WindowEx
     }
 
 
+    [RelayCommand]
+    private void Capture()
+    {
+        Hide();
+        ScreenCaptureService.Capture();
+    }
+
+
+    [RelayCommand]
+    private void CaptureRegion()
+    {
+        Hide();
+        ScreenCaptureService.CaptureRegion();
+    }
+
+
+    [RelayCommand]
+    private void CaptureRegionCopy()
+    {
+        Hide();
+        ScreenCaptureService.CaptureRegionCopyOnly();
+    }
+
+
     private void WindowEx_Closed(object sender, WindowEventArgs args)
     {
         trayIcon?.Dispose();

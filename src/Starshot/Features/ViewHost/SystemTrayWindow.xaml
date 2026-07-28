@@ -24,6 +24,36 @@
             <Button Height="36"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Left"
+                    Command="{x:Bind CaptureCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="&#xE722;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Starshot_HotkeyScreenshot}" />
+                </StackPanel>
+            </Button>
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind CaptureRegionCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="&#xE8A9;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Starshot_HotkeyRegion}" />
+                </StackPanel>
+            </Button>
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind CaptureRegionCopyCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="&#xE8C8;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Starshot_HotkeyRegionCopy}" />
+                </StackPanel>
+            </Button>
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
                     Command="{x:Bind ShowMainWindowCommand}"
                     Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
                 <StackPanel Orientation="Horizontal" Spacing="12">
