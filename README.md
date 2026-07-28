@@ -6,7 +6,7 @@
 
 **Next-generation Windows-native HDR Screenshot Tool**
 
-16bit full-pipeline capture · Region screenshot · AVIF / JPEG XL encoding · Color management
+Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL Encoding · Color Management
 
 [![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
