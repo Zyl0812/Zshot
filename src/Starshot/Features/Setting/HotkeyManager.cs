@@ -20,8 +20,12 @@ internal static class HotkeyManager
 
 
 
+    private static nint _registeredHwnd;
+
+
     public static void InitializeHotkey(nint hwnd)
     {
+        _registeredHwnd = hwnd;
         try
         {
             foreach (var item in new HotkeyInfo[] { ScreenshotCapture, RegionCapture, RegionCopyOnly })
@@ -100,7 +104,7 @@ internal static class HotkeyManager
             {
                 return Win32Error.ERROR_SUCCESS;
             }
-            User32.RegisterHotKey(hwnd, id, modifiers | User32.HotKeyModifiers.MOD_NOREPEAT, (uint)key);
+            User32.RegisterHotKey(_registeredHwnd, id, modifiers | User32.HotKeyModifiers.MOD_NOREPEAT, (uint)key);
             Win32Error error = Kernel32.GetLastError();
             if (error.Succeeded && (info.Modifiers != modifiers || info.Key != key))
             {
@@ -121,7 +125,7 @@ internal static class HotkeyManager
 
     public static Win32Error UnregisterHotkey(nint hwnd, int id)
     {
-        User32.UnregisterHotKey(hwnd, id);
+        User32.UnregisterHotKey(_registeredHwnd, id);
         Win32Error error = Kernel32.GetLastError();
         if (GetHotkeyInfo(id) is HotkeyInfo info)
         {
@@ -134,7 +138,7 @@ internal static class HotkeyManager
 
     public static Win32Error DeleteHotkey(nint hwnd, int id)
     {
-        User32.UnregisterHotKey(hwnd, id);
+        User32.UnregisterHotKey(_registeredHwnd, id);
         Win32Error error = Kernel32.GetLastError();
         if (GetHotkeyInfo(id) is HotkeyInfo info)
         {
