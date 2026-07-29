@@ -622,6 +622,9 @@
   <data name="Starshot_AutoStartMinimized" xml:space="preserve">
     <value>启动时最小化到托盘</value>
   </data>
+  <data name="Starshot_AboutLicense" xml:space="preserve">
+    <value>MIT 许可证</value>
+  </data>
   <data name="Starshot_AboutDesc" xml:space="preserve">
     <value>Starshot 直接从 DXGI 层获取显示器输出的原始 R16G16B16A16Float scRGB 帧缓冲，完整保留 HDR 亮度信息（可达数千 nit），编码为 16bit HDR AVIF 或 JPEG XL，色彩空间写入 BT2020 + PQ 传输函数元数据。同时提供 SDR 显示器自动降级、区域截图、多格式批量转换等通用截图工具应有的功能。</value>
   </data>

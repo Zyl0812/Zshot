@@ -898,6 +898,15 @@
         }
         
         /// <summary>
+        ///   查找类似 MIT License 的本地化字符串。
+        /// </summary>
+        public static string Starshot_AboutLicense {
+            get {
+                return ResourceManager.GetString("Starshot_AboutLicense", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   查找类似 Starshot pulls the raw R16G16B16A16Float scRGB frame buffer straight from the DXGI layer, fully preserving HDR luminance (up to thousands of nits), and encodes it as 16bit HDR AVIF or JPEG XL with BT2020 + PQ transfer-function metadata written into the color space. It also ships the features a general screenshot tool should have: automatic fallback on SDR displays, region capture, and multi-format batch conversion. 的本地化字符串。
         /// </summary>
         public static string Starshot_AboutDesc {

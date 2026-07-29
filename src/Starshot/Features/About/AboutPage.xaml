@@ -14,10 +14,24 @@
                     Spacing="20">
 
             <Grid Margin="0,0,0,0">
-                <TextBlock VerticalAlignment="Center"
-                           FontSize="32"
-                           FontWeight="Bold"
-                           Text="{x:Bind lang:Lang.Starshot_Nav_About}" />
+                <StackPanel VerticalAlignment="Center"
+                            Margin="0,10,0,0"
+                            Spacing="2">
+                    <TextBlock FontSize="32"
+                               FontWeight="Bold"
+                               Text="{x:Bind lang:Lang.Starshot_Nav_About}" />
+                    <TextBlock FontSize="12"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}">
+                        <Run Text="Copyright © 2026 " />
+                        <Hyperlink NavigateUri="https://gravatar.com/loliri1124" UnderlineStyle="None">
+                            <Run FontWeight="SemiBold"
+                                 Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                 Text="loliri" />
+                        </Hyperlink>
+                        <Run Text=" · " />
+                        <Run Text="{x:Bind lang:Lang.Starshot_AboutLicense}" />
+                    </TextBlock>
+                </StackPanel>
                 <Image Width="80"
                        Height="80"
                        HorizontalAlignment="Right"

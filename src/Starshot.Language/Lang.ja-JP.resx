@@ -622,6 +622,9 @@
   <data name="Starshot_AutoStartMinimized" xml:space="preserve">
     <value>トレイに最小化して起動</value>
   </data>
+  <data name="Starshot_AboutLicense" xml:space="preserve">
+    <value>MIT ライセンス</value>
+  </data>
   <data name="Starshot_AboutDesc" xml:space="preserve">
     <value>DXGIレイヤーからディスプレイ出力のR16G16B16A16Float scRGBフレームバッファを直接取得し、HDR輝度情報（数千nitまで）を完全に保持。16bit HDR AVIFまたはJPEG XLとしてBT2020+PQ伝達関数付きでエンコード。SDRディスプレイ自動フォールバック、領域キャプチャ、マルチフォーマット一括変換も搭載。</value>
   </data>

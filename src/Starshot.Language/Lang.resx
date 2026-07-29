@@ -622,6 +622,9 @@
   <data name="Starshot_AutoStartMinimized" xml:space="preserve">
     <value>Start Minimized to Tray</value>
   </data>
+  <data name="Starshot_AboutLicense" xml:space="preserve">
+    <value>MIT License</value>
+  </data>
   <data name="Starshot_AboutDesc" xml:space="preserve">
     <value>Starshot pulls the raw R16G16B16A16Float scRGB frame buffer straight from the DXGI layer, fully preserving HDR luminance (up to thousands of nits), and encodes it as 16bit HDR AVIF or JPEG XL with BT2020 + PQ transfer-function metadata written into the color space. It also ships the features a general screenshot tool should have: automatic fallback on SDR displays, region capture, and multi-format batch conversion.</value>
   </data>
