@@ -30,6 +30,7 @@ public sealed partial class UpdateWindow : WindowEx
     public string ProgressPercentText { get; set => SetProperty(ref field, value); } = "";
     public double ProgressValue { get; set => SetProperty(ref field, value); }
     public Visibility IsProgressVisible { get; set => SetProperty(ref field, value); } = Visibility.Collapsed;
+    public bool IsVerifying { get; set => SetProperty(ref field, value); }
     public string ErrorMessage { get; set => SetProperty(ref field, value); } = "";
     public Visibility HasError { get; set => SetProperty(ref field, value); } = Visibility.Collapsed;
 
@@ -93,6 +94,15 @@ public sealed partial class UpdateWindow : WindowEx
         _cts = new CancellationTokenSource();
         var progress = new Progress<(int percent, string bytesText)>(p =>
         {
+            // 哨兵：percent < 0 = 完整性校验阶段（非线性，进度条切 indeterminate + 校验文案）
+            if (p.percent < 0)
+            {
+                IsVerifying = true;
+                ProgressPercentText = Lang.Starshot_UpdateVerifying;
+                ProgressBytesText = "";
+                return;
+            }
+            IsVerifying = false;
             ProgressValue = p.percent;
             // 多层 delta：bytesText 格式 "1/3  2MB / 5MB"，百分比位置显示层号
             var sep = p.bytesText.IndexOf("  ");

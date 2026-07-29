@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -212,6 +213,9 @@ public static class UpdateService
         // 用 CopyEachFile 而非 Directory.Copy（后者在 .NET 不存在；用递归）
         CopyDirectory(currentAppDir, appNewDir);
 
+        // 最后一层 manifest.files 是目标版本全量清单，循环结束后据此校验完整性
+        Dictionary<string, string>? targetFiles = null;
+
         // 2. 依次应用 delta 链
         for (int i = 0; i < chain.Count; i++)
         {
@@ -256,6 +260,8 @@ public static class UpdateService
                         catch { /* 删除失败不致命 */ }
                     }
                 }
+                // 最后一层：保留目标版本全量文件清单，供循环结束后校验
+                if (i == chain.Count - 1) targetFiles = manifest?.Files;
                 // 清理 manifest.json
                 try { File.Delete(manifestPath); } catch { }
             }
@@ -274,6 +280,30 @@ public static class UpdateService
                     _logger?.LogWarning("Delta result version mismatch: expected {Expected}, got {Actual}", info.TagName, ver);
                     return false;
                 }
+            }
+        }
+
+        // 全量 SHA256 校验：用最后一层 manifest 的目标版本文件清单逐文件比对
+        if (targetFiles is not null && targetFiles.Count > 0)
+        {
+            progress.Report((-1, "")); // 哨兵：UpdateWindow 切 indeterminate + 校验文案
+            bool integrityOk = await Task.Run(() =>
+            {
+                using var sha = SHA256.Create();
+                foreach (var kv in targetFiles)
+                {
+                    string abs = Path.Combine(appNewDir, kv.Key.Replace('/', Path.DirectorySeparatorChar));
+                    if (!File.Exists(abs)) return false;
+                    using var fs = File.OpenRead(abs);
+                    string hash = Convert.ToHexString(sha.ComputeHash(fs));
+                    if (!hash.Equals(kv.Value, StringComparison.OrdinalIgnoreCase)) return false;
+                }
+                return true;
+            });
+            if (!integrityOk)
+            {
+                _logger?.LogWarning("Delta integrity check failed (hash mismatch), falling back to full package");
+                return false;
             }
         }
 
@@ -303,6 +333,9 @@ public static class UpdateService
     {
         [JsonPropertyName("deletedFiles")]
         public List<string>? DeletedFiles { get; set; }
+
+        [JsonPropertyName("files")]
+        public Dictionary<string, string>? Files { get; set; }
     }
 
 

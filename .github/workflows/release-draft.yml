@@ -128,6 +128,7 @@ jobs:
           $newRoot = (Resolve-Path $newApp).Path
           $deletedFiles = @()
           $changedFiles = @()
+          $filesMap = @{}
           Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
             $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
             if (!(Test-Path (Join-Path $newRoot $rel))) { $deletedFiles += "app-$newTag/$rel" }
@@ -136,6 +137,7 @@ jobs:
             $relApp = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
             $oldFile = Join-Path $oldRoot $relApp
             $newHash = (Get-FileHash $_.FullName).Hash
+            $filesMap[$relApp] = $newHash
             if (!(Test-Path $oldFile)) {
               $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName }
             } else {
@@ -146,7 +148,9 @@ jobs:
           $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
           $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
           Write-Host "Changed: $($changedFiles.Count), Deleted: $($deletedFiles.Count)"
-          $manifest = @{ deletedFiles = $deletedFiles }
+          $filesSorted = [ordered]@{}
+          foreach ($k in ($filesMap.Keys | Sort-Object)) { $filesSorted[$k] = $filesMap[$k] }
+          $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object); files = $filesSorted }
           $manifestPath = "build/release/manifest.json"
           $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
           $deltaZip = "diff-${newTag}-from-${oldTag}-win-${arch}.zip"

@@ -123,6 +123,7 @@
                            Text="{x:Bind ProgressPercentText}"
                            Visibility="{x:Bind IsProgressVisible}" />
                 <ProgressBar Grid.Row="1"
+                             IsIndeterminate="{x:Bind IsVerifying}"
                              Value="{x:Bind ProgressValue}"
                              Visibility="{x:Bind IsProgressVisible}" />
                 <TextBlock Grid.Row="2"

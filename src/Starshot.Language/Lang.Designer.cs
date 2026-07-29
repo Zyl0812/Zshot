@@ -1688,6 +1688,15 @@
                 return ResourceManager.GetString("Starshot_UpdateFull", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   查找类似 Verifying integrity… 的本地化字符串。
+        /// </summary>
+        public static string Starshot_UpdateVerifying {
+            get {
+                return ResourceManager.GetString("Starshot_UpdateVerifying", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   查找类似 Links 的本地化字符串。

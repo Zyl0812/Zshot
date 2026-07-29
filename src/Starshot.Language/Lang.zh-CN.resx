@@ -676,6 +676,9 @@
   <data name="Starshot_UpdateFull" xml:space="preserve">
     <value>全量更新</value>
   </data>
+  <data name="Starshot_UpdateVerifying" xml:space="preserve">
+    <value>正在校验完整性…</value>
+  </data>
   <data name="Starshot_UpdateArchitecture" xml:space="preserve">
     <value>架构</value>
   </data>

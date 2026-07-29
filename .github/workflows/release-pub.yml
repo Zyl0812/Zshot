@@ -133,6 +133,7 @@ jobs:
 
           $deletedFiles = @()
           $changedFiles = @()
+          $filesMap = @{}
 
           # 删除文件（old app 有 new app 没有，路径相对 app 目录）
           Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
@@ -145,6 +146,7 @@ jobs:
             $relApp = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
             $oldFile = Join-Path $oldRoot $relApp
             $newHash = (Get-FileHash $_.FullName).Hash
+            $filesMap[$relApp] = $newHash
             if (!(Test-Path $oldFile)) {
               $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName }
             } else {
@@ -159,7 +161,9 @@ jobs:
 
           Write-Host "Changed: $($changedFiles.Count), Deleted: $($deletedFiles.Count)"
 
-          $manifest = @{ deletedFiles = $deletedFiles }
+          $filesSorted = [ordered]@{}
+          foreach ($k in ($filesMap.Keys | Sort-Object)) { $filesSorted[$k] = $filesMap[$k] }
+          $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object); files = $filesSorted }
           $manifestPath = "build/release/manifest.json"
           $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
 
