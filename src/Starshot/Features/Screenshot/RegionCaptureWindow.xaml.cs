@@ -36,7 +36,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private readonly CanvasBitmap _canvasOriginal;   // 原始帧（裁剪用，可能 HDR）
     private readonly CanvasBitmap _displayBitmap;     // 显示用（SDR 色调映射后）
-    private readonly float _scale;
+    private float _scale;
     private readonly int _vx, _vy;  // 虚拟屏幕物理坐标原点（放大镜钳制到当前显示器用）
 
     private Point _positionOnClick;
@@ -114,8 +114,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
         }
 
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Cross);
-
-        _ = Task.Run(DetectWindows);
     }
 
 
@@ -272,12 +270,14 @@ public sealed partial class RegionCaptureWindow : WindowEx
         _dashOffset = (float)_timer.Elapsed.TotalSeconds * -15;
         var ds = args.DrawingSession;
 
-        // 首帧锁定画布尺寸
+        // 首帧锁定画布尺寸 + 用 CanvasControl 实际 DPI 覆盖 _scale（前台窗口 DPI 在混合 DPI 下可能不同）
         if (!_sizeLocked)
         {
+            _scale = sender.Dpi / 96f;
             _lockedW = (float)sender.Size.Width;
             _lockedH = (float)sender.Size.Height;
             _sizeLocked = true;
+            _ = Task.Run(DetectWindows);
         }
 
         float physW = (float)_displayBitmap.SizeInPixels.Width;
