@@ -904,14 +904,7 @@ public class ImageConvertItem : ObservableObject
         FileInfo fileInfo = new FileInfo(filePath);
         SourceFileSize = fileInfo.Length;
         SourceFileSizeText = $"{SourceFileSize / 1024:N0} KB";
-        if (ScreenshotItem.TryParseCreationTime(SourceFileName, out DateTime time))
-        {
-            SourceFileTime = new DateTimeOffset(time);
-        }
-        else
-        {
-            SourceFileTime = fileInfo.CreationTime;
-        }
+        SourceFileTime = fileInfo.CreationTime;
     }
 
 }
