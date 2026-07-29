@@ -150,14 +150,14 @@
                     <SplitButton.Resources>
                         <ResourceDictionary>
                             <StaticResource x:Key="SplitButtonBackground" ResourceKey="AccentFillColorDefaultBrush" />
-                            <StaticResource x:Key="SplitButtonBackgroundPointerOver" ResourceKey="AccentFillColorSecondary" />
-                            <StaticResource x:Key="SplitButtonBackgroundPressed" ResourceKey="AccentFillColorTertiary" />
+                            <StaticResource x:Key="SplitButtonBackgroundPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+                            <StaticResource x:Key="SplitButtonBackgroundPressed" ResourceKey="AccentFillColorTertiaryBrush" />
                             <StaticResource x:Key="SplitButtonForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
                             <StaticResource x:Key="SplitButtonForegroundPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
                             <StaticResource x:Key="SplitButtonForegroundPressed" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
                             <StaticResource x:Key="SplitButtonSecondaryBackground" ResourceKey="AccentFillColorDefaultBrush" />
-                            <StaticResource x:Key="SplitButtonSecondaryBackgroundPointerOver" ResourceKey="AccentFillColorSecondary" />
-                            <StaticResource x:Key="SplitButtonSecondaryBackgroundPressed" ResourceKey="AccentFillColorTertiary" />
+                            <StaticResource x:Key="SplitButtonSecondaryBackgroundPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+                            <StaticResource x:Key="SplitButtonSecondaryBackgroundPressed" ResourceKey="AccentFillColorTertiaryBrush" />
                             <StaticResource x:Key="SplitButtonSecondaryForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
                             <StaticResource x:Key="SplitButtonSecondaryForegroundPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
                             <StaticResource x:Key="SplitButtonSecondaryForegroundPressed" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
