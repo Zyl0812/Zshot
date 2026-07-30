@@ -136,7 +136,7 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
         _captureImageCount++;
         CropImage(bitmap, GetDpiForMonitor(displayId), maxCLL);
         _cancellationTokenSource?.Cancel();
-        DisplayWindow(displayId, true);
+        DisplayWindow(true);
     }
 
 
@@ -189,7 +189,7 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
             _openImageCancellationToken = _cancellationTokenSource.Token;
-            DisplayWindow(displayId, false, _cancellationTokenSource.Token);
+            DisplayWindow(false, _cancellationTokenSource.Token);
         }
         catch (Exception ex)
         {
@@ -214,7 +214,7 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
             _openImageCancellationToken = _cancellationTokenSource.Token;
-            DisplayWindow(displayId, false, _cancellationTokenSource.Token);
+            DisplayWindow(false, _cancellationTokenSource.Token);
         }
         catch (Exception ex)
         {
@@ -434,16 +434,24 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
     }
 
 
-    private async void DisplayWindow(Microsoft.UI.DisplayId displayId, bool doNotClose, CancellationToken cancellationToken = default)
+    private async void DisplayWindow(bool doNotClose = false, CancellationToken cancellationToken = default)
     {
         try
         {
-            float dpiScale = GetDpiForMonitor(displayId) / 96f;
+            // 用光标位置定位所在显示器（物理坐标，DPI 无关），避开 DisplayArea.OuterBounds 单位歧义
+            User32.GetCursorPos(out var pt);
+            HMONITOR monitor = User32.MonitorFromPoint(pt, User32.MonitorFlags.MONITOR_DEFAULTTONEAREST);
+            User32.MONITORINFOEX monitorInfo = new() { cbSize = (uint)Marshal.SizeOf<User32.MONITORINFOEX>() };
+            User32.GetMonitorInfo(monitor, ref monitorInfo);
+            var rc = monitorInfo.rcMonitor;
+
+            GetDpiForMonitor((nint)monitor.DangerousGetHandle(), 0, out uint dpiX, out _);
+            float dpiScale = dpiX / 96f;
             int width = (int)(WindowWidth * dpiScale);
             int height = (int)(WindowHeight * dpiScale);
-            var area = DisplayArea.GetFromDisplayId(displayId);
-            int targetX = area.OuterBounds.X + area.OuterBounds.Width - width;
-            int targetY = area.OuterBounds.Y + (int)(area.OuterBounds.Height * 0.25) - height / 2;
+
+            int targetX = rc.right - width;
+            int targetY = rc.top + (int)(rc.Height * 0.25) - height / 2;
 
             ApplyStatusVisual();
 
@@ -468,6 +476,9 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
 
     private void ShowWindow(RectInt32 rect)
     {
+        // 跨 DPI 屏移动会触发 WM_DPICHANGED，系统默认按 DPI 比例调整窗口 rect（位置偏）。
+        // 连续 MoveAndResize 两次：第一次触发 DPI 更新（被系统调整），第二次时 DPI 已匹配该屏，落到精确位置。
+        AppWindow.MoveAndResize(rect);
         AppWindow.MoveAndResize(rect);
         AppWindow.Show(false);
         StartShowAnimation();
