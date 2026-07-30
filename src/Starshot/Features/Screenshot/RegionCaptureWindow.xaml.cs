@@ -107,12 +107,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
         User32.SetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_STYLE, (nint)style);
         User32.SetWindowPos(WindowHandle, IntPtr.Zero, vx, vy, vw, vh, (User32.SetWindowPosFlags)0x0020 | User32.SetWindowPosFlags.SWP_NOZORDER);
 
-        // 首帧前用当前光标位置初始化 _currentMousePos，否则放大镜/坐标框会画在 (0,0) 直到第一次 PointerMoved
-        if (User32.GetCursorPos(out var initCursor))
-        {
-            _currentMousePos = new Point((initCursor.x - _vx) / _scale, (initCursor.y - _vy) / _scale);
-        }
-
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Cross);
     }
 
@@ -277,6 +271,11 @@ public sealed partial class RegionCaptureWindow : WindowEx
             _lockedW = (float)sender.Size.Width;
             _lockedH = (float)sender.Size.Height;
             _sizeLocked = true;
+            // 首帧用正确的 CanvasControl DPI 重算初始光标位置（构造时 _scale 可能与实际不符，混合 DPI 下首帧放大镜/坐标框会偏）
+            if (User32.GetCursorPos(out var initCursor))
+            {
+                _currentMousePos = new Point((initCursor.x - _vx) / _scale, (initCursor.y - _vy) / _scale);
+            }
             _ = Task.Run(DetectWindows);
         }
 
