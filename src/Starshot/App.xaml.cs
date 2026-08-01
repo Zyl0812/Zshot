@@ -8,6 +8,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using Windows.UI;
 
 namespace Starshot;
@@ -17,6 +18,8 @@ public partial class App : Application
 
     private readonly DispatcherQueue _uiDispatcherQueue;
 
+    private readonly Timer _gcTimer = new(TimeSpan.FromSeconds(60));
+
     public static new App Current => (App)Application.Current;
 
 
@@ -25,6 +28,10 @@ public partial class App : Application
         this.InitializeComponent();
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
         UnhandledException += App_UnhandledException;
+        // 后台定时 GC：截图（尤其区域截图覆盖层）残留的 RCW/未引用资源靠 GC 回收，
+        // GC 看托管堆不看显存，不主动 Collect 会累积占显存。每 60s 回收一次（参考 Starward，且补上它漏掉的 Start）。
+        _gcTimer.Elapsed += (_, _) => GC.Collect();
+        _gcTimer.Start();
     }
 
 
