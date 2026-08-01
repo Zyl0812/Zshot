@@ -34,6 +34,7 @@ internal class ScreenCaptureService
     private readonly ILogger<ScreenCaptureService> _logger;
 
     private ScreenCaptureInfoWindow? _infoWindow;
+    private RegionCaptureWindow? _regionWindow;
 
     private static SemaphoreSlim _encodeSlim = new(1);
 
@@ -253,27 +254,22 @@ internal class ScreenCaptureService
                 r.frame.Dispose();
             }
 
-            // DPI scale
             nint fgHwnd = (nint)User32.GetForegroundWindow();
-            float dpi = User32.GetDpiForWindow(fgHwnd);
-            float scale = dpi / 96f;
 
             // 弹覆盖层，等用户选区
             _logger.LogInformation("Region capture: showing overlay window");
-            var tcs = new TaskCompletionSource<bool>();
-            var window = new RegionCaptureWindow(composite, scale, sdrWhiteLevel, vw, vh);
-            window.Closed += (s, e) => tcs.TrySetResult(window.IsConfirmed);
-            window.Show();
+            _regionWindow ??= new RegionCaptureWindow();
+            _regionWindow.SetCapture(composite, sdrWhiteLevel, vw, vh);
 
-            bool confirmed = await tcs.Task;
+            bool confirmed = await _regionWindow.Completion.Task;
 
-            if (!confirmed || window.SelectionRect.Width < 2 || window.SelectionRect.Height < 2)
+            if (!confirmed || _regionWindow.SelectionRect.Width < 2 || _regionWindow.SelectionRect.Height < 2)
             {
                 return; // 取消
             }
 
-            // 覆盖层关窗时已从 _displayBitmap（tonemap 好的 SDR）裁出选区
-            sdrCrop = window.SdrCrop;
+            // 覆盖层隐藏时已从 _displayBitmap（tonemap 好的 SDR）裁出选区
+            sdrCrop = _regionWindow.SdrCrop;
 
             if (copyOnly)
             {
@@ -288,7 +284,7 @@ internal class ScreenCaptureService
             }
 
             // 裁剪 HDR 选区用于保存（用窗口提供的物理像素坐标）
-            var srcRect = window.GetPhysicalSourceRect();
+            var srcRect = _regionWindow.GetPhysicalSourceRect();
             int cx = (int)srcRect.X;
             int cy = (int)srcRect.Y;
             int cw = (int)srcRect.Width;

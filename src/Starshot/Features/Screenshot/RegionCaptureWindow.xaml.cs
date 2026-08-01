@@ -34,8 +34,8 @@ public sealed partial class RegionCaptureWindow : WindowEx
     // 确认时从 _displayBitmap（冻结帧，已 tonemap 的 SDR）裁出的选区，供剪贴板直接复用，不再二次 tonemap
     public CanvasRenderTarget SdrCrop { get; private set; }
 
-    private readonly CanvasBitmap _canvasOriginal;   // 原始帧（裁剪用，可能 HDR）
-    private readonly CanvasBitmap _displayBitmap;     // 显示用（SDR 色调映射后）
+    private CanvasBitmap _canvasOriginal;   // 原始帧（裁剪用，可能 HDR），每次 SetCapture 更新
+    private CanvasBitmap _displayBitmap;     // 显示用（SDR 色调映射后），每次 SetCapture 重建
     private float _scale;
     private readonly int _vx, _vy;  // 虚拟屏幕物理坐标原点（放大镜钳制到当前显示器用）
 
@@ -52,7 +52,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private bool _hasHover;
 
     private float _dashOffset;
-    private System.Diagnostics.Stopwatch _timer;
+    private readonly System.Diagnostics.Stopwatch _timer;
     private bool _isClosed;
     private CanvasSwapChain _swapChain;
     private DispatcherTimer _renderTimer;
@@ -64,23 +64,20 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     // HDR 时 _displayBitmap 是本窗新建的 SDR 副本，由本窗释放；
     // SDR 时它就是传入的 canvas（= composite），归调用方，不能动
-    private readonly bool _ownsDisplayBitmap;
+    private bool _ownsDisplayBitmap;
     private bool _cleanedUp;
 
+    // 单例：选区完成信号（替代 Closed），ScreenCaptureService await 它；窗口不 Close 只 Hide
+    public TaskCompletionSource<bool> Completion { get; private set; }
 
-    public RegionCaptureWindow(CanvasBitmap canvas, float scale, float sdrWhiteLevel, int physW, int physH)
+
+    public RegionCaptureWindow()
     {
         InitializeComponent();
-
-        _canvasOriginal = canvas;
-        _scale = scale;
         _timer = System.Diagnostics.Stopwatch.StartNew();
-
-        _displayBitmap = CreateDisplayBitmap(canvas, physW, physH, sdrWhiteLevel);
-        _ownsDisplayBitmap = !ReferenceEquals(_displayBitmap, canvas);
         this.Closed += RegionCaptureWindow_Closed;
 
-        // 窗口设置
+        // 窗口设置（单例，只一次）
         WindowEx.MainWindowId = AppWindow.Id;
         Title = "Starshot";
         AppWindow.IsShownInSwitchers = false;
@@ -111,15 +108,53 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Cross);
 
-        // CanvasControl 的 swap chain 挂共享 device、靠 GC 回收（收不掉 → 显存泄露）。
-        // 改 CanvasSwapChainPanel + 自管 swapChain（Starward ImageViewWindow2 同款），CloseWindow 时立即 Dispose。
+        // 自管 swapChain（单例复用；CanvasControl 那套挂共享 device 靠 GC 收不掉）
         float dpi = User32.GetDpiForWindow(WindowHandle);
         _scale = dpi / 96f;
         _swapChain = new CanvasSwapChain(CanvasDevice.GetSharedDevice(), vw / _scale, vh / _scale, dpi, DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, CanvasAlphaMode.Premultiplied);
         Canvas.SwapChain = _swapChain;
         _renderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _renderTimer.Tick += (_, _) => Redraw();
+        // 不 Start：SetCapture 时启动（单例每次截图复用窗口）
+    }
+
+
+    /// <summary>
+    /// 每次截图调用：更新冻结帧 + 重置交互状态 + 显示。窗口单例复用（不 Close/不销毁 HWND，
+    /// 避免 DWM redirected surface 累积——WinUI Window.Close 不 destroy HWND，DWM surface 留着）。
+    /// </summary>
+    public void SetCapture(CanvasBitmap canvas, float sdrWhiteLevel, int physW, int physH)
+    {
+        // 更新帧（旧的自有 _displayBitmap 先释放）
+        _canvasOriginal = canvas;
+        if (_ownsDisplayBitmap) _displayBitmap?.Dispose();
+        _displayBitmap = CreateDisplayBitmap(canvas, physW, physH, sdrWhiteLevel);
+        _ownsDisplayBitmap = !ReferenceEquals(_displayBitmap, canvas);
+
+        // 重置交互状态（为本次截图清场）
+        SelectionRect = default;
+        IsConfirmed = false;
+        SdrCrop = null;
+        _positionOnClick = default;
+        _isMouseDown = false;
+        _pressedOnHover = false;
+        if (User32.GetCursorPos(out var initCursor))
+        {
+            _currentMousePos = new Point((initCursor.x - _vx) / _scale, (initCursor.y - _vy) / _scale);
+        }
+        _selectionFromDrag = false;
+        _windowRects = new List<Rect>();
+        _hoverRect = default;
+        _hasHover = false;
+        _lockedW = 0;
+        _lockedH = 0;
+        _sizeLocked = false;  // 首帧重新锁尺寸 + 触发 DetectWindows
+        _isClosed = false;
+        _cleanedUp = false;
+        Completion = new TaskCompletionSource<bool>();
+
         _renderTimer.Start();
+        Show();
     }
 
 
@@ -540,21 +575,17 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void CloseWindow()
     {
-        try { _renderTimer?.Stop(); } catch { }  // 先停渲染（Redraw 不能再用即将 dispose 的资源）
+        try { _renderTimer?.Stop(); } catch { }
         if (IsConfirmed)
         {
-            // _displayBitmap 是冻结帧的 SDR 版（覆盖层已 tonemap），关窗前（它还活着）裁出选区给剪贴板
-            // 包 try-catch：不能让它抛断后面的 swapChain dispose（否则那次就泄露）
+            // _displayBitmap 是冻结帧的 SDR 版（覆盖层已 tonemap），隐藏前（它还活着）裁出选区给剪贴板
             try { SdrCrop = CropDisplayToBgra(); } catch { }
         }
         _isClosed = true;
-        // 立即释放 swapChain + 自有 _displayBitmap + 移除 panel（不等异步 Closed —— 那是 swap chain 泄露的根因）
-        try { Canvas.SwapChain = null; } catch { }
-        try { Canvas.RemoveFromVisualTree(); } catch { }  // panel 的 Composition surface 也要立即释放，不等 Closed
-        try { _swapChain?.Dispose(); _swapChain = null; } catch { }
-        if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
-        this.Hide();   // 立即从屏幕消失，不等 Close() 的异步收尾（避免最后一帧遮罩残留）
-        this.Close();
+        // 单例：只 Hide，不 Close/不销毁 HWND/DWM surface、不 dispose swapChain/_displayBitmap
+        // （下次 SetCapture 会更新 _displayBitmap、复用 swapChain）。DWM redirected surface 始终一块，不累积。
+        this.Hide();
+        Completion?.TrySetResult(IsConfirmed);
     }
 
     // 从 _displayBitmap 裁出选区为 B8G8R8A8 SDR（CF_DIB 要 BGRA）
@@ -577,17 +608,17 @@ public sealed partial class RegionCaptureWindow : WindowEx
         Cleanup();
     }
 
-    // 释放覆盖层资源：移除 CanvasControl（Win2D 已知泄漏点）、释放自有的显示位图。
-    // _canvasOriginal（= composite）归调用方，不在此释放。
+    // 释放覆盖层资源（仅应用退出时调用：单例窗口运行期只 Hide 不 Close，进程退出才真销毁）
     public void Cleanup()
     {
         if (_cleanedUp) return;
         _cleanedUp = true;
         _isClosed = true;
         try { _renderTimer?.Stop(); } catch { }
+        try { Canvas.SwapChain = null; } catch { }
         try { Canvas.RemoveFromVisualTree(); } catch { }
-        // 兜底：CloseWindow 正常路径已立即 dispose；异常路径这里再兜一次
         try { _swapChain?.Dispose(); _swapChain = null; } catch { }
+        if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
