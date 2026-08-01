@@ -548,8 +548,9 @@ public sealed partial class RegionCaptureWindow : WindowEx
             try { SdrCrop = CropDisplayToBgra(); } catch { }
         }
         _isClosed = true;
-        // 立即释放 swapChain + 自有 _displayBitmap（不等异步 Closed —— 那是 CanvasControl swap chain 泄露的根因）
+        // 立即释放 swapChain + 自有 _displayBitmap + 移除 panel（不等异步 Closed —— 那是 swap chain 泄露的根因）
         try { Canvas.SwapChain = null; } catch { }
+        try { Canvas.RemoveFromVisualTree(); } catch { }  // panel 的 Composition surface 也要立即释放，不等 Closed
         try { _swapChain?.Dispose(); _swapChain = null; } catch { }
         if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
         this.Hide();   // 立即从屏幕消失，不等 Close() 的异步收尾（避免最后一帧遮罩残留）
