@@ -11,9 +11,7 @@
     <Grid x:Name="RootGrid"
           Background="Transparent"
           KeyDown="RootGrid_KeyDown">
-        <mgcux:CanvasControl x:Name="Canvas"
-                             CreateResources="Canvas_CreateResources"
-                             Draw="Canvas_Draw"
+        <mgcux:CanvasSwapChainPanel x:Name="Canvas"
                              PointerPressed="Canvas_PointerPressed"
                              PointerMoved="Canvas_PointerMoved"
                              PointerReleased="Canvas_PointerReleased" />

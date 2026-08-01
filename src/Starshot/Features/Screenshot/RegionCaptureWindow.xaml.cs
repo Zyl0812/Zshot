@@ -54,6 +54,8 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private float _dashOffset;
     private System.Diagnostics.Stopwatch _timer;
     private bool _isClosed;
+    private CanvasSwapChain _swapChain;
+    private DispatcherTimer _renderTimer;
 
     // 锁定画布尺寸（首帧后固定，防止布局抖动导致冻结帧移动）
     private float _lockedW;
@@ -108,6 +110,16 @@ public sealed partial class RegionCaptureWindow : WindowEx
         User32.SetWindowPos(WindowHandle, IntPtr.Zero, vx, vy, vw, vh, (User32.SetWindowPosFlags)0x0020 | User32.SetWindowPosFlags.SWP_NOZORDER);
 
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Cross);
+
+        // CanvasControl 的 swap chain 挂共享 device、靠 GC 回收（收不掉 → 显存泄露）。
+        // 改 CanvasSwapChainPanel + 自管 swapChain（Starward ImageViewWindow2 同款），CloseWindow 时立即 Dispose。
+        float dpi = User32.GetDpiForWindow(WindowHandle);
+        _scale = dpi / 96f;
+        _swapChain = new CanvasSwapChain(CanvasDevice.GetSharedDevice(), vw / _scale, vh / _scale, dpi, DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, CanvasAlphaMode.Premultiplied);
+        Canvas.SwapChain = _swapChain;
+        _renderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        _renderTimer.Tick += (_, _) => Redraw();
+        _renderTimer.Start();
     }
 
 
@@ -252,26 +264,18 @@ public sealed partial class RegionCaptureWindow : WindowEx
     }
 
 
-    private void Canvas_CreateResources(CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+    private void Redraw()
     {
-    }
-
-
-    private void Canvas_Draw(CanvasControl sender, CanvasDrawEventArgs args)
-    {
-        if (_isClosed) return;
+        if (_isClosed || _swapChain is null) return;
 
         _dashOffset = (float)_timer.Elapsed.TotalSeconds * -15;
-        var ds = args.DrawingSession;
 
-        // 首帧锁定画布尺寸 + 用 CanvasControl 实际 DPI 覆盖 _scale（前台窗口 DPI 在混合 DPI 下可能不同）
+        // 首帧锁定画布尺寸（_scale 构造时已按覆盖层窗口 DPI 设定）
         if (!_sizeLocked)
         {
-            _scale = sender.Dpi / 96f;
-            _lockedW = (float)sender.Size.Width;
-            _lockedH = (float)sender.Size.Height;
+            _lockedW = (float)_swapChain.Size.Width;
+            _lockedH = (float)_swapChain.Size.Height;
             _sizeLocked = true;
-            // 首帧用正确的 CanvasControl DPI 重算初始光标位置（构造时 _scale 可能与实际不符，混合 DPI 下首帧放大镜/坐标框会偏）
             if (User32.GetCursorPos(out var initCursor))
             {
                 _currentMousePos = new Point((initCursor.x - _vx) / _scale, (initCursor.y - _vy) / _scale);
@@ -279,8 +283,10 @@ public sealed partial class RegionCaptureWindow : WindowEx
             _ = Task.Run(DetectWindows);
         }
 
-        float physW = (float)_displayBitmap.SizeInPixels.Width;
-        float physH = (float)_displayBitmap.SizeInPixels.Height;
+        using (var ds = _swapChain.CreateDrawingSession(Colors.Transparent))
+        {
+            float physW = (float)_displayBitmap.SizeInPixels.Width;
+            float physH = (float)_displayBitmap.SizeInPixels.Height;
 
         // 1. 画冻结帧（铺满，尺寸锁定，不动）
         ds.DrawImage(_displayBitmap,
@@ -346,12 +352,9 @@ public sealed partial class RegionCaptureWindow : WindowEx
         if (cbY + cbH > mb) cbY = my - cbOff - cbH;
         if (cbX < ml) cbX = ml;
         if (cbY < mt) cbY = mt;
-        DrawInfoBox(ds, $"X: {(int)(mx * _scale)} Y: {(int)(my * _scale)}", new Vector2(cbX, cbY));
-
-        if (!_isClosed)
-        {
-            Canvas.Invalidate();
+            DrawInfoBox(ds, $"X: {(int)(mx * _scale)} Y: {(int)(my * _scale)}", new Vector2(cbX, cbY));
         }
+        _swapChain.Present();
     }
 
 
@@ -537,12 +540,18 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void CloseWindow()
     {
+        try { _renderTimer?.Stop(); } catch { }  // 先停渲染（Redraw 不能再用即将 dispose 的资源）
         if (IsConfirmed)
         {
             // _displayBitmap 是冻结帧的 SDR 版（覆盖层已 tonemap），关窗前（它还活着）裁出选区给剪贴板
-            SdrCrop = CropDisplayToBgra();
+            // 包 try-catch：不能让它抛断后面的 swapChain dispose（否则那次就泄露）
+            try { SdrCrop = CropDisplayToBgra(); } catch { }
         }
         _isClosed = true;
+        // 立即释放 swapChain + 自有 _displayBitmap（不等异步 Closed —— 那是 CanvasControl swap chain 泄露的根因）
+        try { Canvas.SwapChain = null; } catch { }
+        try { _swapChain?.Dispose(); _swapChain = null; } catch { }
+        if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
         this.Hide();   // 立即从屏幕消失，不等 Close() 的异步收尾（避免最后一帧遮罩残留）
         this.Close();
     }
@@ -574,11 +583,10 @@ public sealed partial class RegionCaptureWindow : WindowEx
         if (_cleanedUp) return;
         _cleanedUp = true;
         _isClosed = true;
+        try { _renderTimer?.Stop(); } catch { }
         try { Canvas.RemoveFromVisualTree(); } catch { }
-        if (_ownsDisplayBitmap)
-        {
-            _displayBitmap?.Dispose();
-        }
+        // 兜底：CloseWindow 正常路径已立即 dispose；异常路径这里再兜一次
+        try { _swapChain?.Dispose(); _swapChain = null; } catch { }
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
