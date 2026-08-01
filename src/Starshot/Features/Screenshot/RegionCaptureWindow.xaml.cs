@@ -108,11 +108,9 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Cross);
 
-        // 自管 swapChain（单例复用；CanvasControl 那套挂共享 device 靠 GC 收不掉）
+        // _scale 按覆盖层窗口 DPI（d56df02）；swapChain 移到 SetCapture 创建（CloseWindow 释放本进程显存）
         float dpi = User32.GetDpiForWindow(WindowHandle);
         _scale = dpi / 96f;
-        _swapChain = new CanvasSwapChain(CanvasDevice.GetSharedDevice(), vw / _scale, vh / _scale, dpi, DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, CanvasAlphaMode.Premultiplied);
-        Canvas.SwapChain = _swapChain;
         _renderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _renderTimer.Tick += (_, _) => Redraw();
         // 不 Start：SetCapture 时启动（单例每次截图复用窗口）
@@ -125,6 +123,13 @@ public sealed partial class RegionCaptureWindow : WindowEx
     /// </summary>
     public void SetCapture(CanvasBitmap canvas, float sdrWhiteLevel, int physW, int physH)
     {
+        // swapChain（CloseWindow dispose 后此处重建；HWND 单例避 DWM 累积，swapChain 本进程每次释放）
+        if (_swapChain is null)
+        {
+            _swapChain = new CanvasSwapChain(CanvasDevice.GetSharedDevice(), physW / _scale, physH / _scale, _scale * 96f, DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, CanvasAlphaMode.Premultiplied);
+            Canvas.SwapChain = _swapChain;
+        }
+
         // 更新帧（旧的自有 _displayBitmap 先释放）
         _canvasOriginal = canvas;
         if (_ownsDisplayBitmap) _displayBitmap?.Dispose();
@@ -582,9 +587,11 @@ public sealed partial class RegionCaptureWindow : WindowEx
             try { SdrCrop = CropDisplayToBgra(); } catch { }
         }
         _isClosed = true;
-        // 单例：只 Hide，不 Close/不销毁 HWND/DWM surface、不 dispose swapChain/_displayBitmap
-        // （下次 SetCapture 会更新 _displayBitmap、复用 swapChain）。DWM redirected surface 始终一块，不累积。
         this.Hide();
+        // 本进程显存释放（swapChain + 自有 _displayBitmap）；HWND 单例留（DWM redirected surface 一块不累积）
+        try { Canvas.SwapChain = null; } catch { }
+        try { _swapChain?.Dispose(); _swapChain = null; } catch { }
+        if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
         Completion?.TrySetResult(IsConfirmed);
     }
 
