@@ -217,88 +217,88 @@
   <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
     <value>ギャラリーには、以下のフォルダの画像が表示されます。</value>
   </data>
-  <data name="ImageViewWindow2_OpenInExplorer" xml:space="preserve">
+  <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
     <value>エクスプローラーで開く</value>
   </data>
-  <data name="ImageViewWindow2_OpenWith" xml:space="preserve">
+  <data name="ImageViewWindow_OpenWith" xml:space="preserve">
     <value>次で開く:</value>
   </data>
-  <data name="ImageViewWindow2_Previous" xml:space="preserve">
+  <data name="ImageViewWindow_Previous" xml:space="preserve">
     <value>前へ</value>
     <comment>Previous Image</comment>
   </data>
-  <data name="ImageViewWindow2_Next" xml:space="preserve">
+  <data name="ImageViewWindow_Next" xml:space="preserve">
     <value>次へ</value>
     <comment>Next Image</comment>
   </data>
-  <data name="ImageViewWindow2_ShowGallery" xml:space="preserve">
+  <data name="ImageViewWindow_ShowGallery" xml:space="preserve">
     <value>ギャラリーを表示</value>
   </data>
-  <data name="ImageViewWindow2_FitToWindow" xml:space="preserve">
+  <data name="ImageViewWindow_FitToWindow" xml:space="preserve">
     <value>ウィンドウに合わせる</value>
     <comment>Zoom image fit to window</comment>
   </data>
-  <data name="ImageViewWindow2_CopyFile" xml:space="preserve">
+  <data name="ImageViewWindow_CopyFile" xml:space="preserve">
     <value>ファイルをコピー</value>
   </data>
-  <data name="ImageViewWindow2_CopyPath" xml:space="preserve">
+  <data name="ImageViewWindow_CopyPath" xml:space="preserve">
     <value>パスをコピー</value>
   </data>
-  <data name="ImageViewWindow2_CopyImage" xml:space="preserve">
+  <data name="ImageViewWindow_CopyImage" xml:space="preserve">
     <value>画像をコピー</value>
   </data>
   <data name="Common_Edit" xml:space="preserve">
     <value>編集</value>
   </data>
-  <data name="ImageViewWindow2_ImageInformation" xml:space="preserve">
+  <data name="ImageViewWindow_ImageInformation" xml:space="preserve">
     <value>画像情報</value>
   </data>
-  <data name="ImageViewWindow2_EditImage" xml:space="preserve">
+  <data name="ImageViewWindow_EditImage" xml:space="preserve">
     <value>画像を編集</value>
   </data>
-  <data name="ImageViewWindow2_DisplayMode" xml:space="preserve">
+  <data name="ImageViewWindow_DisplayMode" xml:space="preserve">
     <value>表示モード</value>
   </data>
-  <data name="ImageViewWindow2_SDRMappedLuminance" xml:space="preserve">
+  <data name="ImageViewWindow_SDRMappedLuminance" xml:space="preserve">
     <value>SDR マッピングされた輝度</value>
   </data>
-  <data name="ImageViewWindow2_ExportImage" xml:space="preserve">
+  <data name="ImageViewWindow_ExportImage" xml:space="preserve">
     <value>画像をエクスポート</value>
   </data>
-  <data name="ImageViewWindow2_DeleteImageFile" xml:space="preserve">
+  <data name="ImageViewWindow_DeleteImageFile" xml:space="preserve">
     <value>画像ファイルを削除</value>
   </data>
-  <data name="ImageViewWindow2_CopiedToClipboard" xml:space="preserve">
+  <data name="ImageViewWindow_CopiedToClipboard" xml:space="preserve">
     <value>クリップボードにコピーしました。</value>
   </data>
-  <data name="ImageViewWindow2_FileDoesNotExist" xml:space="preserve">
+  <data name="ImageViewWindow_FileDoesNotExist" xml:space="preserve">
     <value>ファイルが見つかりません。</value>
   </data>
-  <data name="ImageViewWindow2_OpenWithDefaultApp" xml:space="preserve">
+  <data name="ImageViewWindow_OpenWithDefaultApp" xml:space="preserve">
     <value>既定のアプリで開く</value>
   </data>
-  <data name="ImageViewWindow2_NoImageToDisplay" xml:space="preserve">
+  <data name="ImageViewWindow_NoImageToDisplay" xml:space="preserve">
     <value>表示する画像がありません</value>
   </data>
   <data name="Common_OpenFiles" xml:space="preserve">
     <value>ファイルを開く</value>
   </data>
-  <data name="ImageViewWindow2_OpenNewFiles" xml:space="preserve">
+  <data name="ImageViewWindow_OpenNewFiles" xml:space="preserve">
     <value>新しいファイルを開く</value>
   </data>
-  <data name="ImageViewWindow2_FailedToDisplayImage" xml:space="preserve">
+  <data name="ImageViewWindow_FailedToDisplayImage" xml:space="preserve">
     <value>画像の表示に失敗しました</value>
   </data>
-  <data name="ImageViewWindow2_FailedToSaveImage" xml:space="preserve">
+  <data name="ImageViewWindow_FailedToSaveImage" xml:space="preserve">
     <value>画像の保存に失敗しました</value>
   </data>
-  <data name="ImageViewWindow2_FailedToDeleteImageFile" xml:space="preserve">
+  <data name="ImageViewWindow_FailedToDeleteImageFile" xml:space="preserve">
     <value>画像の削除に失敗しました</value>
   </data>
-  <data name="ImageViewWindow2_UnableToDeleteTheFile" xml:space="preserve">
+  <data name="ImageViewWindow_UnableToDeleteTheFile" xml:space="preserve">
     <value>ファイルを削除できませんでした</value>
   </data>
-  <data name="ImageViewWindow2_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
+  <data name="ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
     <value>権限が不足しているか、ファイルが使用中です。</value>
   </data>
   <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
@@ -328,7 +328,7 @@
   <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
     <value>スクショファイルの自動コピー</value>
   </data>
-  <data name="ImageViewWindow2_CopyAsJPG" xml:space="preserve">
+  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
     <value>JPG としてコピー</value>
   </data>
   <data name="ScreenshotPage_MultiSelect" xml:space="preserve">

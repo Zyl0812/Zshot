@@ -476,234 +476,234 @@
         /// <summary>
         ///   查找类似 Copied to clipboard. 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_CopiedToClipboard {
+        public static string ImageViewWindow_CopiedToClipboard {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_CopiedToClipboard", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_CopiedToClipboard", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Copy as JPG 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_CopyAsJPG {
+        public static string ImageViewWindow_CopyAsJPG {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_CopyAsJPG", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_CopyAsJPG", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Copy File 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_CopyFile {
+        public static string ImageViewWindow_CopyFile {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_CopyFile", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_CopyFile", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Copy Image 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_CopyImage {
+        public static string ImageViewWindow_CopyImage {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_CopyImage", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_CopyImage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Copy Path 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_CopyPath {
+        public static string ImageViewWindow_CopyPath {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_CopyPath", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_CopyPath", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Delete Image File 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_DeleteImageFile {
+        public static string ImageViewWindow_DeleteImageFile {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_DeleteImageFile", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_DeleteImageFile", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Display Mode 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_DisplayMode {
+        public static string ImageViewWindow_DisplayMode {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_DisplayMode", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_DisplayMode", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Edit Image 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_EditImage {
+        public static string ImageViewWindow_EditImage {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_EditImage", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_EditImage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Export Image 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_ExportImage {
+        public static string ImageViewWindow_ExportImage {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_ExportImage", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_ExportImage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Failed to Delete Image File 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_FailedToDeleteImageFile {
+        public static string ImageViewWindow_FailedToDeleteImageFile {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_FailedToDeleteImageFile", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_FailedToDeleteImageFile", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Failed to Display Image 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_FailedToDisplayImage {
+        public static string ImageViewWindow_FailedToDisplayImage {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_FailedToDisplayImage", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_FailedToDisplayImage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Failed to Save Image 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_FailedToSaveImage {
+        public static string ImageViewWindow_FailedToSaveImage {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_FailedToSaveImage", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_FailedToSaveImage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 File does not exist. 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_FileDoesNotExist {
+        public static string ImageViewWindow_FileDoesNotExist {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_FileDoesNotExist", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_FileDoesNotExist", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Fit to Window 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_FitToWindow {
+        public static string ImageViewWindow_FitToWindow {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_FitToWindow", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_FitToWindow", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Image Information 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_ImageInformation {
+        public static string ImageViewWindow_ImageInformation {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_ImageInformation", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_ImageInformation", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Insufficient permissions or the file is in use. 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_InsufficientPermissionsOrTheFileIsInUse {
+        public static string ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_InsufficientPermissionsOrTheFileIsInUse", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Next 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_Next {
+        public static string ImageViewWindow_Next {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_Next", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_Next", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 No Image to Display 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_NoImageToDisplay {
+        public static string ImageViewWindow_NoImageToDisplay {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_NoImageToDisplay", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_NoImageToDisplay", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Open in Explorer 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_OpenInExplorer {
+        public static string ImageViewWindow_OpenInExplorer {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_OpenInExplorer", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_OpenInExplorer", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Open New Files 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_OpenNewFiles {
+        public static string ImageViewWindow_OpenNewFiles {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_OpenNewFiles", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_OpenNewFiles", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Open with 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_OpenWith {
+        public static string ImageViewWindow_OpenWith {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_OpenWith", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_OpenWith", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Open with Default App 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_OpenWithDefaultApp {
+        public static string ImageViewWindow_OpenWithDefaultApp {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_OpenWithDefaultApp", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_OpenWithDefaultApp", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Previous 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_Previous {
+        public static string ImageViewWindow_Previous {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_Previous", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_Previous", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 SDR Mapped Luminance 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_SDRMappedLuminance {
+        public static string ImageViewWindow_SDRMappedLuminance {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_SDRMappedLuminance", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_SDRMappedLuminance", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Show Gallery 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_ShowGallery {
+        public static string ImageViewWindow_ShowGallery {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_ShowGallery", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_ShowGallery", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 Unable to Delete the File 的本地化字符串。
         /// </summary>
-        public static string ImageViewWindow2_UnableToDeleteTheFile {
+        public static string ImageViewWindow_UnableToDeleteTheFile {
             get {
-                return ResourceManager.GetString("ImageViewWindow2_UnableToDeleteTheFile", resourceCulture);
+                return ResourceManager.GetString("ImageViewWindow_UnableToDeleteTheFile", resourceCulture);
             }
         }
         

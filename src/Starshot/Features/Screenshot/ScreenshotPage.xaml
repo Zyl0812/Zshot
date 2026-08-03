@@ -147,7 +147,7 @@
                                 <MenuFlyoutItem x:Name="MenuFlyoutItem_CopyFile"
                                                 Click="MenuFlyoutItem_CopyFile_Click"
                                                 IsTextScaleFactorEnabled="False"
-                                                Text="{x:Bind lang:Lang.ImageViewWindow2_CopyFile}">
+                                                Text="{x:Bind lang:Lang.ImageViewWindow_CopyFile}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE8C8;" IsTextScaleFactorEnabled="False" />
                                     </MenuFlyoutItem.Icon>
@@ -156,7 +156,7 @@
                                 <MenuFlyoutItem x:Name="MenuFlyoutItem_CopyAsJPG"
                                                 Click="MenuFlyoutItem_CopyAsJPG_Click"
                                                 IsTextScaleFactorEnabled="False"
-                                                Text="{x:Bind lang:Lang.ImageViewWindow2_CopyAsJPG}">
+                                                Text="{x:Bind lang:Lang.ImageViewWindow_CopyAsJPG}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xF413;" IsTextScaleFactorEnabled="False" />
                                     </MenuFlyoutItem.Icon>
@@ -166,7 +166,7 @@
                                 <MenuFlyoutItem x:Name="MenuFlyoutItem_OpenInExplorer"
                                                 Click="MenuFlyoutItem_OpenInExplorer_Click"
                                                 IsTextScaleFactorEnabled="False"
-                                                Text="{x:Bind lang:Lang.ImageViewWindow2_OpenInExplorer}">
+                                                Text="{x:Bind lang:Lang.ImageViewWindow_OpenInExplorer}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEC50;" IsTextScaleFactorEnabled="False" />
                                     </MenuFlyoutItem.Icon>
@@ -175,7 +175,7 @@
                                 <MenuFlyoutItem x:Name="MenuFlyoutItem_OpenWithDefault"
                                                 Click="MenuFlyoutItem_OpenWithDefault_Click"
                                                 IsTextScaleFactorEnabled="False"
-                                                Text="{x:Bind lang:Lang.ImageViewWindow2_OpenWithDefaultApp}">
+                                                Text="{x:Bind lang:Lang.ImageViewWindow_OpenWithDefaultApp}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE91B;" IsTextScaleFactorEnabled="False" />
                                     </MenuFlyoutItem.Icon>
@@ -184,7 +184,7 @@
                                 <MenuFlyoutItem x:Name="MenuFlyoutItem_OpenWith"
                                                 Click="MenuFlyoutItem_OpenWith_Click"
                                                 IsTextScaleFactorEnabled="False"
-                                                Text="{x:Bind lang:Lang.ImageViewWindow2_OpenWith}">
+                                                Text="{x:Bind lang:Lang.ImageViewWindow_OpenWith}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE7AC;" IsTextScaleFactorEnabled="False" />
                                     </MenuFlyoutItem.Icon>

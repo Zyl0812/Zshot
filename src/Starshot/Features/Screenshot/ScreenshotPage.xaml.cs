@@ -313,7 +313,7 @@ public sealed partial class ScreenshotPage : PageBase
             {
                 if (e.ClickedItem is ScreenshotItem item)
                 {
-                    _ = new ImageViewWindow2().ShowWindowAsync(this.XamlRoot.ContentIslandEnvironment.AppWindowId, item, _screenshotItems);
+                    _ = new ImageViewWindow().ShowWindowAsync(this.XamlRoot.ContentIslandEnvironment.AppWindowId, item, _screenshotItems);
                 }
             }
         }
@@ -396,7 +396,7 @@ public sealed partial class ScreenshotPage : PageBase
         {
             if (sender is FrameworkElement { DataContext: ScreenshotItem item })
             {
-                _ = new ImageViewWindow2().ShowWindowAsync(this.XamlRoot.ContentIslandEnvironment.AppWindowId, item, _screenshotItems);
+                _ = new ImageViewWindow().ShowWindowAsync(this.XamlRoot.ContentIslandEnvironment.AppWindowId, item, _screenshotItems);
             }
         }
         catch { }
@@ -421,7 +421,7 @@ public sealed partial class ScreenshotPage : PageBase
                 if (list.Count > 0)
                 {
                     ClipboardHelper.SetStorageItems(DataPackageOperation.Copy, list.ToArray());
-                    InAppToast.MainWindow?.Success(Lang.ImageViewWindow2_CopiedToClipboard, string.Format(Lang.ScreenshotPage_Total0Files, list.Count), 1500);
+                    InAppToast.MainWindow?.Success(Lang.ImageViewWindow_CopiedToClipboard, string.Format(Lang.ScreenshotPage_Total0Files, list.Count), 1500);
                 }
             }
             else if (sender is FrameworkElement fe && fe.DataContext is ScreenshotItem item)
@@ -430,11 +430,11 @@ public sealed partial class ScreenshotPage : PageBase
                 {
                     var file = await StorageFile.GetFileFromPathAsync(item.FilePath);
                     ClipboardHelper.SetStorageItems(DataPackageOperation.Copy, file);
-                    InAppToast.MainWindow?.Success(Lang.ImageViewWindow2_CopiedToClipboard, null, 1500);
+                    InAppToast.MainWindow?.Success(Lang.ImageViewWindow_CopiedToClipboard, null, 1500);
                 }
                 else
                 {
-                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow2_FileDoesNotExist, item.FilePath, 5000);
+                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_FileDoesNotExist, item.FilePath, 5000);
                 }
             }
         }
@@ -469,17 +469,17 @@ public sealed partial class ScreenshotPage : PageBase
                     string jpgFilePath = await ScreenshotHelper.ConvertToJpgAsync(item.FilePath);
                     var file = await StorageFile.GetFileFromPathAsync(jpgFilePath);
                     ClipboardHelper.SetStorageItems(DataPackageOperation.Copy, file);
-                    InAppToast.MainWindow?.Success($"{Lang.ImageViewWindow2_CopiedToClipboard} ({GetSizeString(new FileInfo(jpgFilePath).Length)})", null, 1500);
+                    InAppToast.MainWindow?.Success($"{Lang.ImageViewWindow_CopiedToClipboard} ({GetSizeString(new FileInfo(jpgFilePath).Length)})", null, 1500);
                 }
                 else
                 {
-                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow2_FileDoesNotExist, item.FilePath, 5000);
+                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_FileDoesNotExist, item.FilePath, 5000);
                 }
             }
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(Lang.ImageViewWindow2_CopyAsJPG, ex.Message);
+            InAppToast.MainWindow?.Error(Lang.ImageViewWindow_CopyAsJPG, ex.Message);
             _logger.LogError(ex, "Failed to copy file as JPG to clipboard");
         }
     }
@@ -500,7 +500,7 @@ public sealed partial class ScreenshotPage : PageBase
                 }
                 else
                 {
-                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow2_FileDoesNotExist, item.FilePath, 5000);
+                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_FileDoesNotExist, item.FilePath, 5000);
                 }
             }
         }
@@ -524,7 +524,7 @@ public sealed partial class ScreenshotPage : PageBase
                 }
                 else
                 {
-                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow2_FileDoesNotExist, item.FilePath, 5000);
+                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_FileDoesNotExist, item.FilePath, 5000);
                 }
             }
         }
@@ -549,7 +549,7 @@ public sealed partial class ScreenshotPage : PageBase
                 }
                 else
                 {
-                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow2_FileDoesNotExist, item.FilePath, 5000);
+                    InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_FileDoesNotExist, item.FilePath, 5000);
                 }
             }
         }
@@ -612,7 +612,7 @@ public sealed partial class ScreenshotPage : PageBase
         catch (UnauthorizedAccessException ex)
         {
             // TODO 使用 RPC 删除
-            InAppToast.MainWindow?.Warning(Lang.ImageViewWindow2_UnableToDeleteTheFile, Lang.ImageViewWindow2_InsufficientPermissionsOrTheFileIsInUse, 5000);
+            InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_UnableToDeleteTheFile, Lang.ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse, 5000);
             _logger.LogError(ex, "Failed to delete image file");
         }
         catch (Exception ex)

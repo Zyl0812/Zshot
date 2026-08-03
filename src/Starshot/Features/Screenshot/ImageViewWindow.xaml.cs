@@ -36,7 +36,7 @@ using Windows.UI;
 namespace Starshot.Features.Screenshot;
 
 [INotifyPropertyChanged]
-public sealed partial class ImageViewWindow2 : Window
+public sealed partial class ImageViewWindow : Window
 {
 
 
@@ -46,11 +46,11 @@ public sealed partial class ImageViewWindow2 : Window
 
     private const float MAX_ZOOM_FACTOR = 5f;
 
-    private readonly ILogger<ImageViewWindow2> _logger = AppConfig.GetLogger<ImageViewWindow2>();
+    private readonly ILogger<ImageViewWindow> _logger = AppConfig.GetLogger<ImageViewWindow>();
 
 
 
-    public ImageViewWindow2()
+    public ImageViewWindow()
     {
         InitializeComponent();
         SystemBackdrop = new MicaBackdrop();
@@ -1029,7 +1029,7 @@ public sealed partial class ImageViewWindow2 : Window
             }
             else
             {
-                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_FileDoesNotExist, "", 5000);
+                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_FileDoesNotExist, "", 5000);
             }
         }
         catch (Exception ex)
@@ -1050,7 +1050,7 @@ public sealed partial class ImageViewWindow2 : Window
             }
             else
             {
-                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_FileDoesNotExist, "", 5000);
+                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_FileDoesNotExist, "", 5000);
             }
         }
         catch (Exception ex)
@@ -1072,7 +1072,7 @@ public sealed partial class ImageViewWindow2 : Window
             }
             else
             {
-                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_FileDoesNotExist, "", 5000);
+                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_FileDoesNotExist, "", 5000);
             }
         }
         catch (Exception ex)
@@ -1090,11 +1090,11 @@ public sealed partial class ImageViewWindow2 : Window
             {
                 var file = await StorageFile.GetFileFromPathAsync(CurrentFilePath);
                 ClipboardHelper.SetStorageItems(DataPackageOperation.Copy, file);
-                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow2_CopiedToClipboard, "", 2000);
+                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow_CopiedToClipboard, "", 2000);
             }
             else
             {
-                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_FileDoesNotExist, "", 5000);
+                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_FileDoesNotExist, "", 5000);
             }
         }
         catch (Exception ex)
@@ -1111,11 +1111,11 @@ public sealed partial class ImageViewWindow2 : Window
             if (File.Exists(CurrentFilePath))
             {
                 ClipboardHelper.SetText(CurrentFilePath);
-                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow2_CopiedToClipboard, "", 2000);
+                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow_CopiedToClipboard, "", 2000);
             }
             else
             {
-                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_FileDoesNotExist, "", 5000);
+                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_FileDoesNotExist, "", 5000);
             }
         }
         catch (Exception ex)
@@ -1133,11 +1133,11 @@ public sealed partial class ImageViewWindow2 : Window
             {
                 var file = await StorageFile.GetFileFromPathAsync(CurrentFilePath);
                 ClipboardHelper.SetBitmap(file);
-                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow2_CopiedToClipboard, "", 2000);
+                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow_CopiedToClipboard, "", 2000);
             }
             else
             {
-                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_FileDoesNotExist, "", 5000);
+                ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_FileDoesNotExist, "", 5000);
             }
         }
         catch (Exception ex)
@@ -1186,12 +1186,12 @@ public sealed partial class ImageViewWindow2 : Window
         catch (UnauthorizedAccessException ex)
         {
             // TODO 使用 RPC 删除
-            ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow2_UnableToDeleteTheFile, Lang.ImageViewWindow2_InsufficientPermissionsOrTheFileIsInUse, 5000);
+            ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_UnableToDeleteTheFile, Lang.ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse, 5000);
             _logger.LogError(ex, "Failed to delete image file");
         }
         catch (Exception ex)
         {
-            ShowInfo(InfoBarSeverity.Error, Lang.ImageViewWindow2_FailedToDeleteImageFile, ex.Message, 0);
+            ShowInfo(InfoBarSeverity.Error, Lang.ImageViewWindow_FailedToDeleteImageFile, ex.Message, 0);
             _logger.LogError(ex, "Failed to delete image file");
         }
     }
@@ -1388,7 +1388,7 @@ public sealed partial class ImageViewWindow2 : Window
         }
         catch (Exception ex)
         {
-            ShowInfo(InfoBarSeverity.Error, Lang.ImageViewWindow2_FailedToSaveImage, ex.Message, 0);
+            ShowInfo(InfoBarSeverity.Error, Lang.ImageViewWindow_FailedToSaveImage, ex.Message, 0);
             _logger.LogError(ex, "Failed to export image");
         }
     }

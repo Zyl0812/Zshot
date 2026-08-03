@@ -217,88 +217,88 @@
   <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
     <value>以下文件夹中的图片都会显示在图库中</value>
   </data>
-  <data name="ImageViewWindow2_OpenInExplorer" xml:space="preserve">
+  <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
     <value>在资源管理器中打开</value>
   </data>
-  <data name="ImageViewWindow2_OpenWith" xml:space="preserve">
+  <data name="ImageViewWindow_OpenWith" xml:space="preserve">
     <value>打开方式</value>
   </data>
-  <data name="ImageViewWindow2_Previous" xml:space="preserve">
+  <data name="ImageViewWindow_Previous" xml:space="preserve">
     <value>上一个</value>
     <comment>Previous Image</comment>
   </data>
-  <data name="ImageViewWindow2_Next" xml:space="preserve">
+  <data name="ImageViewWindow_Next" xml:space="preserve">
     <value>下一个</value>
     <comment>Next Image</comment>
   </data>
-  <data name="ImageViewWindow2_ShowGallery" xml:space="preserve">
+  <data name="ImageViewWindow_ShowGallery" xml:space="preserve">
     <value>显示图库</value>
   </data>
-  <data name="ImageViewWindow2_FitToWindow" xml:space="preserve">
+  <data name="ImageViewWindow_FitToWindow" xml:space="preserve">
     <value>适应窗口大小</value>
     <comment>Zoom image fit to window</comment>
   </data>
-  <data name="ImageViewWindow2_CopyFile" xml:space="preserve">
+  <data name="ImageViewWindow_CopyFile" xml:space="preserve">
     <value>复制文件</value>
   </data>
-  <data name="ImageViewWindow2_CopyPath" xml:space="preserve">
+  <data name="ImageViewWindow_CopyPath" xml:space="preserve">
     <value>复制路径</value>
   </data>
-  <data name="ImageViewWindow2_CopyImage" xml:space="preserve">
+  <data name="ImageViewWindow_CopyImage" xml:space="preserve">
     <value>复制图像</value>
   </data>
   <data name="Common_Edit" xml:space="preserve">
     <value>编辑</value>
   </data>
-  <data name="ImageViewWindow2_ImageInformation" xml:space="preserve">
+  <data name="ImageViewWindow_ImageInformation" xml:space="preserve">
     <value>图像信息</value>
   </data>
-  <data name="ImageViewWindow2_EditImage" xml:space="preserve">
+  <data name="ImageViewWindow_EditImage" xml:space="preserve">
     <value>编辑图像</value>
   </data>
-  <data name="ImageViewWindow2_DisplayMode" xml:space="preserve">
+  <data name="ImageViewWindow_DisplayMode" xml:space="preserve">
     <value>显示模式</value>
   </data>
-  <data name="ImageViewWindow2_SDRMappedLuminance" xml:space="preserve">
+  <data name="ImageViewWindow_SDRMappedLuminance" xml:space="preserve">
     <value>SDR 映射亮度</value>
   </data>
-  <data name="ImageViewWindow2_ExportImage" xml:space="preserve">
+  <data name="ImageViewWindow_ExportImage" xml:space="preserve">
     <value>导出图像</value>
   </data>
-  <data name="ImageViewWindow2_DeleteImageFile" xml:space="preserve">
+  <data name="ImageViewWindow_DeleteImageFile" xml:space="preserve">
     <value>删除图像文件</value>
   </data>
-  <data name="ImageViewWindow2_CopiedToClipboard" xml:space="preserve">
+  <data name="ImageViewWindow_CopiedToClipboard" xml:space="preserve">
     <value>已复制到剪贴板</value>
   </data>
-  <data name="ImageViewWindow2_FileDoesNotExist" xml:space="preserve">
+  <data name="ImageViewWindow_FileDoesNotExist" xml:space="preserve">
     <value>文件不存在</value>
   </data>
-  <data name="ImageViewWindow2_OpenWithDefaultApp" xml:space="preserve">
+  <data name="ImageViewWindow_OpenWithDefaultApp" xml:space="preserve">
     <value>使用默认应用打开</value>
   </data>
-  <data name="ImageViewWindow2_NoImageToDisplay" xml:space="preserve">
+  <data name="ImageViewWindow_NoImageToDisplay" xml:space="preserve">
     <value>没有要显示的图像</value>
   </data>
   <data name="Common_OpenFiles" xml:space="preserve">
     <value>打开文件</value>
   </data>
-  <data name="ImageViewWindow2_OpenNewFiles" xml:space="preserve">
+  <data name="ImageViewWindow_OpenNewFiles" xml:space="preserve">
     <value>打开新文件</value>
   </data>
-  <data name="ImageViewWindow2_FailedToDisplayImage" xml:space="preserve">
+  <data name="ImageViewWindow_FailedToDisplayImage" xml:space="preserve">
     <value>图像加载失败</value>
   </data>
-  <data name="ImageViewWindow2_FailedToSaveImage" xml:space="preserve">
+  <data name="ImageViewWindow_FailedToSaveImage" xml:space="preserve">
     <value>保存图像失败</value>
   </data>
-  <data name="ImageViewWindow2_FailedToDeleteImageFile" xml:space="preserve">
+  <data name="ImageViewWindow_FailedToDeleteImageFile" xml:space="preserve">
     <value>删除图像文件失败</value>
   </data>
-  <data name="ImageViewWindow2_UnableToDeleteTheFile" xml:space="preserve">
+  <data name="ImageViewWindow_UnableToDeleteTheFile" xml:space="preserve">
     <value>无法删除文件</value>
   </data>
-  <data name="ImageViewWindow2_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
+  <data name="ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
     <value>没有权限或文件正在使用</value>
   </data>
   <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
@@ -328,7 +328,7 @@
   <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
     <value>自动复制截图文件</value>
   </data>
-  <data name="ImageViewWindow2_CopyAsJPG" xml:space="preserve">
+  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
     <value>复制为 JPG</value>
   </data>
   <data name="ScreenshotPage_MultiSelect" xml:space="preserve">
