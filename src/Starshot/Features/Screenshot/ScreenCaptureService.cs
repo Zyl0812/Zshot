@@ -508,8 +508,9 @@ internal class ScreenCaptureService
     /// 直接从内存 SDR 位图复制到剪贴板（Win32 CF_DIB，不读文件、不经 WinRT DataPackage）。
     /// 输入需已是 SDR（区域截图用覆盖层裁好的 SdrCrop）。与保存流程平级、独立，可复用。
     /// </summary>
-    public static async Task CopyCaptureToClipboardAsync(CanvasBitmap sdrBitmap, bool force = false)
+    public static async Task CopyCaptureToClipboardAsync(CanvasBitmap? sdrBitmap, bool force = false)
     {
+        if (sdrBitmap is null) return;
         var log = AppConfig.GetLogger<ScreenCaptureService>();
         if (!force && !AppConfig.AutoCopyScreenshotToClipboard)
         {

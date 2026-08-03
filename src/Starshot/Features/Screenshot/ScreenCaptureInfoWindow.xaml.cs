@@ -201,8 +201,9 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
     /// <summary>
     /// 仅复制成功：显示缩略图 + "已复制"，无文件、无打开按钮
     /// </summary>
-    public void CaptureCopySuccess(Microsoft.UI.DisplayId displayId, CanvasBitmap bitmap, float maxCLL = -1)
+    public void CaptureCopySuccess(Microsoft.UI.DisplayId displayId, CanvasBitmap? bitmap, float maxCLL = -1)
     {
+        if (bitmap is null) return;
         try
         {
             IsSuccess = true;

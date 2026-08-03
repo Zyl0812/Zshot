@@ -32,7 +32,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
     public Rect SelectionRect { get; private set; }
     public bool IsConfirmed { get; private set; }
     // 确认时从 _displayBitmap（冻结帧，已 tonemap 的 SDR）裁出的选区，供剪贴板直接复用，不再二次 tonemap
-    public CanvasRenderTarget SdrCrop { get; private set; }
+    public CanvasRenderTarget? SdrCrop { get; private set; }
 
     private CanvasBitmap _canvasOriginal;   // 原始帧（裁剪用，可能 HDR），每次 SetCapture 更新
     private CanvasBitmap _displayBitmap;     // 显示用（SDR 色调映射后），每次 SetCapture 重建
@@ -54,7 +54,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private float _dashOffset;
     private readonly System.Diagnostics.Stopwatch _timer;
     private bool _isClosed;
-    private CanvasSwapChain _swapChain;
+    private CanvasSwapChain? _swapChain;
     private DispatcherTimer _renderTimer;
 
     // 锁定画布尺寸（首帧后固定，防止布局抖动导致冻结帧移动）
