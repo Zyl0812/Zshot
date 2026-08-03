@@ -121,6 +121,7 @@ public sealed partial class ImageViewWindow : Window
             ScrollViewer_Image.PointerMoved -= ScrollViewer_Image_PointerMoved;
             ScrollViewer_Image.PointerReleased -= ScrollViewer_Image_PointerReleased;
             ScrollViewer_Image.PointerWheelChanged -= ScrollViewer_Image_PointerWheelChanged;
+            CompositionTarget.Rendering -= OnZoomTick;
             ScrollViewer_Image.DragOver -= ScrollViewer_Image_DragOver;
             ScrollViewer_Image.Drop -= ScrollViewer_Image_Drop;
             Slider_ZoomFactor.ManipulationDelta -= Slider_ZoomFactor_ManipulationDelta;
@@ -383,19 +384,51 @@ public sealed partial class ImageViewWindow : Window
 
     private void ScrollViewer_Image_PointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (e.KeyModifiers.HasFlag(VirtualKeyModifiers.Control)) return;
         try
         {
-            int delta = e.GetCurrentPoint(ScrollViewer_Image).Properties.MouseWheelDelta;
-            if (delta > 0)
+            var pointer = e.GetCurrentPoint(ScrollViewer_Image);
+            int delta = pointer.Properties.MouseWheelDelta;
+            Point cursorViewportPoint = pointer.Position;
+
+            double currentFactor = ScrollViewer_Image.ZoomFactor;
+            // 连续滚轮累积：新 target 乘前 target（不乘当前显示值），×1.1 步进不变
+            double baseTarget = _isZoomAnimating ? _zoomTargetFactor : currentFactor;
+            _zoomTargetFactor = Math.Clamp(baseTarget * (delta > 0 ? 1.1 : 1.0 / 1.1), ScrollViewer_Image.MinZoomFactor, MAX_ZOOM_FACTOR);
+            _zoomStartFactor = currentFactor;
+            _zoomContentPoint = new Point(
+                (ScrollViewer_Image.HorizontalOffset + cursorViewportPoint.X) / currentFactor,
+                (ScrollViewer_Image.VerticalOffset + cursorViewportPoint.Y) / currentFactor);
+            _zoomCursorViewportPoint = cursorViewportPoint;
+            _zoomAnimStart = DateTime.UtcNow;
+
+            if (!_isZoomAnimating)
             {
-                LoadPreviewImage();
+                _isZoomAnimating = true;
+                CompositionTarget.Rendering += OnZoomTick;
             }
-            else if (delta < 0)
-            {
-                LoadNextImage();
-            }
+            e.Handled = true;
         }
         catch { }
+    }
+
+
+    private void OnZoomTick(object sender, object e)
+    {
+        double t = (DateTime.UtcNow - _zoomAnimStart).TotalMilliseconds / _zoomAnimDuration.TotalMilliseconds;
+        bool done = t >= 1.0;
+        double eased = 1 - Math.Pow(1 - Math.Clamp(t, 0, 1), 3); // ease-out cubic
+
+        double factor = _zoomStartFactor + (_zoomTargetFactor - _zoomStartFactor) * eased;
+        double h = _zoomContentPoint.X * factor - _zoomCursorViewportPoint.X;
+        double v = _zoomContentPoint.Y * factor - _zoomCursorViewportPoint.Y;
+        ScrollViewer_Image.ChangeView(h, v, (float)factor, disableAnimation: true);
+
+        if (done)
+        {
+            _isZoomAnimating = false;
+            CompositionTarget.Rendering -= OnZoomTick;
+        }
     }
 
 
@@ -561,6 +594,15 @@ public sealed partial class ImageViewWindow : Window
     private CancellationTokenSource _loadImageCts;
 
     private double _lastUIScale;
+
+    // 滚轮缩放自定义动画：ChangeView 动画时长系统固定无法延长，
+    // 自己每帧 lerp（CompositionTarget.Rendering）+ ChangeView(disableAnimation:true)
+    private bool _isZoomAnimating;
+    private double _zoomStartFactor, _zoomTargetFactor;
+    private Point _zoomContentPoint;
+    private Point _zoomCursorViewportPoint;
+    private DateTime _zoomAnimStart;
+    private readonly TimeSpan _zoomAnimDuration = TimeSpan.FromMilliseconds(300);
 
     private ColorPrimaries ImageColorPrimaries { get => field ?? ColorPrimaries.BT709; set; }
 
