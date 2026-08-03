@@ -711,6 +711,31 @@ public sealed partial class ImageViewWindow : Window
     }
 
 
+    /// <summary>
+    /// 加载内存中的 CanvasBitmap（无文件路径，如剪贴板图片）。文件相关操作
+    /// （打开/删除/在资源管理器打开/复制文件/复制路径）不可用——CurrentFilePath 为空，
+    /// 操作 handler 的 File.Exists 检查会提示"文件不存在"。复制图像走 SetBitmapDib（内存，仅 BGRA）。
+    /// </summary>
+    public void LoadBitmap(CanvasBitmap bitmap, string? displayName = null)
+    {
+        _loadImageCts?.Cancel();
+        _loadImageCts = new();
+        CurrentFilePath = "";
+        CurrentFileName = displayName ?? "";
+        ImageColorPrimaries = ColorPrimaries.BT709;
+        _sourceBitmap?.Dispose();
+        _sourceBitmap = bitmap;
+        CurrentFileSizeText = "-";
+        CurrentPixelSizeText = $"{_sourceBitmap.SizeInPixels.Width} x {_sourceBitmap.SizeInPixels.Height}";
+        UpdateImageInformation(_sourceBitmap);
+        DrawImage(true);
+        ResetZoomFactor();
+        CanvasSwapChainPanel_Image.Visibility = Visibility.Visible;
+        StackPanel_NoImage.Visibility = Visibility.Collapsed;
+        StackPanel_DisplayImageError.Visibility = Visibility.Collapsed;
+    }
+
+
     private static string GetSizeText(long size)
     {
         const double MB = 1 << 20;
@@ -1133,6 +1158,14 @@ public sealed partial class ImageViewWindow : Window
             {
                 var file = await StorageFile.GetFileFromPathAsync(CurrentFilePath);
                 ClipboardHelper.SetBitmap(file);
+                ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow_CopiedToClipboard, "", 2000);
+            }
+            else if (_sourceBitmap is not null && _sourceBitmap.Format is DirectXPixelFormat.B8G8R8A8UIntNormalized)
+            {
+                // 内存对象（无文件）：直接从 _sourceBitmap 拷 BGRA 到剪贴板
+                int w = (int)_sourceBitmap.SizeInPixels.Width;
+                int h = (int)_sourceBitmap.SizeInPixels.Height;
+                ClipboardHelper.SetBitmapDib(w, h, _sourceBitmap.GetPixelBytes());
                 ShowInfo(InfoBarSeverity.Success, Lang.ImageViewWindow_CopiedToClipboard, "", 2000);
             }
             else
