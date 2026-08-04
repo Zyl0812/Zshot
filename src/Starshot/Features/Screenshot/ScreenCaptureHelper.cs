@@ -59,7 +59,6 @@ internal partial class ScreenCaptureHelper
         using Direct3D11CaptureFramePool framePool = IsWin10 ? Direct3D11CaptureFramePool.Create(device, DirectXPixelFormat.R8G8B8A8UIntNormalized, 1, item.Size)
                                                              : Direct3D11CaptureFramePool.CreateFreeThreaded(device, pixelFormat, 1, item.Size);
         using GraphicsCaptureSession session = framePool.CreateCaptureSession(item);
-#pragma warning disable CA1416 // 验证平台兼容性
         if (IsIncludeSecondaryWindowsPresent)
         {
             session.IncludeSecondaryWindows = true;
@@ -72,7 +71,6 @@ internal partial class ScreenCaptureHelper
         {
             session.IsCursorCaptureEnabled = false;
         }
-#pragma warning restore CA1416 // 验证平台兼容性
         var completionSource = new TaskCompletionSource<Direct3D11CaptureFrame>();
         cancellationToken.Register(() => completionSource.TrySetCanceled());
         // 额外超时保护：即使外部没传 CancellationToken，也不会永久挂起

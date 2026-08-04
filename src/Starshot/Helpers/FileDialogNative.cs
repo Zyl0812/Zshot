@@ -1,6 +1,4 @@
-﻿#pragma warning disable 108
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Starshot.Helpers;
