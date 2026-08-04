@@ -316,6 +316,9 @@
   <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
     <value>点击设置快捷键</value>
   </data>
+  <data name="HotkeyInput_DeleteShortcut" xml:space="preserve">
+    <value>删除快捷键</value>
+  </data>
   <data name="HotkeyInput_PressTheShortcutKeys" xml:space="preserve">
     <value>按下快捷键</value>
   </data>
@@ -771,5 +774,14 @@
   </data>
   <data name="Starshot_DebugExtract" xml:space="preserve">
     <value>解压</value>
+  </data>
+  <data name="Starshot_DebugUrlEmpty" xml:space="preserve">
+    <value>URL 和路径都不能为空</value>
+  </data>
+  <data name="Starshot_DebugExtractDone" xml:space="preserve">
+    <value>完成！</value>
+  </data>
+  <data name="Starshot_DebugExtractFailed" xml:space="preserve">
+    <value>失败：</value>
   </data>
 </root>

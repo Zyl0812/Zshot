@@ -316,6 +316,9 @@
   <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
     <value>クリックしてショートカットキーを設定</value>
   </data>
+  <data name="HotkeyInput_DeleteShortcut" xml:space="preserve">
+    <value>ショートカットキーを削除</value>
+  </data>
   <data name="HotkeyInput_PressTheShortcutKeys" xml:space="preserve">
     <value>ショートカットキーを押す</value>
   </data>
@@ -771,5 +774,14 @@
   </data>
   <data name="Starshot_DebugExtract" xml:space="preserve">
     <value>展開</value>
+  </data>
+  <data name="Starshot_DebugUrlEmpty" xml:space="preserve">
+    <value>URLとパスは必須です</value>
+  </data>
+  <data name="Starshot_DebugExtractDone" xml:space="preserve">
+    <value>完了！</value>
+  </data>
+  <data name="Starshot_DebugExtractFailed" xml:space="preserve">
+    <value>失敗：</value>
   </data>
 </root>

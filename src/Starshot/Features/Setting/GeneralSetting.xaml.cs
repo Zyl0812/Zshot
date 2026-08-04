@@ -229,7 +229,7 @@ public sealed partial class GeneralSetting : PageBase
         if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(dest))
         {
             s_extractState = ExtractState.Idle;
-            s_extractStatus = "URL 和路径都不能为空";
+            s_extractStatus = Lang.Starshot_DebugUrlEmpty;
             RefreshExtractState();
             return;
         }
@@ -249,12 +249,12 @@ public sealed partial class GeneralSetting : PageBase
             await UpdateService.ExtractToDirectoryAsync(url, dest, progress, disableCert: DisableCert);
             s_extractState = ExtractState.Completed;
             s_extractPercent = 100;
-            s_extractStatus = "完成！";
+            s_extractStatus = Lang.Starshot_DebugExtractDone;
         }
         catch (Exception ex)
         {
             s_extractState = ExtractState.Failed;
-            s_extractStatus = "失败：" + ex.Message;
+            s_extractStatus = Lang.Starshot_DebugExtractFailed + ex.Message;
         }
         finally
         {

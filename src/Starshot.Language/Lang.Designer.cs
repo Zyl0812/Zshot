@@ -328,7 +328,16 @@
                 return ResourceManager.GetString("HotkeyInput_ClickToSetShortcutKeys", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   查找类似 Delete shortcut 的本地化字符串。
+        /// </summary>
+        public static string HotkeyInput_DeleteShortcut {
+            get {
+                return ResourceManager.GetString("HotkeyInput_DeleteShortcut", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   查找类似 Press the Shortcut Keys 的本地化字符串。
         /// </summary>
@@ -1202,7 +1211,25 @@
                 return ResourceManager.GetString("Starshot_DebugExtract", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   查找类似 Done! 的本地化字符串。
+        /// </summary>
+        public static string Starshot_DebugExtractDone {
+            get {
+                return ResourceManager.GetString("Starshot_DebugExtractDone", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Failed:  的本地化字符串。
+        /// </summary>
+        public static string Starshot_DebugExtractFailed {
+            get {
+                return ResourceManager.GetString("Starshot_DebugExtractFailed", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   查找类似 Streaming Extract Test 的本地化字符串。
         /// </summary>
@@ -1229,7 +1256,16 @@
                 return ResourceManager.GetString("Starshot_DebugSelect", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   查找类似 URL and path cannot be empty 的本地化字符串。
+        /// </summary>
+        public static string Starshot_DebugUrlEmpty {
+            get {
+                return ResourceManager.GetString("Starshot_DebugUrlEmpty", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   查找类似 Delete HDR if SDR Content 的本地化字符串。
         /// </summary>

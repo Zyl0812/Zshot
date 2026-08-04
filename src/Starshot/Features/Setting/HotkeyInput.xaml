@@ -103,7 +103,7 @@
                 BorderThickness="0"
                 Click="Button_DeleteHotkey_Click"
                 CornerRadius="4"
-                ToolTipService.ToolTip="删除快捷键"
+                ToolTipService.ToolTip="{x:Bind lang:Lang.HotkeyInput_DeleteShortcut}"
                 Visibility="Collapsed">
             <FontIcon FontSize="16"
                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -141,7 +141,7 @@
                 Background="Transparent"
                 BorderThickness="0"
                 CornerRadius="4"
-                ToolTipService.ToolTip="取消"
+                ToolTipService.ToolTip="{x:Bind lang:Lang.Common_Cancel}"
                 Visibility="Collapsed">
             <FontIcon FontSize="16"
                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
