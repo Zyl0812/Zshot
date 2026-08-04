@@ -65,6 +65,17 @@
                     </NavigationViewItem.Content>
                 </NavigationViewItem>
 
+                <NavigationViewItem Tag="Clipboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontSize="20" Glyph="&#xE77F;" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <Border Height="40">
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Common_Clipboard}" />
+                        </Border>
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
                 <NavigationViewItemSeparator />
 
                 <NavigationViewItem Tag="Hotkey">

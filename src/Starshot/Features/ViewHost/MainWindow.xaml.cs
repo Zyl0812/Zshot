@@ -146,6 +146,7 @@ public sealed partial class MainWindow : WindowEx
             var pageType = tag switch
             {
                 "Gallery" => typeof(ScreenshotPage),
+                "Clipboard" => typeof(ClipboardPage),
                 "Appearance" => typeof(AppearanceSetting),
                 "Hotkey" => typeof(HotkeySetting),
                 "Screenshot" => typeof(ScreenshotSetting),

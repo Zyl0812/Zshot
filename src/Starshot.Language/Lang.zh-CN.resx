@@ -175,6 +175,18 @@
   <data name="Common_Open" xml:space="preserve">
     <value>打开</value>
   </data>
+  <data name="Common_Clipboard" xml:space="preserve">
+    <value>剪贴板</value>
+  </data>
+  <data name="ClipboardPage_NotEnabled" xml:space="preserve">
+    <value>未开启剪贴板历史功能</value>
+  </data>
+  <data name="ClipboardPage_GoToSettings" xml:space="preserve">
+    <value>前往 Windows 剪贴板设置</value>
+  </data>
+  <data name="ClipboardPage_NoImages" xml:space="preserve">
+    <value>剪贴板历史中暂无图片</value>
+  </data>
   <data name="GachaImportAndExportWindow_Import" xml:space="preserve">
     <value>导入</value>
   </data>
@@ -345,6 +357,9 @@
   </data>
   <data name="ScreenshotPage_BatchConvert" xml:space="preserve">
     <value>批量转换</value>
+  </data>
+  <data name="ScreenshotPage_Recopy" xml:space="preserve">
+    <value>重新复制</value>
   </data>
   <data name="ImageBatchConvertWindow_Quality" xml:space="preserve">
     <value>质量</value>

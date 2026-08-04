@@ -1,11 +1,16 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Starshot.Features.Codec;
+using Starshot.Language;
+using Windows.ApplicationModel.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Windows.Storage.Streams;
 
 namespace Starshot.Features.Screenshot;
 
@@ -26,6 +31,22 @@ public partial class ScreenshotItem : ObservableObject
 
     public string TimeMonthDay { get; set; }
 
+    /// <summary>剪贴板历史项本体（重新复制走 Clipboard.SetHistoryItemAsContent，专用 API）</summary>
+    public ClipboardHistoryItem? HistoryItem { get; set; }
+
+    /// <summary>剪贴板历史项的图片流引用（缓存首张缩略图用；点击预览/信息复用，避免反复 GetBitmapAsync）</summary>
+    public RandomAccessStreamReference? ClipboardStream { get; set; }
+
+    /// <summary>剪贴板项缩略图（BitmapImage）。文件项不用（走 FilePath 优化），故为 null。</summary>
+    public ImageSource? ThumbImage { get; set => SetProperty(ref field, value); }
+
+    /// <summary>
+    /// 统一缩略图源，供 CachedImage.Source 绑定：
+    /// 文件项返回 FilePath（string → 触发 CachedImage 的 IsThumbnail 下采样优化，原管线不动）；
+    /// 剪贴板项返回 ThumbImage（BitmapImage，直接显示）。
+    /// </summary>
+    public object? DisplaySource => ClipboardStream is null ? FilePath : ThumbImage;
+
 
     public ScreenshotItem(string file)
     {
@@ -40,6 +61,25 @@ public partial class ScreenshotItem : ObservableObject
         TimeMonthDay = CreationTime.ToString("yyyy-MM-dd");
     }
 
+
+    /// <summary>剪贴板历史图片项（无文件；存历史项本体 + 缓存流引用）</summary>
+    public static ScreenshotItem FromClipboard(ClipboardHistoryItem hist, RandomAccessStreamReference stream)
+    {
+        var local = hist.Timestamp.LocalDateTime;
+        return new ScreenshotItem
+        {
+            Name = "Clipboard",
+            FilePath = "",
+            FileName = "Clipboard",
+            CreationTime = local,
+            CreationTimeText = local.ToString("yyyy-MM-dd HH:mm:ss"),
+            TimeMonthDay = Lang.Common_Clipboard,
+            HistoryItem = hist,
+            ClipboardStream = stream,
+        };
+    }
+
+    private ScreenshotItem() { }
 
 
     private static string GetFileInfo(FileInfo info)

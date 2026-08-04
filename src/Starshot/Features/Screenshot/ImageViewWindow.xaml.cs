@@ -13,6 +13,7 @@ using Starward.Codec.ICC;
 using Starshot.Features.Codec;
 using Starshot.Features.Setting;
 using Starshot.Helpers;
+using Starshot.Language;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,6 +30,7 @@ using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Graphics.DirectX;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.System;
 using Windows.UI;
 
@@ -413,7 +415,7 @@ public sealed partial class ImageViewWindow : Window
     }
 
 
-    private void OnZoomTick(object sender, object e)
+    private void OnZoomTick(object? sender, object e)
     {
         double t = (DateTime.UtcNow - _zoomAnimStart).TotalMilliseconds / _zoomAnimDuration.TotalMilliseconds;
         bool done = t >= 1.0;
@@ -778,6 +780,32 @@ public sealed partial class ImageViewWindow : Window
     }
 
 
+    /// <summary>
+    /// 按 item 加载：文件走 FilePath（LoadImageAsync），剪贴板历史项走 ClipboardStream（解码→LoadBitmap）。
+    /// 让上一张/下一张导航对剪贴板项也生效。
+    /// </summary>
+    private async Task LoadItemAsync(ScreenshotItem item)
+    {
+        if (item.ClipboardStream is { } streamRef)
+        {
+            try
+            {
+                using var stream = await streamRef.OpenReadAsync();
+                var bitmap = await CanvasBitmap.LoadAsync(CanvasDevice.GetSharedDevice(), stream);
+                LoadBitmap(bitmap, Lang.Common_Clipboard);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "LoadItemAsync (clipboard)");
+            }
+        }
+        else
+        {
+            await LoadImageAsync(item.FilePath);
+        }
+    }
+
+
     private static string GetSizeText(long size)
     {
         const double MB = 1 << 20;
@@ -840,7 +868,7 @@ public sealed partial class ImageViewWindow : Window
             if (index > 0)
             {
                 CurrentScreenshot = ScreenshotCollection[index - 1];
-                _ = LoadImageAsync(CurrentScreenshot.FilePath);
+                _ = LoadItemAsync(CurrentScreenshot);
             }
         }
         catch { }
@@ -859,7 +887,7 @@ public sealed partial class ImageViewWindow : Window
             if (index < ScreenshotCollection.Count - 1)
             {
                 CurrentScreenshot = ScreenshotCollection[index + 1];
-                _ = LoadImageAsync(CurrentScreenshot.FilePath);
+                _ = LoadItemAsync(CurrentScreenshot);
             }
         }
         catch { }
@@ -984,7 +1012,7 @@ public sealed partial class ImageViewWindow : Window
             AppWindow.MoveAndResize(new RectInt32(point.X, point.Y, size.Width, size.Height));
             User32.ShowWindow(WindowHandle, ShowWindowCommand.SW_SHOWMAXIMIZED);
             await Task.Delay(1);
-            await LoadImageAsync(screenshotItem.FilePath);
+            await LoadItemAsync(screenshotItem);
         }
         catch (Exception ex)
         {

@@ -130,6 +130,42 @@
                 return ResourceManager.GetString("Common_Open", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   查找类似 Clipboard 的本地化字符串。
+        /// </summary>
+        public static string Common_Clipboard {
+            get {
+                return ResourceManager.GetString("Common_Clipboard", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Clipboard history is not enabled 的本地化字符串。
+        /// </summary>
+        public static string ClipboardPage_NotEnabled {
+            get {
+                return ResourceManager.GetString("ClipboardPage_NotEnabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Go to Windows clipboard settings 的本地化字符串。
+        /// </summary>
+        public static string ClipboardPage_GoToSettings {
+            get {
+                return ResourceManager.GetString("ClipboardPage_GoToSettings", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 No images in clipboard history 的本地化字符串。
+        /// </summary>
+        public static string ClipboardPage_NoImages {
+            get {
+                return ResourceManager.GetString("ClipboardPage_NoImages", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   查找类似 Open Files 的本地化字符串。
@@ -786,6 +822,15 @@
         public static string ScreenshotPage_BatchConvert {
             get {
                 return ResourceManager.GetString("ScreenshotPage_BatchConvert", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Recopy 的本地化字符串。
+        /// </summary>
+        public static string ScreenshotPage_Recopy {
+            get {
+                return ResourceManager.GetString("ScreenshotPage_Recopy", resourceCulture);
             }
         }
         
