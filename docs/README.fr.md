@@ -33,7 +33,7 @@ Starshot capture directement le framebuffer brut `R16G16B16A16Float` scRGB depui
 - 🎯 **Pipeline HDR sans perte** — Capture, encodage et gestion des couleurs en 16bit de bout en bout. Aucun tone mapping avec perte.
 - 🧠 **Détection intelligente HDR/SDR** — Distingue automatiquement le contenu réellement HDR du contenu SDR encapsulé dans un format HDR, sans gaspiller d'espace.
 - ✂️ **Capture régionale** — Overlay multi-écran avec gel d'image, détection de fenêtres et loupe pour une sélection précise au pixel près.
-- 📋 **Presse-papiers natif** — API native Win32 pour une écriture directe, collage fiable sans perte de contenu.
+- 📋 **Support du presse-papiers** — Les captures sont automatiquement copiées au presse-papiers ; parcourir l'historique des images du presse-papiers sur une page dédiée, aperçu / recopier / supprimer
 - 🗂️ **Support multi-format** — AVIF / JPEG XL / UHDR JPEG / PNG, avec outil de conversion par lots.
 - 🖥️ **Multi-écran** — La capture régionale peut sélectionner à travers plusieurs écrans, composant directement des images traversant les frontières d'écrans.
 - 🔄 **Vérification automatique de mises à jour** — Vérification intégrée ; nouvelle version détectée → téléchargement en flux, extraction et remplacement.
@@ -193,9 +193,19 @@ Après une capture, un toast avec miniature + statut apparaît (n'interfère pas
 - Menu contextuel : Ouvrir / Copier le fichier / Copier en JPG / Ouvrir dans l'Explorateur / Ouvrir avec / Supprimer
 - Sélection multiple + glisser-déposer + point d'entrée de conversion par lots
 
+### Historique du presse-papiers
+
+- Page dédiée pour parcourir les images de l'historique du presse-papiers Windows (Win+V)
+- Lecture via `Clipboard.GetHistoryItemsAsync`, disposition plate triée par temps
+- Actualisation automatique lors des changements (ContentChanged + throttle) + actualisation à l'activation
+- Clic pour aperçu (visionneuse d'images, avec navigation précédent/suivant)
+- Menu contextuel : Infos (format/taille/dimensions) / Ouvrir / Recopier / Supprimer de l'historique
+- Nécessite l'activation de l'historique du presse-papiers dans les paramètres Windows
+- État vide : message + lien `ms-settings:clipboard` si désactivé ; « aucune image » si vide
+
 ### Visualiseur d'images
 
-- Zoom (curseur / boutons / molette de la souris / double-clic pour ajuster), mode plein écran (F11)
+- Zoom (curseur / boutons / molette de la souris animation fluide / double-clic pour ajuster), mode plein écran (F11)
 - Précédent / Suivant (touches fléchées, molette de la souris, bande de miniatures en bas)
 - Glisser-déposer des fichiers pour les ouvrir directement
 - Menu contextuel : Copier le fichier / le chemin / l'image, Supprimer, Ouvrir dans l'Explorateur, Ouvrir avec

@@ -31,7 +31,7 @@ Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from th
 - 🎯 **Full HDR Pipeline** — Lossless capture, encoding, and color management in 16bit throughout. No lossy tone mapping.
 - 🧠 **Smart HDR/SDR Detection** — Automatically distinguishes genuine HDR content from SDR content wrapped in an HDR format, avoiding wasted space.
 - ✂️ **Region Screenshot** — Frozen-frame multi-monitor overlay with window detection and magnifier for pixel-precise selection.
-- 📋 **Native Clipboard** — Win32 native API writes directly to the clipboard for reliable pasting.
+- 📋 **Clipboard Support** — Screenshots auto-copy to clipboard; browse clipboard history images in a dedicated page, preview / recopy / delete
 - 🗂️ **Multi-format Support** — AVIF / JPEG XL / UHDR JPEG / PNG, including a batch conversion tool.
 - 🖥️ **Multi-Monitor** — Region screenshots can span across monitors, composing captures that cross screen boundaries.
 - 🔄 **Auto Update Check** — Built-in update check; on a new release it streams the download, extracts, and replaces in place.
@@ -191,9 +191,19 @@ After a screenshot, a thumbnail + status toast pops up (does not interfere with 
 - Context menu: Open / Copy File / Copy as JPG / Open in Explorer / Open With / Delete.
 - Multi-select + drag-out + batch conversion entry point.
 
+### Clipboard History
+
+- Dedicated page for browsing Windows clipboard history (Win+V) image items
+- Reads `Clipboard.GetHistoryItemsAsync`, flat layout sorted by time
+- Auto-refresh on clipboard change (ContentChanged + throttle) + refresh on window activation
+- Click to preview (image viewer, with previous/next navigation)
+- Context menu: Info (format/size/dimensions) / Open / Recopy / Delete from history
+- Requires clipboard history enabled in Windows Settings
+- Empty state: prompt + link to `ms-settings:clipboard` when not enabled; "no images" when empty
+
 ### Image Viewer
 
-- Zoom (slider / buttons / mouse wheel / double-click to fit), fullscreen mode (F11).
+- Zoom (slider / buttons / mouse wheel smooth animation / double-click to fit), fullscreen mode (F11).
 - Previous / Next (arrow keys, mouse wheel, bottom thumbnail strip).
 - Drag-and-drop files to open directly.
 - Context menu: Copy File / Path / Image, Delete, Open in Explorer, Open With.

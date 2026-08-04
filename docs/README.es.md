@@ -33,7 +33,7 @@ Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB des
 - 🎯 **Pipeline HDR completo sin pérdidas**: captura, codificación y gestión del color en 16 bits de principio a fin. Sin mapeo tonal con pérdidas.
 - 🧠 **Detección inteligente HDR/SDR**: distingue automáticamente el contenido HDR real del contenido SDR envuelto en un formato HDR, evitando ocupar espacio en vano.
 - ✂️ **Captura de región**: superposición multimonitor con fotograma congelado, detección de ventanas y lupa para selección precisa al píxel.
-- 📋 **Portapapeles nativo**: API nativa de Win32 escribe directamente, pegado fiable sin pérdida de contenido.
+- 📋 **Soporte de portapapeles** — Las capturas se copian automáticamente al portapapeles; explorar el historial de imágenes del portapapeles en una página dedicada, vista previa / recopiar / eliminar
 - 🗂️ **Soporte multiformato**: AVIF / JPEG XL / UHDR JPEG / PNG, incluyendo herramienta de conversión por lotes.
 - 🖥️ **Multimonitor**: la captura de región puede seleccionar abarcando varios monitores, componiendo directamente imágenes que cruzan los límites de pantalla.
 - 🔄 **Comprobación automática de actualizaciones**: comprobación integrada; al detectar una nueva versión, descarga por streaming, extracción y reemplazo.
@@ -193,9 +193,19 @@ Después de una captura, aparece una miniatura + notificación de estado (no int
 - Menú contextual: Abrir / Copiar archivo / Copiar como JPG / Abrir en Explorador / Abrir con / Eliminar
 - Selección múltiple + arrastrar fuera + punto de entrada de conversión por lotes
 
+### Historial del portapapeles
+
+- Página dedicada para explorar imágenes del historial del portapapeles de Windows (Win+V)
+- Lee `Clipboard.GetHistoryItemsAsync`, diseño plano ordenado por tiempo
+- Actualización automática al cambiar el portapapeles (ContentChanged + throttle) + actualizar al activar ventana
+- Clic para vista previa (visor de imágenes, con navegación anterior/siguiente)
+- Menú contextual: Información (formato/tamaño/dimensiones) / Abrir / Recopiar / Eliminar del historial
+- Requiere activar el historial del portapapeles en Configuración de Windows
+- Estado vacío: aviso + enlace `ms-settings:clipboard` si no está activado; «sin imágenes» si está vacío
+
 ### Visor de imágenes
 
-- Zoom (deslizador / botones / rueda del ratón / doble clic para ajustar), modo pantalla completa (F11)
+- Zoom (deslizador / botones / rueda del ratón animación fluida / doble clic para ajustar), modo pantalla completa (F11)
 - Anterior / Siguiente (teclas de flecha, rueda del ratón, tira de miniaturas inferior)
 - Arrastrar y soltar archivos para abrirlos directamente
 - Menú contextual: Copiar archivo / ruta / imagen, Eliminar, Abrir en Explorador, Abrir con
