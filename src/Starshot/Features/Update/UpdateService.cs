@@ -105,44 +105,56 @@ public static class UpdateService
         // app-{new}/ 用原始 tag（含 -Preview 后缀），跟 zip 实际目录名对齐；Version 是去后缀的，不能拿来拼目录
         string appNewDir = Path.Combine(root, "app-" + info.TagName);
 
-        // 备份 version.ini + 启动器（Copy 留原件，解压覆盖原件；失败还原 .bak）
+        // 备份 version.ini + 启动器：解压会覆盖原件，异常时 catch 用 .bak 还原，保证下次能启动旧版
         try { if (File.Exists(versionIni)) File.Copy(versionIni, versionIniBak, overwrite: true); } catch { }
         try { if (File.Exists(launcherExe)) File.Copy(launcherExe, launcherBak, overwrite: true); } catch { }
 
-        // 尝试差分更新（链式 delta）；失败自动 fallback 整包。forceFull=true 跳过 delta 直接整包
-        bool deltaOK = false;
-        if (!forceFull)
+        try
         {
-            try
+            // 尝试差分更新（链式 delta）；失败自动 fallback 整包。forceFull=true 跳过 delta 直接整包
+            bool deltaOK = false;
+            if (!forceFull)
             {
-                deltaOK = await TryDeltaUpdateAsync(info, root, appNewDir, progress, ct);
+                try
+                {
+                    deltaOK = await TryDeltaUpdateAsync(info, root, appNewDir, progress, ct);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
+                    deltaOK = false;
+                }
             }
-            catch (Exception ex)
+            if (!deltaOK)
             {
-                _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
-                deltaOK = false;
+                // fallback：删残缺 app-{new}/（差分可能创建了半成品）
+                try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
+
+                _logger?.LogInformation("Falling back to full package update");
+                await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
+            }
+
+            // 校验包结构：root/Starshot.exe + version.ini + app-{new}/
+            if (!File.Exists(launcherExe)
+                || !File.Exists(versionIni)
+                || !Directory.Exists(appNewDir))
+            {
+                throw new InvalidDataException("Update package structure invalid");
             }
         }
-        if (!deltaOK)
+        catch
         {
-            // fallback：删残缺 app-{new}/（差分可能创建了半成品）
-            try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
-
-            _logger?.LogInformation("Falling back to full package update");
-            await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
+            // 解压是 File.Create 直接覆盖、非原子，中途失败原件可能是半截；用 .bak 把启动器 + version.ini 还原回旧版
+            try { if (File.Exists(versionIniBak)) File.Copy(versionIniBak, versionIni, overwrite: true); } catch { }
+            try { if (File.Exists(launcherBak)) File.Copy(launcherBak, launcherExe, overwrite: true); } catch { }
+            throw;
         }
-
-        // 校验包结构：root/Starshot.exe + version.ini + app-{new}/
-        if (!File.Exists(launcherExe)
-            || !File.Exists(versionIni)
-            || !Directory.Exists(appNewDir))
+        finally
         {
-            throw new InvalidDataException("Update package structure invalid");
+            // 成败都删 .bak：成功原件已是新版；失败已在上面的 catch 还原原件，.bak 与原件相同
+            try { if (File.Exists(versionIniBak)) File.Delete(versionIniBak); } catch { }
+            try { if (File.Exists(launcherBak)) File.Delete(launcherBak); } catch { }
         }
-
-        // 成功：删 .bak
-        try { if (File.Exists(versionIniBak)) File.Delete(versionIniBak); } catch { }
-        try { if (File.Exists(launcherBak)) File.Delete(launcherBak); } catch { }
 
         // 启动器接管（--clean=<pid> 清旧 app-*，旧主进程锁着时按 pid 强杀）+ 退出本进程
         Process.Start(new ProcessStartInfo(launcherExe) { UseShellExecute = true, Arguments = $"--clean={Environment.ProcessId}" });
