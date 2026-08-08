@@ -32,26 +32,21 @@
             </StackPanel>
 
 
-            <!--  系统托盘  -->
-            <ToggleSwitch IsOn="{x:Bind EnableSystemTrayIcon, Mode=TwoWay}"
-                          OffContent="{x:Bind lang:Lang.Starshot_SystemTray}"
-                          OnContent="{x:Bind lang:Lang.Starshot_SystemTray}" />
-
-
-            <!--  开机自启  -->
+            <!--  更新源  -->
             <StackPanel Spacing="8">
-                <ToggleSwitch IsOn="{x:Bind EnableAutoStart, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.Starshot_AutoStart}"
-                              OnContent="{x:Bind lang:Lang.Starshot_AutoStart}" />
-                <ToggleSwitch IsOn="{x:Bind AutoStartMinimized, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
-                              OnContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
-                              Visibility="{x:Bind AutoStartMinimizedVisibility}" />
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_Update}" />
+                <ComboBox SelectedIndex="{x:Bind UpdateSource, Mode=TwoWay}" MinWidth="240">
+                    <ComboBoxItem Content="Cloudflare CDN" />
+                    <ComboBoxItem Content="GitHub Release" />
+                </ComboBox>
+                <ToggleSwitch IsOn="{x:Bind GithubApiNoProxy, Mode=TwoWay}"
+                              OffContent="{x:Bind lang:Lang.Starshot_GithubApiNoProxy}"
+                              OnContent="{x:Bind lang:Lang.Starshot_GithubApiNoProxy}" />
             </StackPanel>
 
 
             <!--  调试  -->
-            <StackPanel Spacing="8">
+            <StackPanel Spacing="8" Visibility="{x:Bind DevModeVisibility}">
                 <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_DebugSection}" />
                 <Expander Header="{x:Bind lang:Lang.Starshot_DebugExtractTitle}"
                           IsExpanded="True"
@@ -146,20 +141,20 @@
                 </Expander>
             </StackPanel>
 
-            <!--  高级  -->
+
+            <!--  通用  -->
             <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_Advanced}" />
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <TextBlock VerticalAlignment="Center"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               FontSize="13"
-                               Text="{x:Bind lang:Lang.Starshot_DeltaUpdateMaxLayers}" />
-                    <NumberBox Value="{x:Bind DeltaUpdateMaxLayers, Mode=TwoWay}"
-                               Minimum="1"
-                               Maximum="20"
-                               SpinButtonPlacementMode="Compact"
-                               Width="100" />
-                </StackPanel>
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_General}" />
+                <ToggleSwitch IsOn="{x:Bind EnableSystemTrayIcon, Mode=TwoWay}"
+                              OffContent="{x:Bind lang:Lang.Starshot_SystemTray}"
+                              OnContent="{x:Bind lang:Lang.Starshot_SystemTray}" />
+                <ToggleSwitch IsOn="{x:Bind EnableAutoStart, Mode=TwoWay}"
+                              OffContent="{x:Bind lang:Lang.Starshot_AutoStart}"
+                              OnContent="{x:Bind lang:Lang.Starshot_AutoStart}" />
+                <ToggleSwitch IsOn="{x:Bind AutoStartMinimized, Mode=TwoWay}"
+                              OffContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
+                              OnContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
+                              Visibility="{x:Bind AutoStartMinimizedVisibility}" />
             </StackPanel>
 
         </StackPanel>

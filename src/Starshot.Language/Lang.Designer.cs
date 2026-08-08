@@ -1231,6 +1231,42 @@
         }
 
         /// <summary>
+        ///   查找类似 Update 的本地化字符串。
+        /// </summary>
+        public static string Starshot_Update {
+            get {
+                return ResourceManager.GetString("Starshot_Update", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Update source 的本地化字符串。
+        /// </summary>
+        public static string Starshot_UpdateSource {
+            get {
+                return ResourceManager.GetString("Starshot_UpdateSource", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 General 的本地化字符串。
+        /// </summary>
+        public static string Starshot_General {
+            get {
+                return ResourceManager.GetString("Starshot_General", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 God Mode (pin debug to top) 的本地化字符串。
+        /// </summary>
+        public static string Starshot_GodMode {
+            get {
+                return ResourceManager.GetString("Starshot_GodMode", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   查找类似 Streaming Extract Test 的本地化字符串。
         /// </summary>
         public static string Starshot_DebugExtractTitle {

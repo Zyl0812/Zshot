@@ -245,6 +245,24 @@ public static partial class AppConfig
 
 
     /// <summary>
+    /// 更新源：0=Cloudflare CDN（默认，功能更多、国内访问更快），1=GitHub Release。选定后整条更新流程走该源，不跨源回退。
+    /// </summary>
+    public static int UpdateSource { get => GetValue(0); set => SetValue(value); }
+
+
+    /// <summary>
+    /// CDN 更新源基址（UpdateSource=Cloudflare 时用）
+    /// </summary>
+    public const string CdnBase = "https://starshot-release.cialo.site";
+
+
+    /// <summary>
+    /// 开发者模式：显示设置页调试组（流式解压测试）。默认关。
+    /// </summary>
+    public static bool DevMode { get => GetValue(false); set => SetValue(value); }
+
+
+    /// <summary>
     /// 日志/缓存文件夹，默认 %LOCALAPPDATA%\Starshot
     /// </summary>
     public static string LogFolder

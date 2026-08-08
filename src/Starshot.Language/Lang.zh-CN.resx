@@ -784,4 +784,16 @@
   <data name="Starshot_DebugExtractFailed" xml:space="preserve">
     <value>失败：</value>
   </data>
+  <data name="Starshot_Update" xml:space="preserve">
+    <value>更新源</value>
+  </data>
+  <data name="Starshot_UpdateSource" xml:space="preserve">
+    <value>更新服务器</value>
+  </data>
+  <data name="Starshot_General" xml:space="preserve">
+    <value>通用</value>
+  </data>
+  <data name="Starshot_GodMode" xml:space="preserve">
+    <value>上帝模式（调试置顶）</value>
+  </data>
 </root>

@@ -11,7 +11,9 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using SemVersion = SemanticVersioning.Version;
 
 namespace Starshot.Features.Update;
 
@@ -26,12 +28,14 @@ public static class UpdateService
 #else
         // 不吞异常：网络失败向上抛（手动检查弹"更新失败"，启动检查由调用方 catch 静默）。
         // update=null 仅表示"确无新版本/被忽略/无 zip 资源"；latestTag 始终带 GitHub 最新版号（供"已是最新"提示显示）
-        var release = await ReleaseClient.GetLatestReleaseAsync(AppConfig.EnablePreReleaseUpdateCheck);
+        var release = AppConfig.UpdateSource == 0
+            ? await ReleaseClient.GetLatestReleaseCDNAsync(AppConfig.EnablePreReleaseUpdateCheck)
+            : await ReleaseClient.GetLatestReleaseGitHubAsync(AppConfig.EnablePreReleaseUpdateCheck);
         if (release is null) return (null, null);
         if (!TryParseVersion(AppConfig.AppVersion, out var current)) return (null, release.TagName);
         if (release.Version <= current) return (null, release.TagName);
         // 只有自动检查才跳过用户忽略的版本；手动检查无视忽略
-        if (ignoreSkipped && Version.TryParse(AppConfig.IgnoreVersion, out var ignore) && release.Version <= ignore) return (null, release.TagName);
+        if (ignoreSkipped && SemVersion.TryParse(AppConfig.IgnoreVersion, out var ignore) && release.Version <= ignore) return (null, release.TagName);
         if (string.IsNullOrWhiteSpace(release.ZipUrl)) return (null, release.TagName);
         return (release, release.TagName);
 #endif
@@ -117,7 +121,9 @@ public static class UpdateService
             {
                 try
                 {
-                    deltaOK = await TryDeltaUpdateAsync(info, root, appNewDir, progress, ct);
+                    deltaOK = AppConfig.UpdateSource == 0
+                        ? await TryDeltaUpdateCDNAsync(info, root, appNewDir, progress, ct)
+                        : await TryDeltaUpdateGitHubAsync(info, root, appNewDir, progress, ct);
                 }
                 catch (Exception ex)
                 {
@@ -166,7 +172,7 @@ public static class UpdateService
     /// 差分更新（链式 delta）：复制当前 app 目录 → 依次解压 delta 链覆盖 + 删 manifest deletedFiles。
     /// 返回 true = 成功；false/异常 = 调用方 fallback 整包。
     /// </summary>
-    private static async Task<bool> TryDeltaUpdateAsync(
+    private static async Task<bool> TryDeltaUpdateGitHubAsync(
         ReleaseInfo info, string root, string appNewDir,
         IProgress<(int percent, string bytesText)> progress, CancellationToken ct)
     {
@@ -194,7 +200,7 @@ public static class UpdateService
 
         // 查 delta 链
         int maxLayers = AppConfig.DeltaUpdateMaxLayers;
-        var chain = await ReleaseClient.GetDeltaChainAsync(currentTag, info.TagName, maxLayers, ct);
+        var chain = await ReleaseClient.GetDeltaChainGitHubAsync(currentTag, info.TagName, maxLayers, ct);
         if (chain is null || chain.Count == 0)
         {
             _logger?.LogInformation("Delta skipped: no chain found from {From} to {To} (max {Max} layers), falling back to full package", currentTag, info.TagName, maxLayers);
@@ -325,6 +331,148 @@ public static class UpdateService
     }
 
 
+    /// <summary>
+    /// CDN 差分更新：版本 manifest 的 diffs 找 from==当前 → 单 diff（CDN 每 version 对最近 5 个 target 各打一个 diff，命中即一步到位，无链）。
+    /// 返回 true=成功；false/异常=调用方走整包。
+    /// </summary>
+    private static async Task<bool> TryDeltaUpdateCDNAsync(
+        ReleaseInfo info, string root, string appNewDir,
+        IProgress<(int percent, string bytesText)> progress, CancellationToken ct)
+    {
+        // 当前版本 tag
+        string versionIni = Path.Combine(root, "version.ini");
+        string? currentTag = null;
+        if (File.Exists(versionIni))
+        {
+            string line = File.ReadAllText(versionIni).TrimStart('\xEF', '\xBB', '\xBF');
+            var eq = line.IndexOf('=');
+            if (eq >= 0) currentTag = line[(eq + 1)..].Trim().ToLowerInvariant();
+        }
+        if (string.IsNullOrEmpty(currentTag))
+        {
+            _logger?.LogInformation("CDN delta skipped: no version.ini");
+            return false;
+        }
+        if (currentTag == "local")
+        {
+            _logger?.LogInformation("CDN delta skipped: Local build");
+            return false;
+        }
+
+        // 拿目标版本 manifest
+        var vm = await ReleaseClient.GetVersionManifestCDNAsync(info.TagName, ct);
+        if (vm is null)
+        {
+            _logger?.LogInformation("CDN delta skipped: version manifest not found for {Tag}", info.TagName);
+            return false;
+        }
+
+        // 当前架构
+        string arch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
+        var archManifest = arch == "x64" ? vm.X64 : vm.Arm64;
+        if (archManifest is null)
+        {
+            _logger?.LogInformation("CDN delta skipped: no {Arch} manifest", arch);
+            return false;
+        }
+
+        // diffs 找 from == 当前版本
+        var diff = archManifest.Diffs?.FirstOrDefault(d => string.Equals(d.From, currentTag, StringComparison.OrdinalIgnoreCase));
+        if (diff is null)
+        {
+            _logger?.LogInformation("CDN delta skipped: no diff from {From} to {To} (not in 5 targets)", currentTag, info.TagName);
+            return false;
+        }
+
+        // 当前 app 目录
+        string currentAppDir = Path.Combine(root, "app-" + currentTag);
+        if (!Directory.Exists(currentAppDir))
+        {
+            var found = Directory.GetDirectories(root, "app-*")
+                .FirstOrDefault(d => string.Equals(
+                    Path.GetFileName(d)["app-".Length..],
+                    currentTag,
+                    StringComparison.OrdinalIgnoreCase));
+            if (found is null)
+            {
+                _logger?.LogInformation("CDN delta skipped: current app dir not found for tag {Tag}", currentTag);
+                return false;
+            }
+            currentAppDir = found;
+        }
+
+        _logger?.LogInformation("CDN delta update: {From} -> {To}", currentTag, info.TagName);
+
+        // 1. 复制当前 app → 新 app
+        CopyDirectory(currentAppDir, appNewDir);
+
+        // 2. 解压 diff 到 root（覆盖变化文件 + diff 内 manifest + version.ini）
+        string diffUrl = $"{AppConfig.CdnBase}/release/{info.TagName}/{diff.File}";
+        await ExtractToDirectoryAsync(diffUrl, root, progress, ct);
+
+        // 3. 读 diff 内 manifest → 删 deletedFiles（CDN diff 内 manifest 只剩 deletedFiles）
+        string manifestPath = Path.Combine(root, "manifest.json");
+        if (File.Exists(manifestPath))
+        {
+            string json = await File.ReadAllTextAsync(manifestPath, ct);
+            var manifest = JsonSerializer.Deserialize<DeltaManifest>(json);
+            if (manifest?.DeletedFiles is not null)
+            {
+                foreach (var rel in manifest.DeletedFiles)
+                {
+                    string abs = Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar));
+                    try { if (File.Exists(abs)) File.Delete(abs); } catch { }
+                }
+            }
+            try { File.Delete(manifestPath); } catch { }
+        }
+
+        // 4. 校验 version.ini 版本 == target
+        if (File.Exists(versionIni))
+        {
+            string line = File.ReadAllText(versionIni).TrimStart('\xEF', '\xBB', '\xBF');
+            var eq = line.IndexOf('=');
+            if (eq >= 0)
+            {
+                string ver = line[(eq + 1)..].Trim().ToLowerInvariant();
+                if (!string.Equals(ver, info.TagName, StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger?.LogWarning("CDN delta result version mismatch: expected {Expected}, got {Actual}", info.TagName, ver);
+                    return false;
+                }
+            }
+        }
+
+        // 5. 全量 SHA256 校验：用版本 manifest 的 files（不是 diff 内 manifest，那个只剩 deletedFiles）
+        if (archManifest.Files is not null && archManifest.Files.Count > 0)
+        {
+            progress.Report((-1, ""));
+            bool integrityOk = await Task.Run(() =>
+            {
+                using var sha = SHA256.Create();
+                foreach (var kv in archManifest.Files)
+                {
+                    string abs = Path.Combine(appNewDir, kv.Key.Replace('/', Path.DirectorySeparatorChar));
+                    if (!File.Exists(abs)) return false;
+                    using var fs = File.OpenRead(abs);
+                    string hash = Convert.ToHexString(sha.ComputeHash(fs));
+                    if (!hash.Equals(kv.Value, StringComparison.OrdinalIgnoreCase)) return false;
+                }
+                return true;
+            });
+            if (!integrityOk)
+            {
+                _logger?.LogWarning("CDN delta integrity check failed (hash mismatch)");
+                return false;
+            }
+        }
+
+        progress.Report((100, ""));
+        _logger?.LogInformation("CDN delta update completed successfully");
+        return true;
+    }
+
+
     /// <summary>递归复制目录（Directory.Copy 在 .NET 不存在）</summary>
     private static void CopyDirectory(string source, string dest)
     {
@@ -352,18 +500,16 @@ public static class UpdateService
 
 
     /// <summary>
-    /// 解析版本字符串（version.ini 的 AppVersion 或 tag）：去 v 前缀 + pre-release 后缀（-Preview/-beta/-rc）再 Version.TryParse。
+    /// 解析版本字符串（version.ini 的 AppVersion 或 tag）：去 v 前缀，保留 prerelease 用 SemVersion 比。
     /// 本地构建（无 version.ini 或 "Local"）按 0.0.0 最低版本处理，可更新到任意 CI/CD release（方便测试更新流程）。
     /// </summary>
-    private static bool TryParseVersion(string? raw, out Version version)
+    private static bool TryParseVersion(string? raw, out SemVersion version)
     {
-        version = new Version(0, 0, 0);
+        version = new SemVersion(0, 0, 0);
         if (string.IsNullOrWhiteSpace(raw)) return true;
         string s = raw.Trim();
         if (s.StartsWith("v", StringComparison.OrdinalIgnoreCase)) s = s[1..];
-        int dash = s.IndexOf('-');
-        if (dash > 0) s = s[..dash];
-        if (Version.TryParse(s, out var v)) version = v;
+        if (SemVersion.TryParse(s, out var v)) version = v;
         return true;
     }
 

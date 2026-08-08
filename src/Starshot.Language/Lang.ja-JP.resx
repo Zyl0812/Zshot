@@ -784,4 +784,16 @@
   <data name="Starshot_DebugExtractFailed" xml:space="preserve">
     <value>失敗：</value>
   </data>
+  <data name="Starshot_Update" xml:space="preserve">
+    <value>更新元</value>
+  </data>
+  <data name="Starshot_UpdateSource" xml:space="preserve">
+    <value>更新サーバー</value>
+  </data>
+  <data name="Starshot_General" xml:space="preserve">
+    <value>全般</value>
+  </data>
+  <data name="Starshot_GodMode" xml:space="preserve">
+    <value>ゴッドモード（デバッグを先頭に固定）</value>
+  </data>
 </root>

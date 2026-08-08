@@ -9,11 +9,12 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using SemVersion = SemanticVersioning.Version;
 namespace Starshot.Features.Update;
 
 public sealed class ReleaseInfo
 {
-    public Version Version { get; init; } = new();
+    public SemVersion Version { get; init; } = new(0, 0, 0);
     /// <summary>原始 tag_name（如 0.3.1-Preview）。zip 里 app-{TagName}/ 目录名用它，不能用去后缀的 Version。</summary>
     public string TagName { get; init; } = "";
     public string ZipUrl { get; init; } = "";
@@ -39,6 +40,7 @@ public static class ReleaseClient
     private const string AllReleasesUrl = "https://api.github.com/repos/loliri/Starshot/releases";
 
     private static readonly HttpClient _http = CreateClient();
+    private static readonly HttpClient _cdnHttp = CreateCdnClient();
 
 
     private static HttpClient CreateClient()
@@ -52,7 +54,16 @@ public static class ReleaseClient
     }
 
 
-    public static async Task<ReleaseInfo?> GetLatestReleaseAsync(bool includePrerelease, CancellationToken ct = default)
+    private static HttpClient CreateCdnClient()
+    {
+        // CDN 走系统代理（用户的网络 / 优选 IP），跟 GitHub API 的直连策略分开
+        var c = new HttpClient();
+        c.DefaultRequestHeaders.UserAgent.ParseAdd($"Starshot/{AppConfig.AppVersion}");
+        return c;
+    }
+
+
+    public static async Task<ReleaseInfo?> GetLatestReleaseGitHubAsync(bool includePrerelease, CancellationToken ct = default)
     {
         // 不吞网络异常：让 HttpRequestException 向上抛，调用方据此区分"无新版本"与"检查失败"
         // pre-release 用 /releases 取列表第一个（最新，含 pre-release）；正式版用 /releases/latest（跳过 pre-release）
@@ -72,18 +83,16 @@ public static class ReleaseClient
             payload = await JsonSerializer.DeserializeAsync<GitHubReleasePayload>(stream, cancellationToken: ct);
         }
         if (payload is null) return null;
-        return BuildReleaseInfo(payload);
+        return BuildGitHubReleaseInfo(payload);
     }
 
 
-    private static ReleaseInfo? BuildReleaseInfo(GitHubReleasePayload payload)
+    private static ReleaseInfo? BuildGitHubReleaseInfo(GitHubReleasePayload payload)
     {
-        // tag_name 去前缀 v；再去 pre-release 后缀（-Preview / -beta / -rc1 等）再 Version.TryParse
+        // tag_name 去前缀 v；保留 prerelease 后缀用 SemVersion 比（preview < 正式）
         string tag = (payload.TagName ?? "").Trim();
         if (tag.StartsWith("v", StringComparison.OrdinalIgnoreCase)) tag = tag[1..];
-        int dash = tag.IndexOf('-');
-        if (dash > 0) tag = tag[..dash];
-        if (!Version.TryParse(tag, out var version)) return null;
+        if (!SemVersion.TryParse(tag, out var version)) return null;
 
         // 找 Starshot-{tag_name}-win-{arch}.zip（arch 跟随当前进程架构：x64 / arm64）
         string arch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
@@ -129,7 +138,7 @@ public static class ReleaseClient
     /// 构建链式 delta：从 currentTag 到 targetTag，在 GitHub releases 的 assets 里逐层找 delta。
     /// 返回 null = 找不到完整链（或超过 maxLayers）→ 调用方应 fallback 整包。
     /// </summary>
-    public static async Task<List<DeltaChainLink>?> GetDeltaChainAsync(
+    public static async Task<List<DeltaChainLink>?> GetDeltaChainGitHubAsync(
         string currentTag, string targetTag, int maxLayers, CancellationToken ct = default)
     {
         string arch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
@@ -189,5 +198,87 @@ public static class ReleaseClient
         }
         // 超过 maxLayers 还没到目标
         return null;
+    }
+
+
+    // ===== CDN（Cloudflare R2）更新源 =====
+
+    private sealed class CdnRootManifest
+    {
+        [JsonPropertyName("latest")] public string? Latest { get; set; }
+        [JsonPropertyName("latestPreview")] public string? LatestPreview { get; set; }
+    }
+
+    public sealed class CdnVersionManifest
+    {
+        [JsonPropertyName("tag")] public string Tag { get; set; } = "";
+        [JsonPropertyName("prerelease")] public bool Prerelease { get; set; }
+        [JsonPropertyName("x64")] public CdnArchManifest? X64 { get; set; }
+        [JsonPropertyName("arm64")] public CdnArchManifest? Arm64 { get; set; }
+    }
+
+    public sealed class CdnArchManifest
+    {
+        [JsonPropertyName("full")] public string? Full { get; set; }
+        [JsonPropertyName("diffs")] public CdnDiffEntry[]? Diffs { get; set; }
+        [JsonPropertyName("files")] public Dictionary<string, string>? Files { get; set; }
+    }
+
+    public sealed class CdnDiffEntry
+    {
+        [JsonPropertyName("from")] public string From { get; set; } = "";
+        [JsonPropertyName("file")] public string File { get; set; } = "";
+    }
+
+
+    public static async Task<ReleaseInfo?> GetLatestReleaseCDNAsync(bool includePrerelease, CancellationToken ct = default)
+    {
+        using var resp = await _cdnHttp.GetAsync($"{AppConfig.CdnBase}/manifest.json", ct);
+        resp.EnsureSuccessStatusCode();
+        await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+        var root = await JsonSerializer.DeserializeAsync<CdnRootManifest>(stream, cancellationToken: ct);
+        if (root is null) return null;
+        // 正式渠道只看 latest；预览渠道 latest 和 latestPreview 都看，取版本号大的（相等取 latest 正式版）
+        // 因为正式版更新后版本号可能 ≥ 预览版，预览渠道也该收到这个正式版更新
+        string? tag;
+        if (includePrerelease)
+        {
+            string? a = root.Latest;
+            string? b = root.LatestPreview;
+            if (string.IsNullOrWhiteSpace(b)) tag = a;
+            else if (string.IsNullOrWhiteSpace(a)) tag = b;
+            else tag = (SemVersion.TryParse(a, out var sa) && SemVersion.TryParse(b, out var sb) && sa >= sb) ? a : b;
+        }
+        else
+        {
+            tag = root.Latest;
+        }
+        if (string.IsNullOrWhiteSpace(tag)) return null;
+
+        var vm = await GetVersionManifestCDNAsync(tag, ct);
+        if (vm is null) return null;
+
+        string arch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
+        var archManifest = arch == "x64" ? vm.X64 : vm.Arm64;
+        if (string.IsNullOrWhiteSpace(archManifest?.Full)) return null;
+
+        if (!SemVersion.TryParse(tag, out var version)) return null;
+
+        return new ReleaseInfo
+        {
+            Version = version,
+            TagName = tag,
+            ZipUrl = $"{AppConfig.CdnBase}/release/{tag}/{archManifest.Full}",
+            Prerelease = vm.Prerelease,
+        };
+    }
+
+
+    public static async Task<CdnVersionManifest?> GetVersionManifestCDNAsync(string tag, CancellationToken ct = default)
+    {
+        using var resp = await _cdnHttp.GetAsync($"{AppConfig.CdnBase}/release/{tag}/manifest.json", ct);
+        resp.EnsureSuccessStatusCode();
+        await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+        return await JsonSerializer.DeserializeAsync<CdnVersionManifest>(stream, cancellationToken: ct);
     }
 }
