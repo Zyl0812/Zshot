@@ -258,6 +258,17 @@ public static class ReleaseClient
 
         if (!SemVersion.TryParse(tag, out var version)) return null;
 
+        // 提前对比当前版本：<= 当前 → 已是最新，返回空 ReleaseInfo（只 TagName + Version，ZipUrl 空）
+        // 不 GET 版本 manifest——避免无更新时白请求，也避免 latest 指向不存在版本时 404
+        string curRaw = (AppConfig.AppVersion ?? "").Trim();
+        if (curRaw.StartsWith("v", StringComparison.OrdinalIgnoreCase)) curRaw = curRaw[1..];
+        if (!SemVersion.TryParse(curRaw, out var current)) current = new SemVersion(0, 0, 0);
+        if (version <= current)
+        {
+            return new ReleaseInfo { Version = version, TagName = tag };
+        }
+
+        // 有更新 → GET 版本 manifest（zip url 等）
         var vm = await GetVersionManifestCDNAsync(tag, ct);
         if (vm is null) return null;
 
