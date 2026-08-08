@@ -44,20 +44,10 @@ jobs:
         with:
           tag_name: ${{ needs.build.outputs.vl }}
           name: ${{ needs.build.outputs.v }}
-          body: |
-            ### Download / 下载
-
-            - **x64**: [Starshot-${{ needs.build.outputs.vl }}-win-x64.zip](https://github.com/${{ github.repository }}/releases/download/${{ needs.build.outputs.vl }}/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip)
-            - **arm64**: [Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip](https://github.com/${{ github.repository }}/releases/download/${{ needs.build.outputs.vl }}/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip)
-
-            ---
-
           draft: true
           prerelease: ${{ inputs.prerelease }}
           files: |
             x64/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip
             arm64/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip
-            x64/diff-*-win-x64.zip
-            arm64/diff-*-win-arm64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
