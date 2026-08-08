@@ -704,7 +704,7 @@
     <value>チャネル</value>
   </data>
   <data name="Starshot_UpdateBuildTime" xml:space="preserve">
-    <value>ビルド日時</value>
+    <value>公開日時</value>
   </data>
   <data name="Starshot_GithubApiNoProxy" xml:space="preserve">
     <value>GitHub API 直結（プロキシ不使用）</value>

@@ -704,7 +704,7 @@
     <value>Channel</value>
   </data>
   <data name="Starshot_UpdateBuildTime" xml:space="preserve">
-    <value>Build Time</value>
+    <value>Release Time</value>
   </data>
   <data name="Starshot_GithubApiNoProxy" xml:space="preserve">
     <value>GitHub API direct (no proxy)</value>

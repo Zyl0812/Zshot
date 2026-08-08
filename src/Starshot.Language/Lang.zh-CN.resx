@@ -704,7 +704,7 @@
     <value>发布渠道</value>
   </data>
   <data name="Starshot_UpdateBuildTime" xml:space="preserve">
-    <value>编译时间</value>
+    <value>发布时间</value>
   </data>
   <data name="Starshot_GithubApiNoProxy" xml:space="preserve">
     <value>GitHub API 直连（不走代理）</value>
