@@ -17,206 +17,46 @@ permissions:
 
 jobs:
 
-  version:
-    runs-on: windows-latest
-    outputs:
-      v: ${{ steps.ver.outputs.v }}
-      vl: ${{ steps.ver.outputs.vl }}
-    steps:
-      - name: Resolve version
-        id: ver
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $input = "${{ github.event.inputs.version }}".Trim()
-          $isPreview = "${{ github.event.inputs.prerelease }}" -eq 'true'
-          if ([string]::IsNullOrEmpty($input)) {
-            # 最新一条 release（含 prerelease；/releases 默认不含 draft，按创建时间倒序）
-            $latest = (gh api repos/${{ github.repository }}/releases --jq '.[0].tag_name' 2>$null)
-            if ($LASTEXITCODE -eq 0 -and $latest -match '^(\d+)\.(\d+)\.(\d+)') {
-              if ($isPreview) {
-                $input = "$($Matches[1]).$($Matches[2]).$([int]$Matches[3] + 1)"
-              } else {
-                $input = "$($Matches[1]).$([int]$Matches[2] + 1).0"
-              }
-              Write-Host "Version empty, auto-incremented from $latest to $input (prerelease=$isPreview)"
-            } else {
-              $input = if ($isPreview) { "0.0.1" } else { "0.1.0" }
-              Write-Host "Version empty, no release found, fallback to $input (prerelease=$isPreview)"
-            }
-          }
-          $v = $input.Replace(' ', '-')
-          $vl = $v.ToLowerInvariant()
-          "v=$v" >> $env:GITHUB_OUTPUT
-          "vl=$vl" >> $env:GITHUB_OUTPUT
-
-
   build:
-    needs: version
-    strategy:
-      matrix:
-        platform: [x64, arm64]
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Build launcher
-        run: msbuild src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=${{ matrix.platform }}
-
-      - name: Publish main app
-        run: dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=${{ matrix.platform }} -r win-${{ matrix.platform }}
-
-      - name: Remove unuse
-        run: |
-          Remove-Item -Force build/release/app/RestartAgent.exe, build/release/app/DirectML.dll, build/release/app/onnxruntime.dll, build/release/app/onnxruntime_providers_shared.dll, build/release/app/Microsoft.ML.OnnxRuntime.dll, build/release/app/VP9DecoderMFT.dll -ErrorAction SilentlyContinue
-          Remove-Item -Recurse -Force build/release/app/NpuDetect -ErrorAction SilentlyContinue
-
-      - name: Trim unsupported locales
-        run: |
-          # 从 Starshot.Language 的 Lang.{locale}.resx 读程序支持的语言（Lang.resx 是默认 en，主 dll 内无目录）
-          $supported = Get-ChildItem src/Starshot.Language/Lang.*.resx | ForEach-Object {
-            if ($_.Name -match '^Lang\.([a-z]{2}(-[A-Za-z0-9]+)?)\.resx$') { $Matches[1] }
-          }
-          Write-Host "Supported locales: $($supported -join ', ')"
-          Get-ChildItem build/release/app -Directory | Where-Object {
-            if ($supported -contains $_.Name) { return $false }
-            try { [void][System.Globalization.CultureInfo]::GetCultureInfo($_.Name); return $true } catch { return $false }
-          } | Remove-Item -Recurse -Force
-
-      - name: Version layout
-        run: |
-          Move-Item build/release/app "build/release/app-${{ needs.version.outputs.vl }}" -Force
-          "version=${{ needs.version.outputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
-
-      - name: Generate delta
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $newTag = "${{ needs.version.outputs.vl }}"
-          $arch = "${{ matrix.platform }}"
-          $oldTag = (gh api repos/${{ github.repository }}/releases --jq '.[0].tag_name' 2>$null)
-          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($oldTag) -or $oldTag -eq $newTag) {
-            Write-Host "No previous release found (or same tag), skipping delta"
-            exit 0
-          }
-          Write-Host "Generating delta: $oldTag -> $newTag ($arch)"
-          $oldZip = "old-full.zip"
-          gh release download $oldTag --pattern "Starshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
-          if ($LASTEXITCODE -ne 0 -or !(Test-Path $oldZip)) {
-            Write-Host "Previous release zip not found, skipping delta"
-            exit 0
-          }
-          Expand-Archive $oldZip -DestinationPath old/ -Force
-          $oldApp = "old/app-$oldTag"
-          $newApp = "build/release/app-$newTag"
-          if (!(Test-Path $oldApp) -or !(Test-Path $newApp)) {
-            Write-Host "App folder not found, skipping delta"
-            exit 0
-          }
-          $oldRoot = (Resolve-Path $oldApp).Path
-          $newRoot = (Resolve-Path $newApp).Path
-          $deletedFiles = @()
-          $changedFiles = @()
-          $filesMap = @{}
-          Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
-            $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
-            if (!(Test-Path (Join-Path $newRoot $rel))) { $deletedFiles += "app-$newTag/$rel" }
-          }
-          Get-ChildItem $newRoot -Recurse -File | ForEach-Object {
-            $relApp = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
-            $oldFile = Join-Path $oldRoot $relApp
-            $newHash = (Get-FileHash $_.FullName).Hash
-            $filesMap[$relApp] = $newHash
-            if (!(Test-Path $oldFile)) {
-              $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName }
-            } else {
-              $oldHash = (Get-FileHash $oldFile).Hash
-              if ($oldHash -ne $newHash) { $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName } }
-            }
-          }
-          $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
-          $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
-          Write-Host "Changed: $($changedFiles.Count), Deleted: $($deletedFiles.Count)"
-          $filesSorted = [ordered]@{}
-          foreach ($k in ($filesMap.Keys | Sort-Object)) { $filesSorted[$k] = $filesMap[$k] }
-          $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object); files = $filesSorted }
-          $manifestPath = "build/release/manifest.json"
-          $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
-          $deltaZip = "diff-${newTag}-from-${oldTag}-win-${arch}.zip"
-          Add-Type -AssemblyName System.IO.Compression
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
-          if (Test-Path $deltaZip) { Remove-Item $deltaZip }
-          $zipArchive = [System.IO.Compression.ZipFile]::Open($deltaZip, 'Create')
-          try {
-            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $manifestPath, "manifest.json", [System.IO.Compression.CompressionLevel]::SmallestSize)
-            foreach ($f in $changedFiles) {
-              [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $f.FullPath, $f.Path, [System.IO.Compression.CompressionLevel]::SmallestSize)
-            }
-          } finally { $zipArchive.Dispose() }
-          Remove-Item $manifestPath -Force
-          Write-Host "Delta zip created: $deltaZip ($((Get-Item $deltaZip).Length / 1MB) MB)"
-
-      - name: Zip release
-        run: |
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $zip = "Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}.zip"
-          if (Test-Path $zip) { Remove-Item $zip }
-          [System.IO.Compression.ZipFile]::CreateFromDirectory("build/release", $zip, [System.IO.Compression.CompressionLevel]::SmallestSize, $false)
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}
-          path: |
-            Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}.zip
-            diff-*-win-${{ matrix.platform }}.zip
-
+    uses: ./.github/workflows/build.yml
+    with:
+      prerelease: ${{ inputs.prerelease }}
+      version: ${{ inputs.version }}
+    secrets: inherit
 
   release:
-    needs: [version, build]
+    needs: build
     runs-on: windows-latest
     steps:
       - name: Download x64
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ needs.version.outputs.vl }}-win-x64
+          name: Starshot-${{ needs.build.outputs.vl }}-win-x64
           path: x64
       - name: Download arm64
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ needs.version.outputs.vl }}-win-arm64
+          name: Starshot-${{ needs.build.outputs.vl }}-win-arm64
           path: arm64
 
       - name: Create Draft Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ needs.version.outputs.vl }}
-          name: ${{ needs.version.outputs.v }}
+          tag_name: ${{ needs.build.outputs.vl }}
+          name: ${{ needs.build.outputs.v }}
           body: |
             ### Download / 下载
 
-            - **x64**: [Starshot-${{ needs.version.outputs.vl }}-win-x64.zip](https://github.com/${{ github.repository }}/releases/download/${{ needs.version.outputs.vl }}/Starshot-${{ needs.version.outputs.vl }}-win-x64.zip)
-            - **arm64**: [Starshot-${{ needs.version.outputs.vl }}-win-arm64.zip](https://github.com/${{ github.repository }}/releases/download/${{ needs.version.outputs.vl }}/Starshot-${{ needs.version.outputs.vl }}-win-arm64.zip)
+            - **x64**: [Starshot-${{ needs.build.outputs.vl }}-win-x64.zip](https://github.com/${{ github.repository }}/releases/download/${{ needs.build.outputs.vl }}/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip)
+            - **arm64**: [Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip](https://github.com/${{ github.repository }}/releases/download/${{ needs.build.outputs.vl }}/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip)
 
             ---
 
-
           draft: true
-          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          prerelease: ${{ inputs.prerelease }}
           files: |
-            x64/Starshot-${{ needs.version.outputs.vl }}-win-x64.zip
-            arm64/Starshot-${{ needs.version.outputs.vl }}-win-arm64.zip
+            x64/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip
+            arm64/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip
             x64/diff-*-win-x64.zip
             arm64/diff-*-win-arm64.zip
         env:
