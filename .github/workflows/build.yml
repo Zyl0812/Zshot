@@ -268,6 +268,7 @@ jobs:
           $manifest = [PSCustomObject]@{
             tag = $vl
             prerelease = $pre
+            publishedAt = (Get-Date).ToString("o")
             x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs; files = $x64Files }
             arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs; files = $arm64Files }
           }
