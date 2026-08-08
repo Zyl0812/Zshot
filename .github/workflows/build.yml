@@ -6,68 +6,25 @@ name: Build
 on:
   workflow_call:
     inputs:
-      prerelease:
-        description: '是否标记为预发布（影响自动递增规则：patch+1 / minor+1）'
-        type: boolean
-        required: true
-      version:
-        description: '版本号（留空则按 prerelease 规则从最新 release 自动递增）'
-        type: string
-        required: true
-    outputs:
       v:
         description: '显示版本（原大小写）'
-        value: ${{ jobs.version.outputs.v }}
+        type: string
+        required: true
       vl:
         description: '小写版本号（tag/目录名）'
-        value: ${{ jobs.version.outputs.vl }}
+        type: string
+        required: true
 
 permissions:
   contents: read
 
 jobs:
 
-  version:
-    runs-on: windows-latest
-    outputs:
-      v: ${{ steps.ver.outputs.v }}
-      vl: ${{ steps.ver.outputs.vl }}
-    steps:
-      - name: Resolve version
-        id: ver
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $input = "${{ inputs.version }}".Trim()
-          $isPreview = "${{ inputs.prerelease }}" -eq 'true'
-          if ([string]::IsNullOrEmpty($input)) {
-            # 最新一条 release（含 prerelease；/releases 默认不含 draft，按创建时间倒序）
-            $latest = (gh api repos/${{ github.repository }}/releases --jq '.[0].tag_name' 2>$null)
-            if ($LASTEXITCODE -eq 0 -and $latest -match '^(\d+)\.(\d+)\.(\d+)') {
-              if ($isPreview) {
-                $input = "$($Matches[1]).$($Matches[2]).$([int]$Matches[3] + 1)"
-              } else {
-                $input = "$($Matches[1]).$([int]$Matches[2] + 1).0"
-              }
-              Write-Host "Version empty, auto-incremented from $latest to $input (prerelease=$isPreview)"
-            } else {
-              $input = if ($isPreview) { "0.0.1" } else { "0.1.0" }
-              Write-Host "Version empty, no release found, fallback to $input (prerelease=$isPreview)"
-            }
-          }
-          $v = $input.Replace(' ', '-')
-          $vl = $v.ToLowerInvariant()
-          "v=$v" >> $env:GITHUB_OUTPUT
-          "vl=$vl" >> $env:GITHUB_OUTPUT
-
-
   build:
-    needs: version
     strategy:
       matrix:
         platform: [x64, arm64]
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -105,17 +62,19 @@ jobs:
 
       - name: Version layout
         run: |
-          Move-Item build/release/app "build/release/app-${{ needs.version.outputs.vl }}" -Force
-          "version=${{ needs.version.outputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
+          Move-Item build/release/app "build/release/app-${{ inputs.vl }}" -Force
+          "version=${{ inputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
 
       - name: Generate delta
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $newTag = "${{ needs.version.outputs.vl }}"
+          $newTag = "${{ inputs.vl }}"
           $arch = "${{ matrix.platform }}"
-          $oldTag = (gh api repos/${{ github.repository }}/releases --jq '.[0].tag_name' 2>$null)
+          # 显式排除 draft，不依赖 /releases 端点在不同 token 权限下的隐含默认行为
+          # // empty 防止空数组时 jq 输出字面量字符串 "null"（会被 IsNullOrEmpty 判定为"非空"）
+          $oldTag = (gh api repos/${{ github.repository }}/releases --jq '[.[] | select(.draft == false)] | .[0].tag_name // empty' 2>$null)
           if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($oldTag) -or $oldTag -eq $newTag) {
             Write-Host "No previous release found (or same tag), skipping delta"
             exit 0
@@ -197,14 +156,14 @@ jobs:
       - name: Zip release
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $zip = "Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}.zip"
+          $zip = "Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}.zip"
           if (Test-Path $zip) { Remove-Item $zip }
           [System.IO.Compression.ZipFile]::CreateFromDirectory("build/release", $zip, [System.IO.Compression.CompressionLevel]::SmallestSize, $false)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}
+          name: Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}
           path: |
-            Starshot-${{ needs.version.outputs.vl }}-win-${{ matrix.platform }}.zip
+            Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.zip

@@ -1,4 +1,4 @@
-name: Build Release Pub
+name: Release Pub
 
 on:
   workflow_dispatch:
@@ -9,45 +9,59 @@ on:
         required: false
         default: true
       version:
-        description: 'Version (e.g. 0.1.0; leave empty to auto-increment from latest tag — prerelease on: patch+1 (0.6.3->0.6.4), off: minor+1 (0.6.3->0.7.0))'
+        description: 'Version (e.g. 0.1.0-preview.1; leave empty to auto-increment from latest release)'
         required: false
 
 permissions:
   contents: write
 
+# 与 release-draft.yml 共用同一个 group：两个 workflow 都会读"上一个 release"来算版本号，
+# 必须互相串行，否则 draft 和 pub 前后脚触发时可能算出同一个版本号撞车
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
 
-  build:
-    uses: ./.github/workflows/build.yml
+  resolve-version:
+    uses: ./.github/workflows/resolve-version.yml
     with:
       prerelease: ${{ inputs.prerelease }}
       version: ${{ inputs.version }}
     secrets: inherit
 
+  build:
+    needs: resolve-version
+    uses: ./.github/workflows/build.yml
+    with:
+      v: ${{ needs.resolve-version.outputs.v }}
+      vl: ${{ needs.resolve-version.outputs.vl }}
+    secrets: inherit
+
   release:
-    needs: build
-    runs-on: windows-latest
+    needs: [resolve-version, build]
+    runs-on: windows-2025-vs2026
     steps:
       - name: Download x64
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ needs.build.outputs.vl }}-win-x64
+          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64
           path: x64
       - name: Download arm64
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ needs.build.outputs.vl }}-win-arm64
+          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64
           path: arm64
 
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ needs.build.outputs.vl }}
-          name: ${{ needs.build.outputs.v }}
+          tag_name: ${{ needs.resolve-version.outputs.vl }}
+          name: ${{ needs.resolve-version.outputs.v }}
           generate_release_notes: true
           prerelease: ${{ inputs.prerelease }}
           files: |
-            x64/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip
-            arm64/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip
+            x64/Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64.zip
+            arm64/Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
