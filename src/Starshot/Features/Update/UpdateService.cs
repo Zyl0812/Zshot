@@ -36,6 +36,7 @@ public static class UpdateService
         if (release.Version <= current) return (null, release.TagName);
         // 只有自动检查才跳过用户忽略的版本；手动检查无视忽略
         if (ignoreSkipped && SemVersion.TryParse(AppConfig.IgnoreVersion, out var ignore) && release.Version <= ignore) return (null, release.TagName);
+        // ZipUrl 空 = GitHub 源 asset 没找到（没下载资源）。CDN「已最新」不走到这（上面 Version<=current 已兜）
         if (string.IsNullOrWhiteSpace(release.ZipUrl)) return (null, release.TagName);
         return (release, release.TagName);
 #endif

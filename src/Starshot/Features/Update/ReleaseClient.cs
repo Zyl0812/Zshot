@@ -263,6 +263,8 @@ public static class ReleaseClient
         string curRaw = (AppConfig.AppVersion ?? "").Trim();
         if (curRaw.StartsWith("v", StringComparison.OrdinalIgnoreCase)) curRaw = curRaw[1..];
         if (!SemVersion.TryParse(curRaw, out var current)) current = new SemVersion(0, 0, 0);
+        // 已是最新：返回只带 Version + TagName 的 ReleaseInfo（ZipUrl 空）。
+        // 调用方靠 release.Version <= current 第一道判兜住，不走 IsNullOrWhiteSpace(ZipUrl)（那行兜的是 GitHub asset 缺失，跟这无关）
         if (version <= current)
         {
             return new ReleaseInfo { Version = version, TagName = tag };
