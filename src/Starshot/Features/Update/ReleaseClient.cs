@@ -256,6 +256,8 @@ public static class ReleaseClient
         }
         if (string.IsNullOrWhiteSpace(tag)) return null;
 
+        if (!SemVersion.TryParse(tag, out var version)) return null;
+
         var vm = await GetVersionManifestCDNAsync(tag, ct);
         if (vm is null) return null;
 
@@ -263,8 +265,7 @@ public static class ReleaseClient
         var archManifest = arch == "x64" ? vm.X64 : vm.Arm64;
         if (string.IsNullOrWhiteSpace(archManifest?.Full)) return null;
 
-        if (!SemVersion.TryParse(tag, out var version)) return null;
-
+        // release notes 不在这拿（会阻塞检查更新）；UpdateWindow 弹出后异步加载（GetGitHubReleaseBodyAsync）
         return new ReleaseInfo
         {
             Version = version,
@@ -282,5 +283,26 @@ public static class ReleaseClient
         resp.EnsureSuccessStatusCode();
         await using var stream = await resp.Content.ReadAsStreamAsync(ct);
         return await JsonSerializer.DeserializeAsync<CdnVersionManifest>(stream, cancellationToken: ct);
+    }
+
+
+    /// <summary>
+    /// 调 GitHub API 拿指定 tag 的 release body（release notes）。
+    /// CDN 模式 release notes 走这里，跟 GitHub 渠道同源；draft 未发布/编辑时拿不到 → null（调用方 fallback）。
+    /// </summary>
+    public static async Task<string?> GetGitHubReleaseBodyAsync(string tag, CancellationToken ct)
+    {
+        try
+        {
+            using var resp = await _http.GetAsync($"https://api.github.com/repos/loliri/Starshot/releases/tags/{tag}", ct);
+            if (!resp.IsSuccessStatusCode) return null;
+            await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+            var payload = await JsonSerializer.DeserializeAsync<GitHubReleasePayload>(stream, cancellationToken: ct);
+            return payload?.Body;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

@@ -58,6 +58,28 @@ public sealed partial class UpdateWindow : WindowEx
         BuildTimeText = release.PublishedAt == default ? "-" : release.PublishedAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
         ReleaseNotes = string.IsNullOrWhiteSpace(release.Notes) ? "" : release.Notes;
         Activate();
+        // CDN 模式 Notes 空（检查更新时没拿 body 避免阻塞）；弹出后异步加载，在乎的直接更新不等
+        if (string.IsNullOrWhiteSpace(release.Notes))
+        {
+            _ = LoadReleaseNotesAsync();
+        }
+    }
+
+
+    private async Task LoadReleaseNotesAsync()
+    {
+        if (_release is null) return;
+        try
+        {
+            var body = await ReleaseClient.GetGitHubReleaseBodyAsync(_release.TagName, default);
+            ReleaseNotes = string.IsNullOrWhiteSpace(body)
+                ? "Release notes will be available once the update is published."
+                : body;
+        }
+        catch
+        {
+            ReleaseNotes = "Release notes will be available once the update is published.";
+        }
     }
 
 
