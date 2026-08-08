@@ -321,3 +321,22 @@ jobs:
             --endpoint-url "$R2_ENDPOINT" \
             --content-type "application/json" \
             --cache-control "public, max-age=60"
+
+      - name: Clean old versions (keep latest + latestPreview only)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          # CDN 只需最新版（latest + latestPreview）的整包/diff；老版本目录没人用（客户端从老版本更新走最新版 diff/整包）
+          LATEST=$(jq -r .latest root-manifest.json)
+          LATEST_PRE=$(jq -r .latestPreview root-manifest.json)
+          echo "Keep: latest=$LATEST  latestPreview=$LATEST_PRE"
+          for d in $(aws s3 ls "s3://$R2_BUCKET/release/" --endpoint-url "$R2_ENDPOINT" | awk '/PRE/ {print $2}'); do
+            name="${d%/}"
+            if [ "$name" != "$LATEST" ] && [ "$name" != "$LATEST_PRE" ]; then
+              echo "Clean old version dir: release/$name/"
+              aws s3 rm "s3://$R2_BUCKET/release/$name/" --recursive --endpoint-url "$R2_ENDPOINT"
+            fi
+          done
