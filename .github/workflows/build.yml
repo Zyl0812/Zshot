@@ -134,7 +134,7 @@ jobs:
             $oldZip = "old-$oldTag.zip"
             gh release download $oldTag --pattern "Starshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
             if ($LASTEXITCODE -ne 0 -or !(Test-Path $oldZip)) {
-              Write-Host "Skip $oldTag: prev release zip not found"
+              Write-Host "Skip ${oldTag}: prev release zip not found"
               continue
             }
 
@@ -145,7 +145,7 @@ jobs:
 
             $oldApp = Join-Path $oldDir "app-$oldTag"
             if (!(Test-Path $oldApp)) {
-              Write-Host "Skip $oldTag: app folder not found in prev zip"
+              Write-Host "Skip ${oldTag}: app folder not found in prev zip"
               Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue
               continue
             }
