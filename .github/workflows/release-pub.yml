@@ -36,6 +36,7 @@ jobs:
     with:
       v: ${{ needs.resolve-version.outputs.v }}
       vl: ${{ needs.resolve-version.outputs.vl }}
+      prerelease: ${{ inputs.prerelease }}
     secrets: inherit
 
   release:

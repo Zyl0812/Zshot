@@ -14,6 +14,11 @@ on:
         description: '小写版本号（tag/目录名）'
         type: string
         required: true
+      prerelease:
+        description: '本次是否预发布（决定根 manifest 更新 latest 还是 latestPreview）'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -72,86 +77,126 @@ jobs:
         run: |
           $newTag = "${{ inputs.vl }}"
           $arch = "${{ matrix.platform }}"
-          # 显式排除 draft，不依赖 /releases 端点在不同 token 权限下的隐含默认行为
-          # // empty 防止空数组时 jq 输出字面量字符串 "null"（会被 IsNullOrEmpty 判定为"非空"）
-          $oldTag = (gh api repos/${{ github.repository }}/releases --jq '[.[] | select(.draft == false)] | .[0].tag_name // empty' 2>$null)
-          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($oldTag) -or $oldTag -eq $newTag) {
-            Write-Host "No previous release found (or same tag), skipping delta"
-            exit 0
-          }
-          Write-Host "Generating delta: $oldTag -> $newTag ($arch)"
+          $isPre = "${{ inputs.prerelease }}" -eq "true"
 
-          $oldZip = "old-full.zip"
-          gh release download $oldTag --pattern "Starshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
-          if ($LASTEXITCODE -ne 0 -or !(Test-Path $oldZip)) {
-            Write-Host "Previous release zip not found, skipping delta"
-            exit 0
-          }
+          # 读 release 历史（tag + prerelease 字段，倒序；/releases 默认不含 draft）
+          # 不从版本号判断正式/预览——只认 release.prerelease 字段
+          $raw = gh api repos/${{ github.repository }}/releases 2>$null
+          $releases = if ($LASTEXITCODE -eq 0 -and $raw) { $raw | ConvertFrom-Json } else { $null }
+          if (-not $releases) { Write-Host "No releases, skipping delta"; exit 0 }
 
-          Expand-Archive $oldZip -DestinationPath old/ -Force
+          # 上一个 stable（prerelease=false 最近的）
+          $prevStable = $releases | Where-Object { -not $_.prerelease } | Select-Object -First 1
+          if (-not $prevStable) { Write-Host "No stable base release, skipping delta"; exit 0 }
 
-          # 只对比两个 app 文件夹内容（不管目录名），外层 launcher + version.ini 每次都变直接放 delta
-          $oldApp = "old/app-$oldTag"
-          $newApp = "build/release/app-$newTag"
-          if (!(Test-Path $oldApp) -or !(Test-Path $newApp)) {
-            Write-Host "App folder not found (old: $(Test-Path $oldApp), new: $(Test-Path $newApp)), skipping delta"
-            exit 0
-          }
-          $oldRoot = (Resolve-Path $oldApp).Path
-          $newRoot = (Resolve-Path $newApp).Path
-
-          $deletedFiles = @()
-          $changedFiles = @()
-          $filesMap = @{}
-
-          # 删除文件（old app 有 new app 没有，路径相对 app 目录）
-          Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
-            $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
-            if (!(Test-Path (Join-Path $newRoot $rel))) { $deletedFiles += "app-$newTag/$rel" }
+          # 本集/本级 preview：上一个 stable 之后（更新于它）的所有 prerelease
+          # releases 按发布时间倒序，prevStable 的 index 之前（index 更小=更新）的就是它之后的 prerelease
+          $stableIdx = [array]::IndexOf($releases, $prevStable)
+          $recentPreviews = @()
+          if ($stableIdx -gt 0) {
+            $recentPreviews = $releases[0..($stableIdx - 1)] | Where-Object { $_.prerelease }
           }
 
-          # 变化/新增文件（hash 不同，路径相对 release 根目录）
-          Get-ChildItem $newRoot -Recurse -File | ForEach-Object {
-            $relApp = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
-            $oldFile = Join-Path $oldRoot $relApp
-            $newHash = (Get-FileHash $_.FullName).Hash
-            $filesMap[$relApp] = $newHash
-            if (!(Test-Path $oldFile)) {
-              $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName }
-            } else {
-              $oldHash = (Get-FileHash $oldFile).Hash
-              if ($oldHash -ne $newHash) { $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$relApp"; FullPath = $_.FullName } }
+          # 选 diff target（线性发布；不解析版本号）
+          # stable：本集 preview + 前 5 个 stable
+          # preview：本级 preview + 上一个 stable（1 个）
+          $targetTags = [System.Collections.Generic.List[string]]::new()
+          foreach ($r in $recentPreviews) {
+            if ($r.tag_name -ne $newTag -and -not $targetTags.Contains($r.tag_name)) { $targetTags.Add($r.tag_name) }
+          }
+          if ($isPre) {
+            if (-not $targetTags.Contains($prevStable.tag_name)) { $targetTags.Add($prevStable.tag_name) }
+          } else {
+            $releases | Where-Object { -not $_.prerelease } | Select-Object -First 5 | ForEach-Object {
+              if ($_.tag_name -ne $newTag -and -not $targetTags.Contains($_.tag_name)) { $targetTags.Add($_.tag_name) }
             }
           }
 
-          # launcher + version.ini 每次都变（C++ 构建元数据 + 版本号），无条件放 delta
-          $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
-          $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
+          if ($targetTags.Count -eq 0) { Write-Host "No delta target, skipping"; exit 0 }
+          Write-Host "Delta targets ($($targetTags.Count)): $($targetTags -join ', ')"
 
-          Write-Host "Changed: $($changedFiles.Count), Deleted: $($deletedFiles.Count)"
-
-          $filesSorted = [ordered]@{}
-          foreach ($k in ($filesMap.Keys | Sort-Object)) { $filesSorted[$k] = $filesMap[$k] }
-          $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object); files = $filesSorted }
-          $manifestPath = "build/release/manifest.json"
-          $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
-
-          $deltaZip = "diff-${newTag}-from-${oldTag}-win-${arch}.zip"
           Add-Type -AssemblyName System.IO.Compression
           Add-Type -AssemblyName System.IO.Compression.FileSystem
-          if (Test-Path $deltaZip) { Remove-Item $deltaZip }
-          $zipArchive = [System.IO.Compression.ZipFile]::Open($deltaZip, 'Create')
-          try {
-            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $manifestPath, "manifest.json", [System.IO.Compression.CompressionLevel]::SmallestSize)
-            foreach ($f in $changedFiles) {
-              [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $f.FullPath, $f.Path, [System.IO.Compression.CompressionLevel]::SmallestSize)
-            }
-          } finally {
-            $zipArchive.Dispose()
+
+          $newApp = "build/release/app-$newTag"
+          if (!(Test-Path $newApp)) { Write-Host "New app folder missing, skipping delta"; exit 0 }
+          $newRoot = (Resolve-Path $newApp).Path
+
+          # new 的文件 hash 清单（所有 target 共用，只算一次）
+          $newHashes = @{}
+          Get-ChildItem $newRoot -Recurse -File | ForEach-Object {
+            $rel = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
+            $newHashes[$rel] = (Get-FileHash $_.FullName).Hash
           }
-          # 清理临时 manifest（不进整包 zip）
-          Remove-Item $manifestPath -Force
-          Write-Host "Delta zip created: $deltaZip ($((Get-Item $deltaZip).Length / 1MB) MB)"
+
+          foreach ($oldTag in $targetTags) {
+            Write-Host "--- delta: $oldTag -> $newTag ($arch) ---"
+            $oldZip = "old-$oldTag.zip"
+            gh release download $oldTag --pattern "Starshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
+            if ($LASTEXITCODE -ne 0 -or !(Test-Path $oldZip)) {
+              Write-Host "Skip $oldTag: prev release zip not found"
+              continue
+            }
+
+            $oldDir = "old-$oldTag"
+            if (Test-Path $oldDir) { Remove-Item $oldDir -Recurse -Force }
+            Expand-Archive $oldZip -DestinationPath $oldDir -Force
+            Remove-Item $oldZip -Force
+
+            $oldApp = Join-Path $oldDir "app-$oldTag"
+            if (!(Test-Path $oldApp)) {
+              Write-Host "Skip $oldTag: app folder not found in prev zip"
+              Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue
+              continue
+            }
+            $oldRoot = (Resolve-Path $oldApp).Path
+
+            # 删除文件（old 有 new 没有，路径相对 app 目录）
+            $deletedFiles = @()
+            Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
+              $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
+              if (-not $newHashes.ContainsKey($rel)) { $deletedFiles += "app-$newTag/$rel" }
+            }
+
+            # 变化/新增文件（hash 不同，路径相对 release 根目录）
+            $changedFiles = @()
+            foreach ($rel in $newHashes.Keys) {
+              $oldFile = Join-Path $oldRoot $rel
+              $newFile = Join-Path $newRoot $rel
+              if (!(Test-Path $oldFile)) {
+                $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$rel"; FullPath = $newFile }
+              } elseif ((Get-FileHash $oldFile).Hash -ne $newHashes[$rel]) {
+                $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$rel"; FullPath = $newFile }
+              }
+            }
+
+            # launcher + version.ini 每次都变（C++ 构建元数据 + 版本号），无条件放 delta
+            $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
+            $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
+
+            # diff 内 manifest（客户端应用 diff 用：删 deletedFiles + 校验 files hash）
+            $filesSorted = [ordered]@{}
+            foreach ($k in ($newHashes.Keys | Sort-Object)) { $filesSorted[$k] = $newHashes[$k] }
+            $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object); files = $filesSorted }
+            $manifestPath = "manifest-$oldTag.json"
+            $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
+
+            $deltaZip = "diff-${newTag}-from-${oldTag}-win-${arch}.zip"
+            if (Test-Path $deltaZip) { Remove-Item $deltaZip }
+            $zipArchive = [System.IO.Compression.ZipFile]::Open($deltaZip, 'Create')
+            try {
+              [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $manifestPath, "manifest.json", [System.IO.Compression.CompressionLevel]::SmallestSize)
+              foreach ($f in $changedFiles) {
+                [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $f.FullPath, $f.Path, [System.IO.Compression.CompressionLevel]::SmallestSize)
+              }
+            } finally {
+              $zipArchive.Dispose()
+            }
+
+            Remove-Item $manifestPath -Force
+            Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue
+            Write-Host "delta: $deltaZip ($([math]::Round((Get-Item $deltaZip).Length / 1MB, 2)) MB), changed=$($changedFiles.Count) deleted=$($deletedFiles.Count)"
+          }
 
       - name: Zip release
         run: |
@@ -167,3 +212,98 @@ jobs:
           path: |
             Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.zip
+
+
+  upload-cdn:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: auto
+      VL: ${{ inputs.vl }}
+      PRE: ${{ inputs.prerelease }}
+    steps:
+      - name: Download x64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Starshot-${{ inputs.vl }}-win-x64
+          path: upload/
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Starshot-${{ inputs.vl }}-win-arm64
+          path: upload/
+
+      - name: List files
+        run: ls -la upload/
+
+      - name: Generate version manifest
+        shell: pwsh
+        run: |
+          $vl = "$env:VL"
+          $pre = "$env:PRE" -eq "true"
+          $files = Get-ChildItem upload/ -Name
+          $x64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-x64.zip" }) | Select-Object -First 1
+          $arm64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-arm64.zip" }) | Select-Object -First 1
+          $x64Diffs = @(); $arm64Diffs = @()
+          $esc = [regex]::Escape($vl)
+          foreach ($f in $files) {
+            if ($f -match "^diff-$esc-from-(.+?)-win-x64\.zip$") {
+              $x64Diffs += [PSCustomObject]@{ from = $Matches[1]; file = $f }
+            } elseif ($f -match "^diff-$esc-from-(.+?)-win-arm64\.zip$") {
+              $arm64Diffs += [PSCustomObject]@{ from = $Matches[1]; file = $f }
+            }
+          }
+          $manifest = [PSCustomObject]@{
+            tag = $vl
+            prerelease = $pre
+            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs }
+            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs }
+          }
+          $manifest | ConvertTo-Json -Depth 10 | Set-Content upload/manifest.json
+          Write-Host "--- manifest.json ---"
+          Get-Content upload/manifest.json
+
+      - name: Upload version dir to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ] || [ -z "$R2_ENDPOINT" ]; then
+            echo "::error::R2 secrets not configured (R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY / R2_ACCOUNT_ID / R2_BUCKET)"
+            exit 1
+          fi
+          # 整包 + diff（zip）；manifest.json 排除，单独传（json content-type）
+          aws s3 cp upload/ "s3://$R2_BUCKET/release/$VL/" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --recursive \
+            --exclude "manifest.json" \
+            --content-type "application/zip" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 cp "upload/manifest.json" "s3://$R2_BUCKET/release/$VL/manifest.json" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type "application/json" \
+            --cache-control "public, max-age=31536000, immutable"
+
+      - name: Update root manifest (latest / latestPreview)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          # 拉根 manifest（不存在则建空）
+          aws s3 cp "s3://$R2_BUCKET/manifest.json" ./root-manifest.json --endpoint-url "$R2_ENDPOINT" 2>/dev/null \
+            || echo '{"latest":"","latestPreview":""}' > root-manifest.json
+          # 正式版更新 latest，预览版更新 latestPreview
+          if [ "$PRE" = "true" ]; then
+            jq --arg v "$VL" '.latestPreview = $v' root-manifest.json > tmp.json && mv tmp.json root-manifest.json
+          else
+            jq --arg v "$VL" '.latest = $v' root-manifest.json > tmp.json && mv tmp.json root-manifest.json
+          fi
+          echo "--- root manifest.json ---"; cat root-manifest.json
+          aws s3 cp root-manifest.json "s3://$R2_BUCKET/manifest.json" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type "application/json" \
+            --cache-control "public, max-age=60"
