@@ -213,6 +213,7 @@ public static class ReleaseClient
     {
         [JsonPropertyName("tag")] public string Tag { get; set; } = "";
         [JsonPropertyName("prerelease")] public bool Prerelease { get; set; }
+        [JsonPropertyName("publishedAt")] public DateTimeOffset PublishedAt { get; set; }
         [JsonPropertyName("x64")] public CdnArchManifest? X64 { get; set; }
         [JsonPropertyName("arm64")] public CdnArchManifest? Arm64 { get; set; }
     }
@@ -270,6 +271,7 @@ public static class ReleaseClient
             TagName = tag,
             ZipUrl = $"{AppConfig.CdnBase}/release/{tag}/{archManifest.Full}",
             Prerelease = vm.Prerelease,
+            PublishedAt = vm.PublishedAt,
         };
     }
 

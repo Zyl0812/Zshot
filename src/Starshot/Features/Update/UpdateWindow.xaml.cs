@@ -55,7 +55,7 @@ public sealed partial class UpdateWindow : WindowEx
         CurrentVersionText = AppConfig.AppVersion;
         NewVersionText = release.TagName;
         ChannelText = release.Prerelease ? "Preview" : "Stable";
-        BuildTimeText = release.PublishedAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        BuildTimeText = release.PublishedAt == default ? "-" : release.PublishedAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
         ReleaseNotes = string.IsNullOrWhiteSpace(release.Notes) ? "" : release.Notes;
         Activate();
     }
