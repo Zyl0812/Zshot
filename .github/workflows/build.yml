@@ -174,10 +174,8 @@ jobs:
             $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
             $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
 
-            # diff 内 manifest（客户端应用 diff 用：删 deletedFiles + 校验 files hash）
-            $filesSorted = [ordered]@{}
-            foreach ($k in ($newHashes.Keys | Sort-Object)) { $filesSorted[$k] = $newHashes[$k] }
-            $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object); files = $filesSorted }
+            # diff 内 manifest：只放 deletedFiles（每 diff 特有）；files hash 共用一份，移到 CDN 版本 manifest，不进每个 diff zip
+            $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object) }
             $manifestPath = "manifest-$oldTag.json"
             $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
 
@@ -198,6 +196,11 @@ jobs:
             Write-Host "delta: $deltaZip ($([math]::Round((Get-Item $deltaZip).Length / 1MB, 2)) MB), changed=$($changedFiles.Count) deleted=$($deletedFiles.Count)"
           }
 
+          # 存 newHashes 给 upload-cdn 复用（upload-cdn 不再解压整包算第二遍）
+          $sortedHashes = [ordered]@{}
+          foreach ($k in ($newHashes.Keys | Sort-Object)) { $sortedHashes[$k] = $newHashes[$k] }
+          $sortedHashes | ConvertTo-Json -Depth 10 | Set-Content "new-hashes-$arch.json"
+
       - name: Zip release
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -212,6 +215,7 @@ jobs:
           path: |
             Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.zip
+            new-hashes-${{ matrix.platform }}.json
 
 
   upload-cdn:
@@ -242,6 +246,14 @@ jobs:
           $vl = "$env:VL"
           $pre = "$env:PRE" -eq "true"
           $files = Get-ChildItem upload/ -Name
+
+          # 复用 generate delta 已算好的 hash（new-hashes-{arch}.json 同 artifact 传来），不再解压整包
+          function Read-Hashes($path) {
+            if (Test-Path $path) { return Get-Content $path -Raw | ConvertFrom-Json } else { return [PSCustomObject]@{} }
+          }
+          $x64Files = Read-Hashes "upload/new-hashes-x64.json"
+          $arm64Files = Read-Hashes "upload/new-hashes-arm64.json"
+
           $x64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-x64.zip" }) | Select-Object -First 1
           $arm64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-arm64.zip" }) | Select-Object -First 1
           $x64Diffs = @(); $arm64Diffs = @()
@@ -256,14 +268,14 @@ jobs:
           $manifest = [PSCustomObject]@{
             tag = $vl
             prerelease = $pre
-            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs }
-            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs }
+            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs; files = $x64Files }
+            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs; files = $arm64Files }
           }
           $manifest | ConvertTo-Json -Depth 10 | Set-Content upload/manifest.json
           Write-Host "--- manifest.json ---"
           Get-Content upload/manifest.json
 
-      - name: Upload version dir to R2
+      - name: Upload version dir to CDN
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -279,6 +291,7 @@ jobs:
             --endpoint-url "$R2_ENDPOINT" \
             --recursive \
             --exclude "manifest.json" \
+            --exclude "new-hashes-*.json" \
             --content-type "application/zip" \
             --cache-control "public, max-age=31536000, immutable"
           aws s3 cp "upload/manifest.json" "s3://$R2_BUCKET/release/$VL/manifest.json" \
