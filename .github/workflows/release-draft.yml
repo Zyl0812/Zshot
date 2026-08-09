@@ -23,46 +23,37 @@ concurrency:
 
 jobs:
 
-  resolve-version:
-    uses: ./.github/workflows/resolve-version.yml
+  build:
+    uses: ./.github/workflows/build.yml
     with:
       prerelease: ${{ inputs.prerelease }}
       version: ${{ inputs.version }}
     secrets: inherit
 
-  build:
-    needs: resolve-version
-    uses: ./.github/workflows/build.yml
-    with:
-      v: ${{ needs.resolve-version.outputs.v }}
-      vl: ${{ needs.resolve-version.outputs.vl }}
-      prerelease: ${{ inputs.prerelease }}
-    secrets: inherit
-
   release:
-    needs: [resolve-version, build]
+    needs: build
     runs-on: windows-2025-vs2026
     steps:
       - name: Download x64
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64
+          name: Starshot-${{ needs.build.outputs.vl }}-win-x64
           path: x64
       - name: Download arm64
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64
+          name: Starshot-${{ needs.build.outputs.vl }}-win-arm64
           path: arm64
 
       - name: Create Draft Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ needs.resolve-version.outputs.vl }}
-          name: ${{ needs.resolve-version.outputs.v }}
+          tag_name: ${{ needs.build.outputs.vl }}
+          name: ${{ needs.build.outputs.v }}
           draft: true
           prerelease: ${{ inputs.prerelease }}
           files: |
-            x64/Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64.zip
-            arm64/Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64.zip
+            x64/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip
+            arm64/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

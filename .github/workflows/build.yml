@@ -1,31 +1,91 @@
 name: Build
 
-# 可复用构建 workflow：解析版本 + 双架构构建 + 生成差分 + 上传 artifact。
-# 由 release-draft.yml / release-pub.yml 调用，调用方各自做 release（草稿/正式/CDN）。
+# 可复用构建 workflow：解析版本 + 双架构构建 + 生成差分 + 上传 CDN。
+# 由 release-draft.yml / release-pub.yml 调用，调用方各自做 release（草稿/正式）。
+#
+# 版本解析（resolve-version）合并在本文件内部，且是独立、非 matrix 的 job：
+# build job 是 matrix: [x64, arm64]，两个架构并行跑；版本号只应该算一次，
+# 放进单独 job 里用 needs 让两边消费同一个结果，避免各自读一次 GitHub API 可能读到不同状态。
 
 on:
   workflow_call:
     inputs:
+      prerelease:
+        description: '本次是否预发布（决定版本号怎么算、根 manifest 更新 latest 还是 latestPreview）'
+        type: boolean
+        required: true
+      version:
+        description: '手动指定的版本号，留空则从最新 release 自动递增'
+        type: string
+        required: false
+    outputs:
       v:
         description: '显示版本（原大小写）'
-        type: string
-        required: true
+        value: ${{ jobs.resolve-version.outputs.v }}
       vl:
         description: '小写版本号（tag/目录名）'
-        type: string
-        required: true
-      prerelease:
-        description: '本次是否预发布（决定根 manifest 更新 latest 还是 latestPreview）'
-        type: boolean
-        required: false
-        default: false
+        value: ${{ jobs.resolve-version.outputs.vl }}
 
 permissions:
   contents: read
 
 jobs:
 
+  resolve-version:
+    runs-on: windows-2025-vs2026
+    outputs:
+      v: ${{ steps.ver.outputs.v }}
+      vl: ${{ steps.ver.outputs.vl }}
+    steps:
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $isPre = "${{ inputs.prerelease }}" -eq "true"
+          $input = "${{ inputs.version }}".Trim()
+          if ([string]::IsNullOrEmpty($input)) {
+            # 显式排除 draft，不依赖 /releases 端点在不同 token 权限下的隐含默认行为
+            $latestTag = (gh api repos/${{ github.repository }}/releases --jq '[.[] | select(.draft == false)] | .[0].tag_name // empty' 2>$null)
+            if ([string]::IsNullOrEmpty($latestTag)) {
+              $input = if ($isPre) { "0.0.1-preview.0" } else { "0.1.0" }
+              Write-Host "No usable release found, fallback to $input"
+            } elseif ($isPre) {
+              # 预览开关打开：上个正式 a.b.c -> a.b.(c+1)-preview.0；上个预览 a.b.c-preview.N -> a.b.c-preview.(N+1)
+              $input = (npx --yes semver -i prerelease --preid preview $latestTag 2>$null)
+              if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($input)) {
+                Write-Error "semver 无法解析上一个 release 的 tag: '$latestTag'，请检查历史 tag 格式或手动指定 version"
+                exit 1
+              }
+              Write-Host "prerelease: prev release $latestTag -> $input"
+            } else {
+              # 正式版：-i patch 对带 prerelease 的版本是"转正不进位"（1.2.4-preview.3 -> 1.2.4）
+              # 对纯正式版是正常 +1（1.2.3 -> 1.2.4），两种情况同一条命令处理
+              $input = (npx --yes semver -i patch $latestTag 2>$null)
+              if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($input)) {
+                Write-Error "semver 无法解析上一个 release 的 tag: '$latestTag'，请检查历史 tag 格式或手动指定 version"
+                exit 1
+              }
+              Write-Host "stable: prev release $latestTag -> $input"
+            }
+          } else {
+            # 手动指定版本：交给 semver 校验合法性，格式不对直接失败，不静默兜底成一个错误的低版本号
+            $normalized = $input.Replace(' ', '-')
+            npx --yes semver $normalized > $null 2>&1
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "输入的版本号 '$input' 不是合法的 semver 格式"
+              exit 1
+            }
+            $input = $normalized
+          }
+          $v = $input
+          $vl = $v.ToLowerInvariant()
+          "v=$v" >> $env:GITHUB_OUTPUT
+          "vl=$vl" >> $env:GITHUB_OUTPUT
+
   build:
+    needs: resolve-version
     strategy:
       matrix:
         platform: [x64, arm64]
@@ -67,15 +127,15 @@ jobs:
 
       - name: Version layout
         run: |
-          Move-Item build/release/app "build/release/app-${{ inputs.vl }}" -Force
-          "version=${{ inputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
+          Move-Item build/release/app "build/release/app-${{ needs.resolve-version.outputs.vl }}" -Force
+          "version=${{ needs.resolve-version.outputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
 
       - name: Generate delta
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $newTag = "${{ inputs.vl }}"
+          $newTag = "${{ needs.resolve-version.outputs.vl }}"
           $arch = "${{ matrix.platform }}"
           $isPre = "${{ inputs.prerelease }}" -eq "true"
 
@@ -140,7 +200,16 @@ jobs:
 
             $oldDir = "old-$oldTag"
             if (Test-Path $oldDir) { Remove-Item $oldDir -Recurse -Force }
-            Expand-Archive $oldZip -DestinationPath $oldDir -Force
+            # 历史资产可能损坏/非法 zip：Expand-Archive 对此抛的是 terminating error，不包 try/catch
+            # 会中断整个 step，把这次全新构建也拖下水。跟下面下载失败分支一样处理：跳过继续
+            try {
+              Expand-Archive $oldZip -DestinationPath $oldDir -Force
+            } catch {
+              Write-Host "Skip ${oldTag}: 解压失败 - $($_.Exception.Message)"
+              Remove-Item $oldZip -Force -ErrorAction SilentlyContinue
+              Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue
+              continue
+            }
             Remove-Item $oldZip -Force
 
             $oldApp = Join-Path $oldDir "app-$oldTag"
@@ -204,37 +273,37 @@ jobs:
       - name: Zip release
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $zip = "Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}.zip"
+          $zip = "Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip"
           if (Test-Path $zip) { Remove-Item $zip }
           [System.IO.Compression.ZipFile]::CreateFromDirectory("build/release", $zip, [System.IO.Compression.CompressionLevel]::SmallestSize, $false)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}
+          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}
           path: |
-            Starshot-${{ inputs.vl }}-win-${{ matrix.platform }}.zip
+            Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.zip
             new-hashes-${{ matrix.platform }}.json
 
 
   upload-cdn:
-    needs: build
+    needs: [resolve-version, build]
     runs-on: ubuntu-latest
     env:
       AWS_DEFAULT_REGION: auto
-      VL: ${{ inputs.vl }}
+      VL: ${{ needs.resolve-version.outputs.vl }}
       PRE: ${{ inputs.prerelease }}
     steps:
       - name: Download x64 artifact
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ inputs.vl }}-win-x64
+          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64
           path: upload/
       - name: Download arm64 artifact
         uses: actions/download-artifact@v4
         with:
-          name: Starshot-${{ inputs.vl }}-win-arm64
+          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64
           path: upload/
 
       - name: List files
