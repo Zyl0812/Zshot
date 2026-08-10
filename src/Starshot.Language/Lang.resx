@@ -793,7 +793,7 @@
   <data name="Starshot_General" xml:space="preserve">
     <value>General</value>
   </data>
-  <data name="Starshot_GodMode" xml:space="preserve">
-    <value>God Mode (pin debug to top)</value>
+  <data name="Starshot_PriorityStart" xml:space="preserve">
+    <value>High priority start</value>
   </data>
 </root>

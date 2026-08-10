@@ -793,7 +793,7 @@
   <data name="Starshot_General" xml:space="preserve">
     <value>通用</value>
   </data>
-  <data name="Starshot_GodMode" xml:space="preserve">
-    <value>上帝模式（调试置顶）</value>
+  <data name="Starshot_PriorityStart" xml:space="preserve">
+    <value>高优先级启动</value>
   </data>
 </root>

@@ -12,6 +12,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using TaskService = Microsoft.Win32.TaskScheduler.TaskService;
+using LogonTrigger = Microsoft.Win32.TaskScheduler.LogonTrigger;
+using ExecAction = Microsoft.Win32.TaskScheduler.ExecAction;
 using Windows.System;
 
 namespace Starshot.Features.Setting;
@@ -91,23 +94,6 @@ public sealed partial class GeneralSetting : PageBase
     }
 
 
-    public bool EnableSystemTrayIcon
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.EnableSystemTrayIcon = value;
-                if (value)
-                {
-                    App.Current.EnsureSystemTray();
-                }
-            }
-        }
-    } = AppConfig.EnableSystemTrayIcon;
-
-
     public bool EnableAutoStart
     {
         get;
@@ -115,11 +101,29 @@ public sealed partial class GeneralSetting : PageBase
         {
             if (SetProperty(ref field, value))
             {
-                UpdateAutoStartRegistry(value);
+                if (value)
+                {
+                    if (PriorityStart) UpdateAutoStartTask(true);
+                    else UpdateAutoStartRegistry(true);
+                }
+                else
+                {
+                    UpdateAutoStartRegistry(false);
+                    if (PriorityStart) UpdateAutoStartTask(false); // Task 存在才删（提权），不存在不弹 UAC
+                }
                 OnPropertyChanged(nameof(AutoStartMinimizedVisibility));
+                OnPropertyChanged(nameof(PriorityStartVisibility));
             }
         }
-    } = AppConfig.EnableAutoStart;
+    } = IsAutoStartActive();
+
+
+    private static bool IsAutoStartActive()
+    {
+        if (AppConfig.EnableAutoStart) return true;
+        try { using var ts = new TaskService(); return ts.GetTask("Starshot") is not null; }
+        catch { return false; }
+    }
 
 
     public bool AutoStartMinimized
@@ -130,13 +134,37 @@ public sealed partial class GeneralSetting : PageBase
             if (SetProperty(ref field, value))
             {
                 AppConfig.AutoStartMinimized = value;
-                if (AppConfig.EnableAutoStart) UpdateAutoStartRegistry(true);
+                if (AppConfig.EnableAutoStart)
+                    {
+                        if (PriorityStart) UpdateAutoStartTask(true);
+                        else UpdateAutoStartRegistry(true);
+                    }
             }
         }
     } = AppConfig.AutoStartMinimized;
 
 
     public Visibility AutoStartMinimizedVisibility => EnableAutoStart ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility PriorityStartVisibility => EnableAutoStart ? Visibility.Visible : Visibility.Collapsed;
+
+
+    /// <summary>
+    /// Task Scheduler 高优先级启动（ONLOGON + High），独立于注册表 Run
+    /// </summary>
+    public bool PriorityStart
+    {
+        get
+        {
+            try { using var ts = new TaskService(); return ts.GetTask("Starshot") is not null; }
+            catch { return false; }
+        }
+        set
+        {
+            if (value) { UpdateAutoStartTask(true); UpdateAutoStartRegistry(false); }
+            else { if (PriorityStart) UpdateAutoStartTask(false); UpdateAutoStartRegistry(true); }
+        }
+    }
 
 
     public int UpdateSource
@@ -218,6 +246,31 @@ public sealed partial class GeneralSetting : PageBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to update auto-start registry");
+        }
+    }
+
+
+    /// <summary>
+    /// Task Scheduler 高优先级启动（ONLOGON 触发 + High 优先级），独立于注册表 Run。
+    /// </summary>
+    private void UpdateAutoStartTask(bool enable)
+    {
+        try
+        {
+            string launcherPath = GetLauncherPath();
+            string taskArgs = (AppConfig.AutoStartMinimized && AppConfig.EnableSystemTrayIcon) ? "--hide" : "";
+            string mode = enable ? "create" : "delete";
+            // 提权子进程：UAC 弹窗，admin 权限调 TaskScheduler API
+            var psi = new ProcessStartInfo(Environment.ProcessPath!, $"--manage-task {mode} \"{launcherPath}\" \"{taskArgs}\"")
+            {
+                Verb = "runas",
+                UseShellExecute = true,
+            };
+            Process.Start(psi);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update auto-start task");
         }
     }
 

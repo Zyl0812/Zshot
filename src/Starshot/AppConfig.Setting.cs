@@ -135,13 +135,9 @@ public static partial class AppConfig
 
 
     /// <summary>
-    /// 启用系统托盘图标（关闭主窗口时最小化到托盘）
+    /// 系统托盘总是启用（关闭主窗口最小化到托盘）
     /// </summary>
-    public static bool EnableSystemTrayIcon
-    {
-        get => GetValue(true);
-        set => SetValue(value);
-    }
+    public static bool EnableSystemTrayIcon => true;
 
 
     /// <summary>

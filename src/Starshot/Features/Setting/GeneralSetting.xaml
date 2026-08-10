@@ -142,12 +142,9 @@
             </StackPanel>
 
 
-            <!--  通用  -->
+            <!--  开机自启  -->
             <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_General}" />
-                <ToggleSwitch IsOn="{x:Bind EnableSystemTrayIcon, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.Starshot_SystemTray}"
-                              OnContent="{x:Bind lang:Lang.Starshot_SystemTray}" />
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_AutoStart}" />
                 <ToggleSwitch IsOn="{x:Bind EnableAutoStart, Mode=TwoWay}"
                               OffContent="{x:Bind lang:Lang.Starshot_AutoStart}"
                               OnContent="{x:Bind lang:Lang.Starshot_AutoStart}" />
@@ -155,6 +152,10 @@
                               OffContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
                               OnContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
                               Visibility="{x:Bind AutoStartMinimizedVisibility}" />
+                <ToggleSwitch IsOn="{x:Bind PriorityStart, Mode=TwoWay}"
+                              OffContent="{x:Bind lang:Lang.Starshot_PriorityStart}"
+                              OnContent="{x:Bind lang:Lang.Starshot_PriorityStart}"
+                              Visibility="{x:Bind PriorityStartVisibility}" />
             </StackPanel>
 
         </StackPanel>

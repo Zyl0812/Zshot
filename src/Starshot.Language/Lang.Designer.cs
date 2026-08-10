@@ -1260,9 +1260,12 @@
         /// <summary>
         ///   查找类似 God Mode (pin debug to top) 的本地化字符串。
         /// </summary>
-        public static string Starshot_GodMode {
+        /// <summary>
+        ///   查找类似 Priority start 的本地化字符串。
+        /// </summary>
+        public static string Starshot_PriorityStart {
             get {
-                return ResourceManager.GetString("Starshot_GodMode", resourceCulture);
+                return ResourceManager.GetString("Starshot_PriorityStart", resourceCulture);
             }
         }
 
