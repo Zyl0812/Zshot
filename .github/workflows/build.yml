@@ -126,7 +126,7 @@ jobs:
           }
           Write-Host "Supported locales: $($supported -join ', ')"
           Get-ChildItem build/release/app -Directory | Where-Object {
-            if ($supported -contains $_.Name) { return $false }
+            if ($supported -contains $_.Name -or $_.Name -eq "en-US") { return $false }
             try { [void][System.Globalization.CultureInfo]::GetCultureInfo($_.Name); return $true } catch { return $false }
           } | Remove-Item -Recurse -Force
 
