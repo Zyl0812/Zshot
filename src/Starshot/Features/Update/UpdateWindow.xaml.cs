@@ -48,6 +48,7 @@ public sealed partial class UpdateWindow : WindowEx
         CenterInScreen(1000, 680);
         this.Closed += (_, _) =>
         {
+            if (_cts is null) return; // 没在下载，正常关闭不提示
             _userClosed = true;
             _cts?.Cancel();
             // 马上提示（不等 StartUpdateAsync 的 catch 链走完）
