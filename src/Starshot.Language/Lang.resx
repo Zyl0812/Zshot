@@ -569,7 +569,7 @@
     <value>Click to insert at cursor; see </value>
   </data>
   <data name="Starshot_AutoStartInvalidCleared" xml:space="preserve">
-    <value>Auto-start entry pointed to a missing exe and has been removed</value>
+    <value>Startup entry points to a missing program and has been removed</value>
   </data>
   <data name="Starshot_ClickToInsertSuffix" xml:space="preserve">
     <value> filename templates</value>
@@ -795,5 +795,11 @@
   </data>
   <data name="Starshot_PriorityStart" xml:space="preserve">
     <value>High priority start</value>
+  </data>
+  <data name="Starshot_TaskInvalid" xml:space="preserve">
+    <value>High priority start task points to a missing program, please turn it off manually in Settings</value>
+  </data>
+  <data name="Starshot_TurnOffPriorityFirst" xml:space="preserve">
+    <value>← To change this option, turn off high priority start first</value>
   </data>
 </root>

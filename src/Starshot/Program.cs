@@ -34,6 +34,8 @@ public static class Program
                     var td = ts.NewTask();
                     td.Triggers.Add(new LogonTrigger());
                     td.Actions.Add(new ExecAction(launcherPath, taskArgs));
+                    td.Settings.DisallowStartIfOnBatteries = false;
+                    td.Settings.StopIfGoingOnBatteries = false;
                     try { ts.RootFolder.DeleteTask("Starshot", false); } catch { }
                     ts.RootFolder.RegisterTaskDefinition("Starshot", td,
                         TaskCreation.CreateOrUpdate,

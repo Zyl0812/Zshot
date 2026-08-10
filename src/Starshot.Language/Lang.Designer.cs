@@ -1270,6 +1270,24 @@
         }
 
         /// <summary>
+        ///   查找类似 High priority start task points to a missing program. Please turn it off manually in Settings. 的本地化字符串。
+        /// </summary>
+        public static string Starshot_TaskInvalid {
+            get {
+                return ResourceManager.GetString("Starshot_TaskInvalid", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Turn off high priority start first 的本地化字符串。
+        /// </summary>
+        public static string Starshot_TurnOffPriorityFirst {
+            get {
+                return ResourceManager.GetString("Starshot_TurnOffPriorityFirst", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   查找类似 Streaming Extract Test 的本地化字符串。
         /// </summary>
         public static string Starshot_DebugExtractTitle {

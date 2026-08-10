@@ -3,9 +3,11 @@ using Starshot.Features.Database;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.Win32.TaskScheduler;
 
 namespace Starshot;
 
@@ -165,8 +167,18 @@ public static partial class AppConfig
     /// </summary>
     public static bool AutoStartInvalid;
 
+    public static bool TaskInvalid;
+
     public static void CheckAutoStartValidity()
     {
+        // Task 模式（高优先级启动）→ 不检查注册表（互斥，避免重叠 toast）
+        try
+        {
+            using var ts = new TaskService();
+            if (ts.GetTask("Starshot") is not null) return;
+        }
+        catch { }
+
         try
         {
             using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
@@ -188,6 +200,23 @@ public static partial class AppConfig
                 using var wkey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", writable: true);
                 wkey?.DeleteValue("Starshot", throwOnMissingValue: false);
                 AutoStartInvalid = true;
+            }
+        }
+        catch { }
+    }
+
+
+    public static void CheckTaskValidity()
+    {
+        try
+        {
+            using var ts = new TaskService();
+            var task = ts.GetTask("Starshot");
+            if (task is null) return;
+            var action = task.Definition.Actions.OfType<ExecAction>().FirstOrDefault();
+            if (action is null || !File.Exists(action.Path))
+            {
+                TaskInvalid = true;
             }
         }
         catch { }

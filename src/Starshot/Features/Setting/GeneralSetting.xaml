@@ -145,17 +145,36 @@
             <!--  开机自启  -->
             <StackPanel Spacing="8">
                 <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_AutoStart}" />
-                <ToggleSwitch IsOn="{x:Bind EnableAutoStart, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.Starshot_AutoStart}"
-                              OnContent="{x:Bind lang:Lang.Starshot_AutoStart}" />
+                <StackPanel Orientation="Horizontal">
+                    <ToggleSwitch IsOn="{x:Bind EnableAutoStart, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind AutoStartEnabled}"
+                                  OffContent="{x:Bind lang:Lang.Starshot_AutoStart}"
+                                  OnContent="{x:Bind lang:Lang.Starshot_AutoStart}" />
+                    <TextBlock FontSize="14"
+                               VerticalAlignment="Center"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Visibility="{x:Bind PriorityStartHintVisibility}"
+                               Text="{x:Bind lang:Lang.Starshot_TurnOffPriorityFirst}" />
+                </StackPanel>
                 <ToggleSwitch IsOn="{x:Bind AutoStartMinimized, Mode=TwoWay}"
                               OffContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
                               OnContent="{x:Bind lang:Lang.Starshot_AutoStartMinimized}"
                               Visibility="{x:Bind AutoStartMinimizedVisibility}" />
                 <ToggleSwitch IsOn="{x:Bind PriorityStart, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.Starshot_PriorityStart}"
-                              OnContent="{x:Bind lang:Lang.Starshot_PriorityStart}"
-                              Visibility="{x:Bind PriorityStartVisibility}" />
+                              Visibility="{x:Bind PriorityStartVisibility}">
+                    <ToggleSwitch.OnContent>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{x:Bind ShieldSource}" Width="20" Height="20" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind lang:Lang.Starshot_PriorityStart}" />
+                        </StackPanel>
+                    </ToggleSwitch.OnContent>
+                    <ToggleSwitch.OffContent>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{x:Bind ShieldSource}" Width="20" Height="20" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind lang:Lang.Starshot_PriorityStart}" />
+                        </StackPanel>
+                    </ToggleSwitch.OffContent>
+                </ToggleSwitch>
             </StackPanel>
 
         </StackPanel>

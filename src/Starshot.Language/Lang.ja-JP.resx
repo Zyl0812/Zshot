@@ -569,7 +569,7 @@
     <value>クリックでカーソル位置に挿入</value>
   </data>
   <data name="Starshot_AutoStartInvalidCleared" xml:space="preserve">
-    <value>自動起動エントリが存在しないexeを指していたため自動的にクリアしました</value>
+    <value>スタートアップ項目の参照先プログラムは存在しないため自動的に削除されました</value>
   </data>
   <data name="Starshot_ClickToInsertSuffix" xml:space="preserve">
     <value> ファイル名テンプレート</value>
@@ -795,5 +795,11 @@
   </data>
   <data name="Starshot_PriorityStart" xml:space="preserve">
     <value>高優先起動</value>
+  </data>
+  <data name="Starshot_TaskInvalid" xml:space="preserve">
+    <value>この高優先度スタートアップタスクが参照しているプログラムは存在しません、設定から手動で無効にしてください</value>
+  </data>
+  <data name="Starshot_TurnOffPriorityFirst" xml:space="preserve">
+    <value>← このオプションを変更するには、先に高優先起動をオフにしてください</value>
   </data>
 </root>

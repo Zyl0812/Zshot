@@ -84,6 +84,11 @@ public sealed partial class MainWindow : WindowEx
                 AppConfig.AutoStartInvalid = false;
                 InAppToast.MainWindow?.Warning(null, Lang.Starshot_AutoStartInvalidCleared, 5000);
             }
+            if (AppConfig.TaskInvalid)
+            {
+                AppConfig.TaskInvalid = false;
+                InAppToast.MainWindow?.Warning(null, Lang.Starshot_TaskInvalid, 5000);
+            }
             _ = TryCheckUpdateOnStartupAsync();
         };
         sb.Begin();

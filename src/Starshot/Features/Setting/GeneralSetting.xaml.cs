@@ -9,7 +9,10 @@ using Starshot.Helpers;
 using Starshot.Language;
 using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using TaskService = Microsoft.Win32.TaskScheduler.TaskService;
@@ -74,6 +77,7 @@ public sealed partial class GeneralSetting : PageBase
     {
         InitializeComponent();
         s_activeInstance = this;
+        LoadShieldIcon();
     }
 
 
@@ -109,10 +113,14 @@ public sealed partial class GeneralSetting : PageBase
                 else
                 {
                     UpdateAutoStartRegistry(false);
-                    if (PriorityStart) UpdateAutoStartTask(false); // Task 存在才删（提权），不存在不弹 UAC
+                    if (_priorityStart)
+                    {
+                        if (UpdateAutoStartTask(false)) _priorityStart = false;
+                    }
                 }
                 OnPropertyChanged(nameof(AutoStartMinimizedVisibility));
                 OnPropertyChanged(nameof(PriorityStartVisibility));
+                OnPropertyChanged(nameof(PriorityStart));
             }
         }
     } = IsAutoStartActive();
@@ -134,11 +142,11 @@ public sealed partial class GeneralSetting : PageBase
             if (SetProperty(ref field, value))
             {
                 AppConfig.AutoStartMinimized = value;
-                if (AppConfig.EnableAutoStart)
-                    {
-                        if (PriorityStart) UpdateAutoStartTask(true);
-                        else UpdateAutoStartRegistry(true);
-                    }
+                if (EnableAutoStart)
+                {
+                    if (PriorityStart) UpdateAutoStartTask(true);
+                    else UpdateAutoStartRegistry(true);
+                }
             }
         }
     } = AppConfig.AutoStartMinimized;
@@ -146,24 +154,48 @@ public sealed partial class GeneralSetting : PageBase
 
     public Visibility AutoStartMinimizedVisibility => EnableAutoStart ? Visibility.Visible : Visibility.Collapsed;
 
+    public Microsoft.UI.Xaml.Media.ImageSource? ShieldSource { get; set; }
+
     public Visibility PriorityStartVisibility => EnableAutoStart ? Visibility.Visible : Visibility.Collapsed;
+
+    public bool AutoStartEnabled => !PriorityStart;
 
 
     /// <summary>
     /// Task Scheduler 高优先级启动（ONLOGON + High），独立于注册表 Run
     /// </summary>
+    private bool _priorityStart = IsTaskExists();
     public bool PriorityStart
     {
-        get
-        {
-            try { using var ts = new TaskService(); return ts.GetTask("Starshot") is not null; }
-            catch { return false; }
-        }
+        get => _priorityStart;
         set
         {
-            if (value) { UpdateAutoStartTask(true); UpdateAutoStartRegistry(false); }
-            else { if (PriorityStart) UpdateAutoStartTask(false); UpdateAutoStartRegistry(true); }
+            if (value)
+            {
+                if (UpdateAutoStartTask(true)) { UpdateAutoStartRegistry(false); _priorityStart = true; }
+                else OnPropertyChanged(nameof(PriorityStart)); // 失败 toggle 回 OFF
+            }
+            else
+            {
+                if (_priorityStart)
+                {
+                    if (UpdateAutoStartTask(false)) { UpdateAutoStartRegistry(true); _priorityStart = false; }
+                    else OnPropertyChanged(nameof(PriorityStart)); // 失败 toggle 回 ON
+                }
+            }
+            OnPropertyChanged(nameof(AutoStartEnabled));
+            OnPropertyChanged(nameof(PriorityStartHintVisibility));
         }
+    }
+
+
+    public Visibility PriorityStartHintVisibility => _priorityStart ? Visibility.Visible : Visibility.Collapsed;
+
+
+    private static bool IsTaskExists()
+    {
+        try { using var ts = new TaskService(); return ts.GetTask("Starshot") is not null; }
+        catch { return false; }
     }
 
 
@@ -253,7 +285,7 @@ public sealed partial class GeneralSetting : PageBase
     /// <summary>
     /// Task Scheduler 高优先级启动（ONLOGON 触发 + High 优先级），独立于注册表 Run。
     /// </summary>
-    private void UpdateAutoStartTask(bool enable)
+    private bool UpdateAutoStartTask(bool enable)
     {
         try
         {
@@ -267,10 +299,19 @@ public sealed partial class GeneralSetting : PageBase
                 UseShellExecute = true,
             };
             Process.Start(psi);
+            return true;
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update auto-start task");
+            InAppToast.MainWindow?.Warning(null, new System.ComponentModel.Win32Exception(ex.NativeErrorCode).Message, 5000);
+            return false;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to update auto-start task");
+            InAppToast.MainWindow?.Warning(null, ex.Message, 5000);
+            return false;
         }
     }
 
@@ -282,6 +323,30 @@ public sealed partial class GeneralSetting : PageBase
         string rootDir = Path.GetDirectoryName(appDir) ?? "";
         string launcher = Path.Combine(rootDir, "Starshot.exe");
         return File.Exists(launcher) ? launcher : exePath;
+    }
+
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    private static extern IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
+
+
+    private void LoadShieldIcon()
+    {
+        try
+        {
+            // IDI_SHIELD = 32518，系统标准 UAC 盾牌图标
+            IntPtr hIcon = LoadIcon(IntPtr.Zero, (IntPtr)32518);
+            if (hIcon == IntPtr.Zero) return;
+            using var icon = System.Drawing.Icon.FromHandle(hIcon);
+            using var bmp = icon.ToBitmap();
+            using var ms = new MemoryStream();
+            bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            ms.Position = 0;
+            var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+            bitmap.SetSource(ms.AsRandomAccessStream());
+            ShieldSource = bitmap;
+        }
+        catch { }
     }
 
 
