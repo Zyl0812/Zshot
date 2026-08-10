@@ -18,6 +18,11 @@ on:
         description: '手动指定的版本号，留空则从最新 release 自动递增'
         type: string
         required: false
+      dry_run_cleanup:
+        description: '清理旧版本时只打印会删什么，不真的删除'
+        type: boolean
+        required: false
+        default: false
     outputs:
       v:
         description: '显示版本（原大小写）'
@@ -290,6 +295,11 @@ jobs:
   upload-cdn:
     needs: [resolve-version, build]
     runs-on: ubuntu-latest
+    outputs:
+      old_latest: ${{ steps.rootmanifest.outputs.old_latest }}
+      old_latest_preview: ${{ steps.rootmanifest.outputs.old_latest_preview }}
+      new_latest: ${{ steps.rootmanifest.outputs.new_latest }}
+      new_latest_preview: ${{ steps.rootmanifest.outputs.new_latest_preview }}
     env:
       AWS_DEFAULT_REGION: auto
       VL: ${{ needs.resolve-version.outputs.vl }}
@@ -370,6 +380,7 @@ jobs:
             --cache-control "public, max-age=31536000, immutable"
 
       - name: Update root manifest (latest / latestPreview)
+        id: rootmanifest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -379,6 +390,10 @@ jobs:
           # 拉根 manifest（不存在则建空）
           aws s3 cp "s3://$R2_BUCKET/manifest.json" ./root-manifest.json --endpoint-url "$R2_ENDPOINT" 2>/dev/null \
             || echo '{"latest":"","latestPreview":""}' > root-manifest.json
+
+          OLD_LATEST=$(jq -r '.latest' root-manifest.json)
+          OLD_LATEST_PREVIEW=$(jq -r '.latestPreview' root-manifest.json)
+
           # 正式版更新 latest，预览版更新 latestPreview
           if [ "$PRE" = "true" ]; then
             jq --arg v "$VL" '.latestPreview = $v' root-manifest.json > tmp.json && mv tmp.json root-manifest.json
@@ -391,21 +406,80 @@ jobs:
             --content-type "application/json" \
             --cache-control "public, max-age=60"
 
-      - name: Clean old versions (keep latest + latestPreview only)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          # 给 clean-old-versions job 用：更新前后的 latest/latestPreview 各留一代做缓冲，
+          # 防止客户端刚读到旧 root manifest、正准备下载时资产就被删了
+          NEW_LATEST=$(jq -r '.latest' root-manifest.json)
+          NEW_LATEST_PREVIEW=$(jq -r '.latestPreview' root-manifest.json)
+          {
+            echo "old_latest=$OLD_LATEST"
+            echo "old_latest_preview=$OLD_LATEST_PREVIEW"
+            echo "new_latest=$NEW_LATEST"
+            echo "new_latest_preview=$NEW_LATEST_PREVIEW"
+          } >> "$GITHUB_OUTPUT"
+
+  clean-old-versions:
+    needs: upload-cdn
+    runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: auto
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      DRY_RUN: ${{ inputs.dry_run_cleanup }}
+      OLD_LATEST: ${{ needs.upload-cdn.outputs.old_latest }}
+      OLD_LATEST_PREVIEW: ${{ needs.upload-cdn.outputs.old_latest_preview }}
+      NEW_LATEST: ${{ needs.upload-cdn.outputs.new_latest }}
+      NEW_LATEST_PREVIEW: ${{ needs.upload-cdn.outputs.new_latest_preview }}
+    steps:
+      - name: Clean old versions
         run: |
-          # CDN 只需最新版（latest + latestPreview）的整包/diff；老版本目录没人用（客户端从老版本更新走最新版 diff/整包）
-          LATEST=$(jq -r .latest root-manifest.json)
-          LATEST_PRE=$(jq -r .latestPreview root-manifest.json)
-          echo "Keep: latest=$LATEST  latestPreview=$LATEST_PRE"
-          for d in $(aws s3 ls "s3://$R2_BUCKET/release/" --endpoint-url "$R2_ENDPOINT" | awk '/PRE/ {print $2}'); do
-            name="${d%/}"
-            if [ "$name" != "$LATEST" ] && [ "$name" != "$LATEST_PRE" ]; then
-              echo "Clean old version dir: release/$name/"
-              aws s3 rm "s3://$R2_BUCKET/release/$name/" --recursive --endpoint-url "$R2_ENDPOINT"
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$R2_BUCKET" ] || [ -z "$R2_ENDPOINT" ]; then
+            echo "::error::R2 secrets not configured (R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY / R2_ACCOUNT_ID / R2_BUCKET)"
+            exit 1
+          fi
+
+          # 客户端只会读根 manifest 的 latest/latestPreview 指向的那个版本自己的文件夹
+          # （full 包、diff 包、manifest 全在里面），不会碰旧版本自己的文件夹。
+          # 所以保留集合就是这次更新前后的 latest/latestPreview——更新前的也留一代，
+          # 防止客户端刚读到旧根 manifest、正准备下载时资产就被删了。
+          KEEP=$(jq -cn \
+            --arg a "$OLD_LATEST" --arg b "$OLD_LATEST_PREVIEW" \
+            --arg c "$NEW_LATEST" --arg d "$NEW_LATEST_PREVIEW" \
+            '[$a,$b,$c,$d] | map(select(. != "")) | unique')
+
+          COUNT=$(echo "$KEEP" | jq 'length')
+          if [ "$COUNT" -lt 1 ]; then
+            echo "::error::保留列表为空，为安全起见中止清理，不删除任何东西"
+            exit 1
+          fi
+          echo "本次保留 ($COUNT 个): $(echo "$KEEP" | jq -r 'join(", ")')"
+
+          EXISTING=$(aws s3api list-objects-v2 \
+            --bucket "$R2_BUCKET" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --prefix "release/" \
+            --delimiter "/" \
+            --query "CommonPrefixes[].Prefix" \
+            --output json 2>/dev/null | jq -r '.[]? | sub("^release/"; "") | sub("/$"; "")')
+
+          if [ -z "$EXISTING" ]; then
+            echo "release/ 下没有任何版本目录，无需清理"
+            exit 0
+          fi
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "=== dry run：只预览，不会真的删除 ==="
+          fi
+
+          for tag in $EXISTING; do
+            IS_KEEP=$(echo "$KEEP" | jq --arg t "$tag" 'any(. == $t)')
+            if [ "$IS_KEEP" = "true" ]; then
+              echo "保留: $tag"
+            elif [ "$DRY_RUN" = "true" ]; then
+              echo "[dry-run] 会删除: $tag"
+            else
+              echo "删除: $tag"
+              aws s3 rm "s3://$R2_BUCKET/release/$tag/" --recursive --endpoint-url "$R2_ENDPOINT"
             fi
           done

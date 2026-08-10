@@ -11,6 +11,11 @@ on:
       version:
         description: 'Version (e.g. 0.1.0-preview.1; leave empty to auto-increment from latest release)'
         required: false
+      dry_run_cleanup:
+        description: 'Preview CDN cleanup without deleting (dry run)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -28,6 +33,7 @@ jobs:
     with:
       prerelease: ${{ inputs.prerelease }}
       version: ${{ inputs.version }}
+      dry_run_cleanup: ${{ inputs.dry_run_cleanup }}
     secrets: inherit
 
   release:
