@@ -18,6 +18,7 @@ public sealed partial class UpdateWindow : WindowEx
 {
     private ReleaseInfo? _release;
     private CancellationTokenSource? _cts;
+    private bool _userClosed;
 
 
     public string CurrentVersionText { get; set => SetProperty(ref field, value); } = "";
@@ -45,7 +46,13 @@ public sealed partial class UpdateWindow : WindowEx
         SystemBackdrop = new DesktopAcrylicBackdrop();
         AdaptTitleBarButtonColorToActuallTheme();
         CenterInScreen(1000, 680);
-        this.Closed += (_, _) => _cts?.Cancel();
+        this.Closed += (_, _) =>
+        {
+            _userClosed = true;
+            _cts?.Cancel();
+            // 马上提示（不等 StartUpdateAsync 的 catch 链走完）
+            InAppToast.MainWindow?.Warning(null, Lang.Starshot_UpdateFailed, 5000);
+        };
     }
 
 
@@ -152,7 +159,7 @@ public sealed partial class UpdateWindow : WindowEx
             HasError = Visibility.Visible;
             Button_Update.IsEnabled = true;
             Button_Remind.IsEnabled = true;
-            InAppToast.MainWindow?.Error(ex, Lang.Starshot_UpdateFailed);
+            if (!_userClosed) InAppToast.MainWindow?.Error(ex, Lang.Starshot_UpdateFailed);
         }
     }
 

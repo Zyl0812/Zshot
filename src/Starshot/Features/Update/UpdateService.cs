@@ -154,6 +154,8 @@ public static class UpdateService
             // 解压是 File.Create 直接覆盖、非原子，中途失败原件可能是半截；用 .bak 把启动器 + version.ini 还原回旧版
             try { if (File.Exists(versionIniBak)) File.Copy(versionIniBak, versionIni, overwrite: true); } catch { }
             try { if (File.Exists(launcherBak)) File.Copy(launcherBak, launcherExe, overwrite: true); } catch { }
+            // 删下载半成品的 app-{new}/（cancel 中途解压/复制了一半）
+            try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
             throw;
         }
         finally
