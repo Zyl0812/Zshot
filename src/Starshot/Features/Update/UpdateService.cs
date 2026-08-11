@@ -165,7 +165,7 @@ public static class UpdateService
         // 统一写 version.ini = 新 tag（和 app 目录名 + diff.from 对齐；launcher 不更新）
         try { File.WriteAllText(versionIni, $"version={info.TagName}"); } catch { }
 
-        // 启动器接管（--clean=<pid> 清旧 app-*，旧主进程锁着时按 pid 强杀）+ 退出本进程
+        // 启动器接管（--clean=<pid> 清旧 app-*/锁住时弹窗提示用户自行处理）+ 退出本进程
         Process.Start(new ProcessStartInfo(launcherExe) { UseShellExecute = true, Arguments = $"--clean={Environment.ProcessId}" });
         App.Current.Exit();
     }

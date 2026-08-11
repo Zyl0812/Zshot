@@ -18,8 +18,9 @@ int wmain(int argc, wchar_t* argv[])
     GetModuleFileNameW(NULL, exePath, MAX_PATH);
     const std::filesystem::path base_folder = std::filesystem::path(exePath).parent_path();
 
-    // --clean wipes old app-*. Without a pid it just retries 10 times and gives up (no process kill).
-    // With --clean=<pid> it retries harder (once per minute for 5 min) then force-kills that pid.
+    // --clean wipes old app-* dirs (keeps the just-launched one). Retries 10x over 10s;
+    // if still locked, prompts the user -- OK opens the folder, Cancel closes.
+    // --clean=<pid> only adds the pid to the prompt (no force-kill; user handles it).
     bool cleanup = false;
     DWORD oldPid = 0;
     const std::wstring cleanPrefix = L"--clean=";
@@ -91,27 +92,25 @@ int wmain(int argc, wchar_t* argv[])
                     Sleep(1000);
                 }
                 if (!std::filesystem::exists(entry.path())) continue;
-                // Still locked after 10s. Always prompt; what we do after OK differs.
+                // Still locked after 10s. No force-kill, let the user handle it.
+                // OK opens the folder in Explorer; Cancel just closes the launcher.
+                std::wstring msg;
                 if (oldPid != 0)
                 {
-                    // Can force-kill: tell the user, then kill the old process and retry once.
-                    MessageBox(NULL,
-                        L"The previous Starshot is still running and holding old files locked.\n"
-                        L"It will be forced to close to finish the cleanup.",
-                        L"Starshot",
-                        MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND);
-                    HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, oldPid);
-                    if (h) { TerminateProcess(h, 1); CloseHandle(h); }
-                    std::filesystem::remove_all(entry.path(), rm_ec);
+                    msg = L"The previous Starshot is still running on " + std::to_wstring(oldPid) +
+                        L" and holding old files locked.\n"
+                        L"Please close it and clean up manually.\n\n"
+                        L"Click OK to open the folder, or Cancel to close.";
                 }
                 else
                 {
-                    // No pid to kill — tell the user to handle it themselves.
-                    MessageBox(NULL,
-                        L"Could not remove old files (maybe locked by another process).\n"
-                        L"Please delete the old folder manually.",
-                        L"Starshot",
-                        MB_OK | MB_ICONWARNING | MB_SETFOREGROUND);
+                    msg = L"Could not remove old files (maybe locked by another process).\n"
+                        L"Please delete the old folder manually.\n\n"
+                        L"Click OK to open the folder, or Cancel to close.";
+                }
+                if (MessageBox(NULL, msg.c_str(), L"Starshot", MB_OKCANCEL | MB_ICONWARNING | MB_SETFOREGROUND) == IDOK)
+                {
+                    ShellExecute(NULL, L"explore", entry.path().c_str(), NULL, NULL, SW_SHOWNORMAL);
                 }
             }
         }
