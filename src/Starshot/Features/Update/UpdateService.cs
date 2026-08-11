@@ -366,30 +366,6 @@ public static class UpdateService
             try { if (File.Exists(patchFile)) File.Delete(patchFile); } catch { }
         }
 
-        // 全量 SHA256 校验：用版本 manifest 的 files
-        if (archManifest.Files is not null && archManifest.Files.Count > 0)
-        {
-            progress.Report((-1, ""));
-            bool integrityOk = await Task.Run(() =>
-            {
-                using var sha = SHA256.Create();
-                foreach (var kv in archManifest.Files)
-                {
-                    string abs = Path.Combine(appNewDir, kv.Key.Replace('/', Path.DirectorySeparatorChar));
-                    if (!File.Exists(abs)) return false;
-                    using var fs = File.OpenRead(abs);
-                    string hash = Convert.ToHexString(sha.ComputeHash(fs));
-                    if (!hash.Equals(kv.Value, StringComparison.OrdinalIgnoreCase)) return false;
-                }
-                return true;
-            });
-            if (!integrityOk)
-            {
-                _logger?.LogWarning("CDN delta integrity check failed (hash mismatch)");
-                return false;
-            }
-        }
-
         progress.Report((100, ""));
         _logger?.LogInformation("CDN delta update completed successfully");
         return true;
