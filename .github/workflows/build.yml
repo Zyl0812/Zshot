@@ -23,6 +23,11 @@ on:
         type: boolean
         required: false
         default: false
+      launcher_updated:
+        description: '这次 launcher 有实质更新，把新 launcher 整个传给增量更新用户（不 diff，直接整份传，客户端整体替换）'
+        type: boolean
+        required: false
+        default: false
     outputs:
       v:
         description: '显示版本（原大小写）'
@@ -250,6 +255,10 @@ jobs:
             Write-Host "delta: $deltaPatch ($([math]::Round((Get-Item $deltaPatch).Length / 1MB, 2)) MB)"
           }
 
+      - name: Copy launcher (if updated)
+        if: ${{ inputs.launcher_updated }}
+        run: Copy-Item build/release/Starshot.exe "launcher-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.exe"
+
       - name: Zip release
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -264,6 +273,7 @@ jobs:
           path: |
             Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.patch
+            launcher-*-win-${{ matrix.platform }}.exe
 
 
   upload-cdn:
@@ -302,6 +312,8 @@ jobs:
 
           $x64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-x64.zip" }) | Select-Object -First 1
           $arm64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-arm64.zip" }) | Select-Object -First 1
+          $x64Launcher = ($files | Where-Object { $_ -eq "launcher-$vl-win-x64.exe" }) | Select-Object -First 1
+          $arm64Launcher = ($files | Where-Object { $_ -eq "launcher-$vl-win-arm64.exe" }) | Select-Object -First 1
           $x64Diffs = @(); $arm64Diffs = @()
           $esc = [regex]::Escape($vl)
           foreach ($f in $files) {
@@ -315,8 +327,8 @@ jobs:
             tag = $vl
             prerelease = $pre
             publishedAt = (Get-Date).ToString("o")
-            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs }
-            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs }
+            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs; launcher = $x64Launcher }
+            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs; launcher = $arm64Launcher }
           }
           $manifest | ConvertTo-Json -Depth 10 | Set-Content upload/manifest.json
           Write-Host "--- manifest.json ---"
@@ -344,6 +356,12 @@ jobs:
             --endpoint-url "$R2_ENDPOINT" \
             --recursive \
             --exclude "*" --include "diff-*.patch" \
+            --content-type "application/octet-stream" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 cp upload/ "s3://$R2_BUCKET/release/$VL/" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --recursive \
+            --exclude "*" --include "launcher-*.exe" \
             --content-type "application/octet-stream" \
             --cache-control "public, max-age=31536000, immutable"
           aws s3 cp "upload/manifest.json" "s3://$R2_BUCKET/release/$VL/manifest.json" \
