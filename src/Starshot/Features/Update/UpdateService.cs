@@ -100,70 +100,70 @@ public static class UpdateService
     }
 
 
+    /// <summary>
+    /// 流式下载文件到磁盘，进度按网络字节 / Content-Length（无解压，patch 直接落盘）。
+    /// </summary>
+    public static async Task DownloadFileAsync(string url, string destFile, IProgress<(int percent, string bytesText)>? progress, CancellationToken ct = default)
+    {
+        progress?.Report((0, ""));
+        using var http = new HttpClient();
+        http.DefaultRequestHeaders.UserAgent.ParseAdd("Starshot");
+        using var resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+        resp.EnsureSuccessStatusCode();
+        long? total = resp.Content.Headers.ContentLength;
+        await using var httpStream = await resp.Content.ReadAsStreamAsync(ct);
+        using var counting = new CountingStream(httpStream);
+        using var fs = File.Create(destFile);
+        var buf = new byte[81920];
+        int n;
+        while ((n = await counting.ReadAsync(buf, 0, buf.Length, ct)) > 0)
+        {
+            await fs.WriteAsync(buf, 0, n, ct);
+            if (total > 0)
+            {
+                int pct = (int)(counting.BytesRead * 99 / total.Value);
+                progress?.Report((pct, $"{FormatSize(counting.BytesRead)} / {FormatSize(total.Value)}"));
+            }
+        }
+    }
+
+
     public static async Task StartUpdateAsync(ReleaseInfo info, IProgress<(int percent, string bytesText)> progress, CancellationToken ct = default, bool forceFull = false)
     {
         string root = AppConfig.UserDataFolder;
         string versionIni = Path.Combine(root, "version.ini");
-        string versionIniBak = versionIni + ".bak";
         string launcherExe = Path.Combine(root, "Starshot.exe");
-        string launcherBak = launcherExe + ".bak";
         // app-{new}/ 用原始 tag（含 -Preview 后缀），跟 zip 实际目录名对齐；Version 是去后缀的，不能拿来拼目录
         string appNewDir = Path.Combine(root, "app-" + info.TagName);
 
-        // 备份 version.ini + 启动器：解压会覆盖原件，异常时 catch 用 .bak 还原，保证下次能启动旧版
-        try { if (File.Exists(versionIni)) File.Copy(versionIni, versionIniBak, overwrite: true); } catch { }
-        try { if (File.Exists(launcherExe)) File.Copy(launcherExe, launcherBak, overwrite: true); } catch { }
-
-        try
+        // 尝试差分更新；失败 fallback 整包。forceFull=true 跳过 delta。
+        // delta 只 patch app 目录（launcher 不动），整包覆盖全部；不再备份 .bak（delta 不动 launcher，失败 fallback 整包）
+        bool deltaOK = false;
+        if (!forceFull)
         {
-            // 尝试差分更新（链式 delta）；失败自动 fallback 整包。forceFull=true 跳过 delta 直接整包
-            bool deltaOK = false;
-            if (!forceFull)
+            try
             {
-                try
-                {
-                    deltaOK = AppConfig.UpdateSource == 0
-                        ? await TryDeltaUpdateCDNAsync(info, root, appNewDir, progress, ct)
-                        : await TryDeltaUpdateGitHubAsync(info, root, appNewDir, progress, ct);
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
-                    deltaOK = false;
-                }
+                deltaOK = AppConfig.UpdateSource == 0
+                    ? await TryDeltaUpdateCDNAsync(info, root, appNewDir, progress, ct)
+                    : await TryDeltaUpdateGitHubAsync(info, root, appNewDir, progress, ct);
             }
-            if (!deltaOK)
+            catch (Exception ex)
             {
-                // fallback：删残缺 app-{new}/（差分可能创建了半成品）
-                try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
-
-                _logger?.LogInformation("Falling back to full package update");
-                await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
-            }
-
-            // 校验包结构：root/Starshot.exe + version.ini + app-{new}/
-            if (!File.Exists(launcherExe)
-                || !File.Exists(versionIni)
-                || !Directory.Exists(appNewDir))
-            {
-                throw new InvalidDataException("Update package structure invalid");
+                _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
+                deltaOK = false;
             }
         }
-        catch
+        if (!deltaOK)
         {
-            // 解压是 File.Create 直接覆盖、非原子，中途失败原件可能是半截；用 .bak 把启动器 + version.ini 还原回旧版
-            try { if (File.Exists(versionIniBak)) File.Copy(versionIniBak, versionIni, overwrite: true); } catch { }
-            try { if (File.Exists(launcherBak)) File.Copy(launcherBak, launcherExe, overwrite: true); } catch { }
-            // 删下载半成品的 app-{new}/（cancel 中途解压/复制了一半）
             try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
-            throw;
+            _logger?.LogInformation("Falling back to full package update");
+            await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
+            if (!File.Exists(launcherExe) || !File.Exists(versionIni) || !Directory.Exists(appNewDir))
+                throw new InvalidDataException("Update package structure invalid");
         }
-        finally
-        {
-            // 成败都删 .bak：成功原件已是新版；失败已在上面的 catch 还原原件，.bak 与原件相同
-            try { if (File.Exists(versionIniBak)) File.Delete(versionIniBak); } catch { }
-            try { if (File.Exists(launcherBak)) File.Delete(launcherBak); } catch { }
-        }
+
+        // 统一写 version.ini = 新 tag（和 app 目录名 + diff.from 对齐；launcher 不更新）
+        try { File.WriteAllText(versionIni, $"version={info.TagName}"); } catch { }
 
         // 启动器接管（--clean=<pid> 清旧 app-*，旧主进程锁着时按 pid 强杀）+ 退出本进程
         Process.Start(new ProcessStartInfo(launcherExe) { UseShellExecute = true, Arguments = $"--clean={Environment.ProcessId}" });
@@ -230,20 +230,14 @@ public static class UpdateService
 
         _logger?.LogInformation("Delta update: {Chain} layers from {From} to {To}", chain.Count, currentTag, info.TagName);
 
-        // 1. 复制当前 app 目录 → 新 app 目录（本地磁盘，SSD 快）
-        // 用 CopyEachFile 而非 Directory.Copy（后者在 .NET 不存在；用递归）
-        CopyDirectory(currentAppDir, appNewDir);
-
-        // 最后一层 manifest.files 是目标版本全量清单，循环结束后据此校验完整性
-        Dictionary<string, string>? targetFiles = null;
-
-        // 2. 依次应用 delta 链
+        // 链式 apply：每层 old + patch → new；中间结果作下一层 old，最后一步落到 appNewDir
+        string currentApp = currentAppDir;
         for (int i = 0; i < chain.Count; i++)
         {
             var link = chain[i];
             _logger?.LogInformation("Delta layer {Index}: {From} -> {To}", i + 1, link.FromTag, link.ToTag);
 
-            // 进度：单层直接用原始百分比；多层进度条按层均分，右边显示层号
+            // 进度：单层直接透传；多层按层均分，右边显示层号
             IProgress<(int percent, string bytesText)> layerProgress;
             if (chain.Count == 1)
             {
@@ -260,72 +254,24 @@ public static class UpdateService
                 });
             }
 
-            // 解压 delta.zip 到 root（覆盖变化文件 + manifest.json + version.ini）
-            await ExtractToDirectoryAsync(link.DeltaUrl, root, layerProgress, ct);
+            bool isLast = i == chain.Count - 1;
+            string nextApp = isLast ? appNewDir : Path.Combine(root, ".delta-step-" + i);
 
-            // 读 manifest.json → 删除 deletedFiles
-            string manifestPath = Path.Combine(root, "manifest.json");
-            if (File.Exists(manifestPath))
+            string patchFile = Path.Combine(root, ".diff-" + Guid.NewGuid().ToString("N") + ".patch");
+            try
             {
-                string json = await File.ReadAllTextAsync(manifestPath, ct);
-                var manifest = JsonSerializer.Deserialize<DeltaManifest>(json);
-                if (manifest?.DeletedFiles is not null)
-                {
-                    foreach (var rel in manifest.DeletedFiles)
-                    {
-                        string abs = Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar));
-                        try
-                        {
-                            if (File.Exists(abs)) File.Delete(abs);
-                        }
-                        catch { /* 删除失败不致命 */ }
-                    }
-                }
-                // 最后一层：保留目标版本全量文件清单，供循环结束后校验
-                if (i == chain.Count - 1) targetFiles = manifest?.Files;
-                // 清理 manifest.json
-                try { File.Delete(manifestPath); } catch { }
+                await DownloadFileAsync(link.DeltaUrl, patchFile, layerProgress, ct);
+                var patchProgress = new Progress<int>(p => layerProgress.Report((p, Lang.Starshot_UpdateDelta)));
+                await HPatchInvoker.ApplyAsync(currentApp, patchFile, nextApp, patchProgress, ct);
             }
-        }
+            finally
+            {
+                try { if (File.Exists(patchFile)) File.Delete(patchFile); } catch { }
+            }
 
-        // 校验 delta 结果：version.ini 版本应是 target
-        if (File.Exists(versionIni))
-        {
-            string line = File.ReadAllText(versionIni).TrimStart('\xEF', '\xBB', '\xBF');
-            var eq = line.IndexOf('=');
-            if (eq >= 0)
-            {
-                string ver = line[(eq + 1)..].Trim().ToLowerInvariant();
-                if (!string.Equals(ver, info.TagName, StringComparison.OrdinalIgnoreCase))
-                {
-                    _logger?.LogWarning("Delta result version mismatch: expected {Expected}, got {Actual}", info.TagName, ver);
-                    return false;
-                }
-            }
-        }
-
-        // 全量 SHA256 校验：用最后一层 manifest 的目标版本文件清单逐文件比对
-        if (targetFiles is not null && targetFiles.Count > 0)
-        {
-            progress.Report((-1, "")); // 哨兵：UpdateWindow 切 indeterminate + 校验文案
-            bool integrityOk = await Task.Run(() =>
-            {
-                using var sha = SHA256.Create();
-                foreach (var kv in targetFiles)
-                {
-                    string abs = Path.Combine(appNewDir, kv.Key.Replace('/', Path.DirectorySeparatorChar));
-                    if (!File.Exists(abs)) return false;
-                    using var fs = File.OpenRead(abs);
-                    string hash = Convert.ToHexString(sha.ComputeHash(fs));
-                    if (!hash.Equals(kv.Value, StringComparison.OrdinalIgnoreCase)) return false;
-                }
-                return true;
-            });
-            if (!integrityOk)
-            {
-                _logger?.LogWarning("Delta integrity check failed (hash mismatch), falling back to full package");
-                return false;
-            }
+            // 清理中间步骤目录（保留起始 currentAppDir，用户回滚兜底；最终 appNewDir 留给 launcher 接管）
+            if (i > 0) try { Directory.Delete(currentApp, recursive: true); } catch { }
+            currentApp = nextApp;
         }
 
         progress.Report((100, ""));
@@ -406,47 +352,21 @@ public static class UpdateService
 
         _logger?.LogInformation("CDN delta update: {From} -> {To}", currentTag, info.TagName);
 
-        // 1. 复制当前 app → 新 app
-        CopyDirectory(currentAppDir, appNewDir);
-
-        // 2. 解压 diff 到 root（覆盖变化文件 + diff 内 manifest + version.ini）
+        // 下载 diff.patch（hdiffz 内置 zstd 压缩，直接文件，无 zip 容器）
         string diffUrl = $"{AppConfig.CdnBase}/release/{info.TagName}/{diff.File}";
-        await ExtractToDirectoryAsync(diffUrl, root, progress, ct);
-
-        // 3. 读 diff 内 manifest → 删 deletedFiles（CDN diff 内 manifest 只剩 deletedFiles）
-        string manifestPath = Path.Combine(root, "manifest.json");
-        if (File.Exists(manifestPath))
+        string patchFile = Path.Combine(root, ".diff-" + Guid.NewGuid().ToString("N") + ".patch");
+        try
         {
-            string json = await File.ReadAllTextAsync(manifestPath, ct);
-            var manifest = JsonSerializer.Deserialize<DeltaManifest>(json);
-            if (manifest?.DeletedFiles is not null)
-            {
-                foreach (var rel in manifest.DeletedFiles)
-                {
-                    string abs = Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar));
-                    try { if (File.Exists(abs)) File.Delete(abs); } catch { }
-                }
-            }
-            try { File.Delete(manifestPath); } catch { }
+            await DownloadFileAsync(diffUrl, patchFile, progress, ct);
+            var patchProgress = new Progress<int>(p => progress.Report((p, Lang.Starshot_UpdateDelta)));
+            await HPatchInvoker.ApplyAsync(currentAppDir, patchFile, appNewDir, patchProgress, ct);
+        }
+        finally
+        {
+            try { if (File.Exists(patchFile)) File.Delete(patchFile); } catch { }
         }
 
-        // 4. 校验 version.ini 版本 == target
-        if (File.Exists(versionIni))
-        {
-            string line = File.ReadAllText(versionIni).TrimStart('\xEF', '\xBB', '\xBF');
-            var eq = line.IndexOf('=');
-            if (eq >= 0)
-            {
-                string ver = line[(eq + 1)..].Trim().ToLowerInvariant();
-                if (!string.Equals(ver, info.TagName, StringComparison.OrdinalIgnoreCase))
-                {
-                    _logger?.LogWarning("CDN delta result version mismatch: expected {Expected}, got {Actual}", info.TagName, ver);
-                    return false;
-                }
-            }
-        }
-
-        // 5. 全量 SHA256 校验：用版本 manifest 的 files（不是 diff 内 manifest，那个只剩 deletedFiles）
+        // 全量 SHA256 校验：用版本 manifest 的 files
         if (archManifest.Files is not null && archManifest.Files.Count > 0)
         {
             progress.Report((-1, ""));
@@ -473,32 +393,6 @@ public static class UpdateService
         progress.Report((100, ""));
         _logger?.LogInformation("CDN delta update completed successfully");
         return true;
-    }
-
-
-    /// <summary>递归复制目录（Directory.Copy 在 .NET 不存在）</summary>
-    private static void CopyDirectory(string source, string dest)
-    {
-        Directory.CreateDirectory(dest);
-        foreach (var file in Directory.GetFiles(source))
-        {
-            File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: true);
-        }
-        foreach (var dir in Directory.GetDirectories(source))
-        {
-            CopyDirectory(dir, Path.Combine(dest, Path.GetFileName(dir)));
-        }
-    }
-
-
-    /// <summary>delta.zip 里的 manifest.json 反序列化模型</summary>
-    private sealed class DeltaManifest
-    {
-        [JsonPropertyName("deletedFiles")]
-        public List<string>? DeletedFiles { get; set; }
-
-        [JsonPropertyName("files")]
-        public Dictionary<string, string>? Files { get; set; }
     }
 
 
