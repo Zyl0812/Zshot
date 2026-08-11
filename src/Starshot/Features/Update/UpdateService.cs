@@ -366,6 +366,24 @@ public static class UpdateService
             try { if (File.Exists(patchFile)) File.Delete(patchFile); } catch { }
         }
 
+        // launcher 有实质更新（manifest.launcher 非空）：单独拉取替换 root/Starshot.exe。
+        // 失败不致命——记 warning 用旧 launcher（delta 主体已成功），下次更新再试
+        if (!string.IsNullOrEmpty(archManifest.Launcher))
+        {
+            string tmpLauncher = Path.Combine(root, ".launcher-new.exe");
+            try
+            {
+                string launcherUrl = $"{AppConfig.CdnBase}/release/{info.TagName}/{archManifest.Launcher}";
+                await DownloadFileAsync(launcherUrl, tmpLauncher, null, ct);
+                File.Move(tmpLauncher, Path.Combine(root, "Starshot.exe"), overwrite: true);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to update launcher, keeping old one");
+                try { if (File.Exists(tmpLauncher)) File.Delete(tmpLauncher); } catch { }
+            }
+        }
+
         progress.Report((100, ""));
         _logger?.LogInformation("CDN delta update completed successfully");
         return true;

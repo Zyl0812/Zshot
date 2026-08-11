@@ -222,6 +222,7 @@ public static class ReleaseClient
     {
         [JsonPropertyName("full")] public string? Full { get; set; }
         [JsonPropertyName("diffs")] public CdnDiffEntry[]? Diffs { get; set; }
+        [JsonPropertyName("launcher")] public string? Launcher { get; set; }
     }
 
     public sealed class CdnDiffEntry
