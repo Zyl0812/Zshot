@@ -204,13 +204,6 @@ jobs:
           if (!(Test-Path $newApp)) { Write-Host "New app folder missing, skipping delta"; exit 0 }
           $newRoot = (Resolve-Path $newApp).Path
 
-          # new 的文件 hash 清单（所有 target 共用，只算一次）
-          $newHashes = @{}
-          Get-ChildItem $newRoot -Recurse -File | ForEach-Object {
-            $rel = $_.FullName.Substring($newRoot.Length + 1).Replace('\','/')
-            $newHashes[$rel] = (Get-FileHash $_.FullName).Hash
-          }
-
           foreach ($oldTag in $targetTags) {
             Write-Host "--- delta: $oldTag -> $newTag ($arch) ---"
             $oldZip = "old-$oldTag.zip"
@@ -257,11 +250,6 @@ jobs:
             Write-Host "delta: $deltaPatch ($([math]::Round((Get-Item $deltaPatch).Length / 1MB, 2)) MB)"
           }
 
-          # 存 newHashes 给 upload-cdn 复用（upload-cdn 不再解压整包算第二遍）
-          $sortedHashes = [ordered]@{}
-          foreach ($k in ($newHashes.Keys | Sort-Object)) { $sortedHashes[$k] = $newHashes[$k] }
-          $sortedHashes | ConvertTo-Json -Depth 10 | Set-Content "new-hashes-$arch.json"
-
       - name: Zip release
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -276,7 +264,6 @@ jobs:
           path: |
             Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.patch
-            new-hashes-${{ matrix.platform }}.json
 
 
   upload-cdn:
@@ -313,13 +300,6 @@ jobs:
           $pre = "$env:PRE" -eq "true"
           $files = Get-ChildItem upload/ -Name
 
-          # 复用 generate delta 已算好的 hash（new-hashes-{arch}.json 同 artifact 传来），不再解压整包
-          function Read-Hashes($path) {
-            if (Test-Path $path) { return Get-Content $path -Raw | ConvertFrom-Json } else { return [PSCustomObject]@{} }
-          }
-          $x64Files = Read-Hashes "upload/new-hashes-x64.json"
-          $arm64Files = Read-Hashes "upload/new-hashes-arm64.json"
-
           $x64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-x64.zip" }) | Select-Object -First 1
           $arm64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-arm64.zip" }) | Select-Object -First 1
           $x64Diffs = @(); $arm64Diffs = @()
@@ -335,8 +315,8 @@ jobs:
             tag = $vl
             prerelease = $pre
             publishedAt = (Get-Date).ToString("o")
-            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs; files = $x64Files }
-            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs; files = $arm64Files }
+            x64 = [PSCustomObject]@{ full = $x64Full; diffs = $x64Diffs }
+            arm64 = [PSCustomObject]@{ full = $arm64Full; diffs = $arm64Diffs }
           }
           $manifest | ConvertTo-Json -Depth 10 | Set-Content upload/manifest.json
           Write-Host "--- manifest.json ---"
