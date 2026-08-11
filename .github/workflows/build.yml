@@ -135,6 +135,23 @@ jobs:
           Move-Item build/release/app "build/release/app-${{ needs.resolve-version.outputs.vl }}" -Force
           "version=${{ needs.resolve-version.outputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
 
+      - name: Setup hdiffz
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $url = gh api repos/sisong/HDiffPatch/releases/latest --jq '.assets[] | select(.name | test("_bin_windows64\\.zip$")) | .browser_download_url'
+          if ([string]::IsNullOrEmpty($url)) {
+            Write-Error "没在 HDiffPatch 最新 release 里找到 windows64 zip 资产"
+            exit 1
+          }
+          Invoke-WebRequest $url -OutFile hdiff.zip
+          Expand-Archive hdiff.zip -DestinationPath hdiff-tool -Force
+          $exe = (Get-ChildItem hdiff-tool -Filter hdiffz.exe -Recurse | Select-Object -First 1).FullName
+          Move-Item $exe hdiffz.exe -Force
+          Remove-Item hdiff.zip, hdiff-tool -Recurse -Force
+          ./hdiffz.exe -v
+
       - name: Generate delta
         shell: pwsh
         env:
@@ -225,49 +242,19 @@ jobs:
             }
             $oldRoot = (Resolve-Path $oldApp).Path
 
-            # 删除文件（old 有 new 没有，路径相对 app 目录）
-            $deletedFiles = @()
-            Get-ChildItem $oldRoot -Recurse -File | ForEach-Object {
-              $rel = $_.FullName.Substring($oldRoot.Length + 1).Replace('\','/')
-              if (-not $newHashes.ContainsKey($rel)) { $deletedFiles += "app-$newTag/$rel" }
+            # hdiffz 生成目录二进制 diff，直接输出 diff-*.patch（zstd 内置压缩，不再外包 zip 容器）
+            $deltaPatch = "diff-${newTag}-from-${oldTag}-win-${arch}.patch"
+            if (Test-Path $deltaPatch) { Remove-Item $deltaPatch }
+            & ./hdiffz.exe -m -c-zstd-19 -D "$oldRoot" "$newRoot" "$deltaPatch"
+            if ($LASTEXITCODE -ne 0 -or !(Test-Path $deltaPatch)) {
+              Write-Host "Skip ${oldTag}: hdiffz failed (exit $LASTEXITCODE)"
+              Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue
+              Remove-Item $deltaPatch -Force -ErrorAction SilentlyContinue
+              continue
             }
 
-            # 变化/新增文件（hash 不同，路径相对 release 根目录）
-            $changedFiles = @()
-            foreach ($rel in $newHashes.Keys) {
-              $oldFile = Join-Path $oldRoot $rel
-              $newFile = Join-Path $newRoot $rel
-              if (!(Test-Path $oldFile)) {
-                $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$rel"; FullPath = $newFile }
-              } elseif ((Get-FileHash $oldFile).Hash -ne $newHashes[$rel]) {
-                $changedFiles += [PSCustomObject]@{ Path = "app-$newTag/$rel"; FullPath = $newFile }
-              }
-            }
-
-            # launcher + version.ini 每次都变（C++ 构建元数据 + 版本号），无条件放 delta
-            $changedFiles += [PSCustomObject]@{ Path = "Starshot.exe"; FullPath = "build/release/Starshot.exe" }
-            $changedFiles += [PSCustomObject]@{ Path = "version.ini"; FullPath = "build/release/version.ini" }
-
-            # diff 内 manifest：只放 deletedFiles（每 diff 特有）；files hash 共用一份，移到 CDN 版本 manifest，不进每个 diff zip
-            $manifest = @{ deletedFiles = ($deletedFiles | Sort-Object) }
-            $manifestPath = "manifest-$oldTag.json"
-            $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
-
-            $deltaZip = "diff-${newTag}-from-${oldTag}-win-${arch}.zip"
-            if (Test-Path $deltaZip) { Remove-Item $deltaZip }
-            $zipArchive = [System.IO.Compression.ZipFile]::Open($deltaZip, 'Create')
-            try {
-              [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $manifestPath, "manifest.json", [System.IO.Compression.CompressionLevel]::SmallestSize)
-              foreach ($f in $changedFiles) {
-                [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $f.FullPath, $f.Path, [System.IO.Compression.CompressionLevel]::SmallestSize)
-              }
-            } finally {
-              $zipArchive.Dispose()
-            }
-
-            Remove-Item $manifestPath -Force
             Remove-Item $oldDir -Recurse -Force -ErrorAction SilentlyContinue
-            Write-Host "delta: $deltaZip ($([math]::Round((Get-Item $deltaZip).Length / 1MB, 2)) MB), changed=$($changedFiles.Count) deleted=$($deletedFiles.Count)"
+            Write-Host "delta: $deltaPatch ($([math]::Round((Get-Item $deltaPatch).Length / 1MB, 2)) MB)"
           }
 
           # 存 newHashes 给 upload-cdn 复用（upload-cdn 不再解压整包算第二遍）
@@ -288,7 +275,7 @@ jobs:
           name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}
           path: |
             Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip
-            diff-*-win-${{ matrix.platform }}.zip
+            diff-*-win-${{ matrix.platform }}.patch
             new-hashes-${{ matrix.platform }}.json
 
 
@@ -338,9 +325,9 @@ jobs:
           $x64Diffs = @(); $arm64Diffs = @()
           $esc = [regex]::Escape($vl)
           foreach ($f in $files) {
-            if ($f -match "^diff-$esc-from-(.+?)-win-x64\.zip$") {
+            if ($f -match "^diff-$esc-from-(.+?)-win-x64\.patch$") {
               $x64Diffs += [PSCustomObject]@{ from = $Matches[1]; file = $f }
-            } elseif ($f -match "^diff-$esc-from-(.+?)-win-arm64\.zip$") {
+            } elseif ($f -match "^diff-$esc-from-(.+?)-win-arm64\.patch$") {
               $arm64Diffs += [PSCustomObject]@{ from = $Matches[1]; file = $f }
             }
           }
@@ -366,13 +353,18 @@ jobs:
             echo "::error::R2 secrets not configured (R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY / R2_ACCOUNT_ID / R2_BUCKET)"
             exit 1
           fi
-          # 整包 + diff（zip）；manifest.json 排除，单独传（json content-type）
+          # 整包 zip（application/zip）+ diff patch（octet-stream）；manifest.json 单独传（json）
           aws s3 cp upload/ "s3://$R2_BUCKET/release/$VL/" \
             --endpoint-url "$R2_ENDPOINT" \
             --recursive \
-            --exclude "manifest.json" \
-            --exclude "new-hashes-*.json" \
+            --exclude "*" --include "*.zip" \
             --content-type "application/zip" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 cp upload/ "s3://$R2_BUCKET/release/$VL/" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --recursive \
+            --exclude "*" --include "diff-*.patch" \
+            --content-type "application/octet-stream" \
             --cache-control "public, max-age=31536000, immutable"
           aws s3 cp "upload/manifest.json" "s3://$R2_BUCKET/release/$VL/manifest.json" \
             --endpoint-url "$R2_ENDPOINT" \
