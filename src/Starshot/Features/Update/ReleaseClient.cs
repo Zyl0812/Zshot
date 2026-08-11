@@ -222,7 +222,6 @@ public static class ReleaseClient
     {
         [JsonPropertyName("full")] public string? Full { get; set; }
         [JsonPropertyName("diffs")] public CdnDiffEntry[]? Diffs { get; set; }
-        [JsonPropertyName("files")] public Dictionary<string, string>? Files { get; set; }
     }
 
     public sealed class CdnDiffEntry
