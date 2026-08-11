@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Serilog;
 using SharpCompress.Readers;
 using Starshot.Language;
 using System;
@@ -19,7 +20,7 @@ namespace Starshot.Features.Update;
 
 public static class UpdateService
 {
-    private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.LoggerFactory.Create(b => { }).CreateLogger("UpdateService");
+    private static readonly Microsoft.Extensions.Logging.ILogger _logger = LoggerFactory.Create(b => b.AddSerilog()).CreateLogger("UpdateService");
 
     public static async Task<(ReleaseInfo? update, string? latestTag)> CheckUpdateAsync(bool ignoreSkipped = true)
     {
