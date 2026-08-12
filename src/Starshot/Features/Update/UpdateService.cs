@@ -137,38 +137,44 @@ public static class UpdateService
         // app-{new}/ 用原始 tag（含 -Preview 后缀），跟 zip 实际目录名对齐；Version 是去后缀的，不能拿来拼目录
         string appNewDir = Path.Combine(root, "app-" + info.TagName);
 
-        // 尝试差分更新；失败 fallback 整包。forceFull=true 跳过 delta。
-        // delta 只 patch app 目录（launcher 不动），整包覆盖全部；不再备份 .bak（delta 不动 launcher，失败 fallback 整包）
-        bool deltaOK = false;
-        if (!forceFull)
+        try
         {
-            try
+            bool deltaOK = false;
+            if (!forceFull)
             {
-                deltaOK = AppConfig.UpdateSource == 0
-                    ? await TryDeltaUpdateCDNAsync(info, root, appNewDir, progress, ct)
-                    : await TryDeltaUpdateGitHubAsync(info, root, appNewDir, progress, ct);
+                try
+                {
+                    deltaOK = AppConfig.UpdateSource == 0
+                        ? await TryDeltaUpdateCDNAsync(info, root, appNewDir, progress, ct)
+                        : await TryDeltaUpdateGitHubAsync(info, root, appNewDir, progress, ct);
+                }
+                catch (OperationCanceledException) { throw; }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
+                }
             }
-            catch (Exception ex)
+            if (!deltaOK)
             {
-                _logger?.LogWarning(ex, "Delta update failed, falling back to full package");
-                deltaOK = false;
+                try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
+                _logger?.LogInformation("Falling back to full package update");
+                await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
+                if (!File.Exists(launcherExe) || !File.Exists(versionIni) || !Directory.Exists(appNewDir))
+                    throw new InvalidDataException("Update package structure invalid");
             }
+
+            try { File.WriteAllText(versionIni, $"version={info.TagName}"); } catch { }
+
+            Process.Start(new ProcessStartInfo(launcherExe) { UseShellExecute = true, Arguments = $"--clean={Environment.ProcessId}" });
+            App.Current.Exit();
         }
-        if (!deltaOK)
+        catch (Exception)
         {
+            // 失败/取消：清残缺 appNewDir + 回滚 version.ini 到当前运行版本
             try { if (Directory.Exists(appNewDir)) Directory.Delete(appNewDir, recursive: true); } catch { }
-            _logger?.LogInformation("Falling back to full package update");
-            await ExtractToDirectoryAsync(info.ZipUrl, root, progress, ct);
-            if (!File.Exists(launcherExe) || !File.Exists(versionIni) || !Directory.Exists(appNewDir))
-                throw new InvalidDataException("Update package structure invalid");
+            try { File.WriteAllText(versionIni, $"version={AppConfig.AppVersion}"); } catch { }
+            throw;
         }
-
-        // 统一写 version.ini = 新 tag（和 app 目录名 + diff.from 对齐；launcher 不更新）
-        try { File.WriteAllText(versionIni, $"version={info.TagName}"); } catch { }
-
-        // 启动器接管（--clean=<pid> 清旧 app-*/锁住时弹窗提示用户自行处理）+ 退出本进程
-        Process.Start(new ProcessStartInfo(launcherExe) { UseShellExecute = true, Arguments = $"--clean={Environment.ProcessId}" });
-        App.Current.Exit();
     }
 
 
