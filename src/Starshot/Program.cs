@@ -19,7 +19,7 @@ public static class Program
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler", " 3.0.0.2411")]
     [global::System.STAThreadAttribute]
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
         // 提权子进程：--manage-task create/delete，以管理员权限调 TaskScheduler API 创建/删除任务后退出
         if (args.Length > 0 && args[0] == "--manage-task")
@@ -53,8 +53,9 @@ public static class Program
             catch (Exception ex)
             {
                 LogManageTask($"Task operation failed: {ex}");
+                return 1;
             }
-            return;
+            return 0;
         }
 
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -67,6 +68,7 @@ public static class Program
             global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
             new App();
         });
+        return 0;
     }
 
 

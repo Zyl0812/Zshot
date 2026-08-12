@@ -103,27 +103,30 @@ public sealed partial class GeneralSetting : PageBase
         get;
         set
         {
-            if (SetProperty(ref field, value))
-            {
-                if (value)
-                {
-                    if (PriorityStart) UpdateAutoStartTask(true);
-                    else UpdateAutoStartRegistry(true);
-                }
-                else
-                {
-                    UpdateAutoStartRegistry(false);
-                    if (_priorityStart)
-                    {
-                        if (UpdateAutoStartTask(false)) _priorityStart = false;
-                    }
-                }
-                OnPropertyChanged(nameof(AutoStartMinimizedVisibility));
-                OnPropertyChanged(nameof(PriorityStartVisibility));
-                OnPropertyChanged(nameof(PriorityStart));
-            }
+            if (SetProperty(ref field, value)) _ = ApplyEnableAutoStartAsync(value);
         }
     } = IsAutoStartActive();
+
+
+    private async Task ApplyEnableAutoStartAsync(bool value)
+    {
+        if (value)
+        {
+            if (PriorityStart) await UpdateAutoStartTaskAsync(true);
+            else UpdateAutoStartRegistry(true);
+        }
+        else
+        {
+            UpdateAutoStartRegistry(false);
+            if (_priorityStart)
+            {
+                if (await UpdateAutoStartTaskAsync(false)) _priorityStart = false;
+            }
+        }
+        OnPropertyChanged(nameof(AutoStartMinimizedVisibility));
+        OnPropertyChanged(nameof(PriorityStartVisibility));
+        OnPropertyChanged(nameof(PriorityStart));
+    }
 
 
     private static bool IsAutoStartActive()
@@ -139,17 +142,20 @@ public sealed partial class GeneralSetting : PageBase
         get;
         set
         {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.AutoStartMinimized = value;
-                if (EnableAutoStart)
-                {
-                    if (PriorityStart) UpdateAutoStartTask(true);
-                    else UpdateAutoStartRegistry(true);
-                }
-            }
+            if (SetProperty(ref field, value)) _ = ApplyAutoStartMinimizedAsync(value);
         }
     } = AppConfig.AutoStartMinimized;
+
+
+    private async Task ApplyAutoStartMinimizedAsync(bool value)
+    {
+        AppConfig.AutoStartMinimized = value;
+        if (EnableAutoStart)
+        {
+            if (PriorityStart) await UpdateAutoStartTaskAsync(true);
+            else UpdateAutoStartRegistry(true);
+        }
+    }
 
 
     public Visibility AutoStartMinimizedVisibility => EnableAutoStart ? Visibility.Visible : Visibility.Collapsed;
@@ -170,19 +176,25 @@ public sealed partial class GeneralSetting : PageBase
         get => _priorityStart;
         set
         {
-            if (value)
-            {
-                if (UpdateAutoStartTask(true)) { UpdateAutoStartRegistry(false); _priorityStart = true; }
-                else OnPropertyChanged(nameof(PriorityStart)); // 失败 toggle 回 OFF
-            }
-            else
-            {
-                if (_priorityStart)
-                {
-                    if (UpdateAutoStartTask(false)) { UpdateAutoStartRegistry(true); _priorityStart = false; }
-                    else OnPropertyChanged(nameof(PriorityStart)); // 失败 toggle 回 ON
-                }
-            }
+            _priorityStart = value;
+            OnPropertyChanged(nameof(AutoStartEnabled));
+            OnPropertyChanged(nameof(PriorityStartHintVisibility));
+            _ = ApplyPriorityStartAsync(value);
+        }
+    }
+
+
+    private async Task ApplyPriorityStartAsync(bool value)
+    {
+        bool ok = await UpdateAutoStartTaskAsync(value);
+        if (ok)
+        {
+            UpdateAutoStartRegistry(!value);
+        }
+        else
+        {
+            _priorityStart = !value;
+            OnPropertyChanged(nameof(PriorityStart));
             OnPropertyChanged(nameof(AutoStartEnabled));
             OnPropertyChanged(nameof(PriorityStartHintVisibility));
         }
@@ -285,21 +297,24 @@ public sealed partial class GeneralSetting : PageBase
     /// <summary>
     /// Task Scheduler 高优先级启动（ONLOGON 触发 + High 优先级），独立于注册表 Run。
     /// </summary>
-    private bool UpdateAutoStartTask(bool enable)
+    /// <returns>true 成功（ExitCode 0）；false 失败（子进程异常或非 0 退出）</returns>
+    private async Task<bool> UpdateAutoStartTaskAsync(bool enable)
     {
         try
         {
             string launcherPath = GetLauncherPath();
             string taskArgs = (AppConfig.AutoStartMinimized && AppConfig.EnableSystemTrayIcon) ? "--hide" : "";
             string mode = enable ? "create" : "delete";
-            // 提权子进程：UAC 弹窗，admin 权限调 TaskScheduler API
+            // 提权子进程：UAC 弹窗，admin 权限调 TaskScheduler API（同步）；await 不阻塞 UI
             var psi = new ProcessStartInfo(Environment.ProcessPath!, $"--manage-task {mode} \"{launcherPath}\" \"{taskArgs}\"")
             {
                 Verb = "runas",
                 UseShellExecute = true,
             };
-            Process.Start(psi);
-            return true;
+            var p = Process.Start(psi);
+            if (p is null) return false;
+            await p.WaitForExitAsync();
+            return p.ExitCode == 0;
         }
         catch (System.ComponentModel.Win32Exception ex)
         {
