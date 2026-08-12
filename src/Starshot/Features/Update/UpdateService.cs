@@ -262,8 +262,11 @@ public static class UpdateService
             try
             {
                 await DownloadFileAsync(link.DeltaUrl, patchFile, layerProgress, ct);
-                var patchProgress = new Progress<int>(p => layerProgress.Report((p, Lang.Starshot_UpdateDelta)));
-                await HPatchInvoker.ApplyAsync(currentApp, patchFile, nextApp, patchProgress, ct);
+                if (!await HPatchInvoker.ApplyAsync(currentApp, patchFile, nextApp, ct))
+                {
+                    _logger?.LogWarning("Delta layer {Index}: hpatchz apply failed", i + 1);
+                    return false;
+                }
             }
             finally
             {
@@ -359,8 +362,11 @@ public static class UpdateService
         try
         {
             await DownloadFileAsync(diffUrl, patchFile, progress, ct);
-            var patchProgress = new Progress<int>(p => progress.Report((p, Lang.Starshot_UpdateDelta)));
-            await HPatchInvoker.ApplyAsync(currentAppDir, patchFile, appNewDir, patchProgress, ct);
+            if (!await HPatchInvoker.ApplyAsync(currentAppDir, patchFile, appNewDir, ct))
+            {
+                _logger?.LogWarning("CDN delta: hpatchz apply failed");
+                return false;
+            }
         }
         finally
         {
