@@ -140,43 +140,37 @@ jobs:
           Move-Item build/release/app "build/release/app-${{ needs.resolve-version.outputs.vl }}" -Force
           "version=${{ needs.resolve-version.outputs.v }}" | Set-Content -Path build/release/version.ini -Encoding UTF8
 
-      - name: Setup hdiffz
+      - name: Setup HDiffPatch tools
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $url = gh api repos/sisong/HDiffPatch/releases/latest --jq '.assets[] | select(.name | test("_bin_windows64\\.zip$")) | .browser_download_url'
-          if ([string]::IsNullOrEmpty($url)) {
-            Write-Error "没在 HDiffPatch 最新 release 里找到 windows64 zip 资产"
-            exit 1
-          }
-          Invoke-WebRequest $url -OutFile hdiff.zip
-          Expand-Archive hdiff.zip -DestinationPath hdiff-tool -Force
-          $exe = (Get-ChildItem hdiff-tool -Filter hdiffz.exe -Recurse | Select-Object -First 1).FullName
-          Move-Item $exe hdiffz.exe -Force
-          Remove-Item hdiff.zip, hdiff-tool -Recurse -Force
+          $appDir = "build/release/app-${{ needs.resolve-version.outputs.vl }}"
+          # hdiffz 永远取 windows64（跑在 x64 runner 上，跟 matrix 无关）
+          $win64 = gh api repos/sisong/HDiffPatch/releases/latest --jq '.assets[] | select(.name | test("_bin_windows64\\.zip$")) | .browser_download_url'
+          if ([string]::IsNullOrEmpty($win64)) { Write-Error "HDiffPatch windows64 zip not found"; exit 1 }
+          Invoke-WebRequest $win64 -OutFile hdiff-win64.zip
+          Expand-Archive hdiff-win64.zip -DestinationPath hdiff-tool -Force
+          $hdiffExe = (Get-ChildItem hdiff-tool -Filter hdiffz.exe -Recurse | Select-Object -First 1).FullName
+          Move-Item $hdiffExe hdiffz.exe -Force
           ./hdiffz.exe -v
-
-      - name: Setup hpatchz (into release)
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
+          # hpatchz 跟 matrix 对齐（打进 release 给客户端 apply 用）
           if ("${{ matrix.platform }}" -eq "x64") {
-            Invoke-WebRequest "https://r2.cialo.site/hpatchz.exe" -OutFile build/release/hpatchz.exe
+            # 同一份 windows64 解压里取 hpatchz，不再重复下载
+            $hpExe = (Get-ChildItem hdiff-tool -Filter hpatchz.exe -Recurse | Select-Object -First 1).FullName
+            Move-Item $hpExe "$appDir/hpatchz.exe" -Force
+            & "$appDir/hpatchz.exe" -v
           } else {
-            $url = gh api repos/sisong/HDiffPatch/releases/latest --jq '.assets[] | select(.name | test("_bin_windows_arm64\\.zip$")) | .browser_download_url'
-            if ([string]::IsNullOrEmpty($url)) {
-              Write-Error "HDiffPatch release windows_arm64 zip not found"
-              exit 1
-            }
-            Invoke-WebRequest $url -OutFile hpatch-arm64.zip
+            $arm = gh api repos/sisong/HDiffPatch/releases/latest --jq '.assets[] | select(.name | test("_bin_windows_arm64\\.zip$")) | .browser_download_url'
+            if ([string]::IsNullOrEmpty($arm)) { Write-Error "HDiffPatch windows_arm64 zip not found"; exit 1 }
+            Invoke-WebRequest $arm -OutFile hpatch-arm64.zip
             Expand-Archive hpatch-arm64.zip -DestinationPath hpatch-tool -Force
-            $exe = (Get-ChildItem hpatch-tool -Filter hpatchz.exe -Recurse | Select-Object -First 1).FullName
-            Move-Item $exe build/release/hpatchz.exe -Force
+            $hpExe = (Get-ChildItem hpatch-tool -Filter hpatchz.exe -Recurse | Select-Object -First 1).FullName
+            Move-Item $hpExe "$appDir/hpatchz.exe" -Force
+            if (-not (Test-Path "$appDir/hpatchz.exe")) { Write-Error "hpatchz.exe not found"; exit 1 }
             Remove-Item hpatch-arm64.zip, hpatch-tool -Recurse -Force
           }
-          build/release/hpatchz.exe -v
+          Remove-Item hdiff-win64.zip, hdiff-tool -Recurse -Force
 
       - name: Generate delta
         shell: pwsh
@@ -197,7 +191,7 @@ jobs:
           $prevStable = $releases | Where-Object { -not $_.prerelease } | Select-Object -First 1
           if (-not $prevStable) { Write-Host "No stable base release, skipping delta"; exit 0 }
 
-          # 本集/本级 preview：上一个 stable 之后（更新于它）的所有 prerelease
+          # 本级 preview：上一个 stable 之后（更新于它）的所有 prerelease
           # releases 按发布时间倒序，prevStable 的 index 之前（index 更小=更新）的就是它之后的 prerelease
           $stableIdx = [array]::IndexOf($releases, $prevStable)
           $recentPreviews = @()
@@ -206,7 +200,7 @@ jobs:
           }
 
           # 选 diff target（线性发布；不解析版本号）
-          # stable：本集 preview + 前 5 个 stable
+          # stable：本级 preview + 前 5 个 stable
           # preview：本级 preview + 上一个 stable（1 个）
           $targetTags = [System.Collections.Generic.List[string]]::new()
           foreach ($r in $recentPreviews) {
