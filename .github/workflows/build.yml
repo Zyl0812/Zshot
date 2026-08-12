@@ -157,6 +157,27 @@ jobs:
           Remove-Item hdiff.zip, hdiff-tool -Recurse -Force
           ./hdiffz.exe -v
 
+      - name: Setup hpatchz (into release)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ("${{ matrix.platform }}" -eq "x64") {
+            Invoke-WebRequest "https://r2.cialo.site/hpatchz.exe" -OutFile build/release/hpatchz.exe
+          } else {
+            $url = gh api repos/sisong/HDiffPatch/releases/latest --jq '.assets[] | select(.name | test("_bin_windows_arm64\\.zip$")) | .browser_download_url'
+            if ([string]::IsNullOrEmpty($url)) {
+              Write-Error "HDiffPatch release windows_arm64 zip not found"
+              exit 1
+            }
+            Invoke-WebRequest $url -OutFile hpatch-arm64.zip
+            Expand-Archive hpatch-arm64.zip -DestinationPath hpatch-tool -Force
+            $exe = (Get-ChildItem hpatch-tool -Filter hpatchz.exe -Recurse | Select-Object -First 1).FullName
+            Move-Item $exe build/release/hpatchz.exe -Force
+            Remove-Item hpatch-arm64.zip, hpatch-tool -Recurse -Force
+          }
+          build/release/hpatchz.exe -v
+
       - name: Generate delta
         shell: pwsh
         env:
