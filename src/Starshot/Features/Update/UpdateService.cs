@@ -179,8 +179,8 @@ public static class UpdateService
 
 
     /// <summary>
-    /// 差分更新（链式 delta）：复制当前 app 目录 → 依次解压 delta 链覆盖 + 删 manifest deletedFiles。
-    /// 返回 true = 成功；false/异常 = 调用方 fallback 整包。
+    /// 差分更新（链式 delta）：hpatchz 子进程逐层 apply，每层 old + patch → new；
+    /// 中间结果作下一层 old，最后一步落 appNewDir。返回 true = 成功；false/异常 = 调用方 fallback 整包。
     /// </summary>
     private static async Task<bool> TryDeltaUpdateGitHubAsync(
         ReleaseInfo info, string root, string appNewDir,

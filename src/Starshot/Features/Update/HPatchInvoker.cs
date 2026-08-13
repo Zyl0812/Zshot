@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -21,7 +20,7 @@ internal static class HPatchInvoker
         string exe = FindHpatchz();
         if (exe is null)
         {
-            Log.Warning("[HPatchInvoker] hpatchz.exe not found in {Dir}", AppConfig.UserDataFolder);
+            Log.Warning("[HPatchInvoker] hpatchz.exe not found in {Dir}", AppContext.BaseDirectory);
             return false;
         }
 
@@ -60,7 +59,6 @@ internal static class HPatchInvoker
     }
 
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static string? FindHpatchz()
     {
         // 程序目录（app-{tag}/，hpatchz.exe 跟主程序一起）
