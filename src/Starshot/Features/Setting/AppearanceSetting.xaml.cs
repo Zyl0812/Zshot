@@ -22,6 +22,15 @@ public sealed partial class AppearanceSetting : PageBase
     public AppearanceSetting()
     {
         InitializeComponent();
+        // NowPlaying 初始值（设置页打开时拿当前壁纸），后续靠消息实时更新
+        NowPlayingText = AppBackground.CurrentWallpaperFileName;
+        WeakReferenceMessenger.Default.Register<WallpaperNowPlayingChangedMessage>(this, static (r, m) =>
+        {
+            if (r is not AppearanceSetting s) return;
+            s.NowPlayingText = m.FileName;
+            s.OnPropertyChanged(nameof(NowPlayingDisplay));
+            s.OnPropertyChanged(nameof(NowPlayingVisibility));
+        });
     }
 
 
@@ -286,5 +295,12 @@ public sealed partial class AppearanceSetting : PageBase
             sender.FontSize -= 1;
         }
     }
+
+
+    public string? NowPlayingText { get; set => SetProperty(ref field, value); }
+
+    public string NowPlayingDisplay => string.IsNullOrEmpty(NowPlayingText) ? "" : $"{Lang.Starshot_WallpaperNowPlaying}: {NowPlayingText}";
+
+    public Visibility NowPlayingVisibility => AppConfig.WallpaperMode == 3 && !string.IsNullOrEmpty(NowPlayingText) ? Visibility.Visible : Visibility.Collapsed;
 
 }

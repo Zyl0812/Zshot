@@ -487,6 +487,9 @@
   <data name="Starshot_WallpaperFolderVideoOnlyDesc" xml:space="preserve">
     <value>Picks videos first; falls back to a random image if the video can't initialize</value>
   </data>
+  <data name="Starshot_WallpaperNowPlaying" xml:space="preserve">
+    <value>NowPlaying</value>
+  </data>
   <data name="Starshot_WallpaperVideoFallbackToImage" xml:space="preserve">
     <value>No video in folder, picked a random image instead</value>
   </data>

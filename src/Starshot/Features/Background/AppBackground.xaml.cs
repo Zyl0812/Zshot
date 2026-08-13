@@ -41,6 +41,19 @@ public sealed partial class AppBackground : UserControl
     private string? _lastFile;
     private CancellationTokenSource? _cts;
 
+    /// <summary>
+    /// 文件夹随机模式下当前壁纸文件名（设置页打开时取初始值）。null = 未加载/非文件夹模式。
+    /// </summary>
+    public static string? CurrentWallpaperFileName { get; private set; }
+
+
+    /// <summary>广播当前壁纸文件名变更（设置页 NowPlaying 跟随）。file 传 null = 清空。</summary>
+    private static void ReportNowPlaying(string? file)
+    {
+        CurrentWallpaperFileName = file is null ? null : Path.GetFileName(file);
+        WeakReferenceMessenger.Default.Send(new WallpaperNowPlayingChangedMessage { FileName = CurrentWallpaperFileName });
+    }
+
 
     // ===== 视频 =====
     private MediaPlayer? _mediaPlayer;
@@ -109,6 +122,7 @@ public sealed partial class AppBackground : UserControl
                 DisposeVideoResource();
                 BackgroundImageSource = null;
                 _lastFile = null;
+                ReportNowPlaying(null);
                 return;
             }
 
@@ -118,6 +132,7 @@ public sealed partial class AppBackground : UserControl
                 DisposeVideoResource();
                 BackgroundImageSource = null;
                 _lastFile = null;
+                ReportNowPlaying(null);
                 return;
             }
             if (fellBackToImage)
@@ -317,6 +332,7 @@ public sealed partial class AppBackground : UserControl
             ds2.DrawImage(bgra);
         }
         BackgroundImageSource = src;
+        ReportNowPlaying(file);
 
         await ExtractAccentAsync(bgra, w, h);
     }
@@ -460,6 +476,7 @@ public sealed partial class AppBackground : UserControl
                     _videoImageSource = new CanvasImageSource(CanvasDevice.GetSharedDevice(), w, h, 96);
                     BackgroundImageSource = _videoImageSource;
                     _mediaPlayerRetryCount = 0;
+                    ReportNowPlaying(_lastFile);
                     _logger.LogInformation("VideoFrameAvailable first frame {W}x{H}", w, h);
                 }
                 sender.CopyFrameToVideoSurface(_videoSurface);

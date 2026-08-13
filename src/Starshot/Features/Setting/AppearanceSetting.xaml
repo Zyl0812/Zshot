@@ -83,6 +83,11 @@
                            Text="{x:Bind lang:Lang.Starshot_WallpaperFolderVideoOnlyDesc}"
                            TextWrapping="Wrap"
                            Visibility="{x:Bind WallpaperFolderVideoOnlyVisibility}" />
+                <TextBlock FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind NowPlayingDisplay, Mode=OneWay}"
+                           TextWrapping="Wrap"
+                           Visibility="{x:Bind NowPlayingVisibility, Mode=OneWay}" />
             </StackPanel>
 
 

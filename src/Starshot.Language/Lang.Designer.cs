@@ -1916,6 +1916,15 @@
                 return ResourceManager.GetString("Starshot_WallpaperFolderVideoOnlyDesc", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   查找类似 Now Playing 的本地化字符串。
+        /// </summary>
+        public static string Starshot_WallpaperNowPlaying {
+            get {
+                return ResourceManager.GetString("Starshot_WallpaperNowPlaying", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   查找类似 Folder Random 的本地化字符串。
