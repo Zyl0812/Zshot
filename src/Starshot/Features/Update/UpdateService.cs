@@ -68,7 +68,7 @@ public static class UpdateService
         await using var httpStream = await resp.Content.ReadAsStreamAsync(ct);
         // CountingStream 包装统计已读字节，SharpCompress 透过它读网络流
         using var counting = new CountingStream(httpStream);
-        using var reader = ReaderFactory.Open(counting);
+        using var reader = ReaderFactory.OpenReader(counting);
 
         var buf = new byte[81920];
         while (reader.MoveToNextEntry())
