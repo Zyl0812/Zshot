@@ -166,6 +166,9 @@ public static class UpdateService
             try { File.WriteAllText(versionIni, $"version={info.TagName}"); } catch { }
 
             Process.Start(new ProcessStartInfo(launcherExe) { UseShellExecute = true, Arguments = $"--clean={Environment.ProcessId}" });
+            // launcher 已取消强杀旧进程，app 必须自己保证终止以释放 app-{old}/ 目录锁：
+            // 先软退走 UI 关闭流程，2s 后硬退兜底（SystemTrayWindow 的 Closing 无条件 Cancel 会卡住软退）
+            _ = Task.Run(async () => { await Task.Delay(2000); Environment.Exit(0); });
             App.Current.Exit();
         }
         catch (Exception)
