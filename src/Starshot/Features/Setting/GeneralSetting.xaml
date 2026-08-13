@@ -6,6 +6,7 @@
              xmlns:lang="using:Starshot.Language"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sf="using:Starshot.Frameworks"
+             xmlns:cwc="using:CommunityToolkit.WinUI.Controls"
              x:DefaultBindMode="OneWay"
              mc:Ignorable="d">
 
@@ -35,10 +36,10 @@
             <!--  更新源  -->
             <StackPanel Spacing="8">
                 <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_Update}" />
-                <ComboBox SelectedIndex="{x:Bind UpdateSource, Mode=TwoWay}" MinWidth="240">
-                    <ComboBoxItem Content="Cloudflare CDN" />
-                    <ComboBoxItem Content="GitHub Release" />
-                </ComboBox>
+                <cwc:Segmented SelectedIndex="{x:Bind UpdateSource, Mode=TwoWay}">
+                    <cwc:SegmentedItem Content="Cloudflare" />
+                    <cwc:SegmentedItem Content="GitHub" />
+                </cwc:Segmented>
                 <ToggleSwitch IsOn="{x:Bind GithubApiNoProxy, Mode=TwoWay}"
                               OffContent="{x:Bind lang:Lang.Starshot_GithubApiNoProxy}"
                               OnContent="{x:Bind lang:Lang.Starshot_GithubApiNoProxy}" />
