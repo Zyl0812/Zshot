@@ -79,8 +79,8 @@ public static partial class AppConfig
             }
         }
 
-        // 版本号读 version.ini（启动器同源），无则 Local（debug/local release）
-        AppVersion = ReadVersionFromIni();
+        // 版本号编译时注入 exe（CI publish 传 -p:InformationalVersion），本地默认 0.0.0-local；不再读 version.ini
+        AppVersion = typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0-local";
 
         // 应用强调色与语言
         AccentColorHelper.ChangeAppAccentColor(AccentColor);
@@ -126,31 +126,6 @@ public static partial class AppConfig
             }
         }
         catch { }
-    }
-
-
-    /// <summary>
-    /// 读 version.ini 的 version 字段；无文件或格式错返回 "Local"（debug/local release）
-    /// </summary>
-    private static string ReadVersionFromIni()
-    {
-        try
-        {
-            string ini = Path.Combine(UserDataFolder, "version.ini");
-            if (!File.Exists(ini)) return "Local";
-            string content = File.ReadAllText(ini);
-            int eq = content.IndexOf('=');
-            if (eq > 0)
-            {
-                string v = content[(eq + 1)..].Trim();
-                return string.IsNullOrEmpty(v) ? "Local" : v;
-            }
-            return "Local";
-        }
-        catch
-        {
-            return "Local";
-        }
     }
 
 
