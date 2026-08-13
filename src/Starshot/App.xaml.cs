@@ -2,6 +2,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.AppLifecycle;
+using Serilog;
 using Starshot.Features.ViewHost;
 using System;
 using System.Collections;
@@ -37,26 +38,7 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        string logFile = AppConfig.LogFile;
-        if (string.IsNullOrWhiteSpace(logFile))
-        {
-            string logFolder = Path.Combine(AppContext.BaseDirectory, "log");
-            Directory.CreateDirectory(logFolder);
-            logFile = Path.Combine(logFolder, $"Starshot_{DateTime.Now:yyMMdd}.log");
-        }
-        var sb = new StringBuilder();
-        sb.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] App Crash:");
-        sb.AppendLine(e.Exception.ToString());
-        if (e.Exception.Data.Count > 0)
-        {
-            foreach (DictionaryEntry item in e.Exception.Data)
-            {
-                sb.AppendLine($"{item.Key}: {item.Value}");
-            }
-        }
-        using var fs = File.Open(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
-        using var sw = new StreamWriter(fs);
-        sw.Write(sb);
+        Log.Fatal(e.Exception, "App Crash");
     }
 
 

@@ -19,10 +19,20 @@ public static partial class AppConfig
     {
         if (_serviceProvider == null)
         {
-            Log.Logger = new LoggerConfiguration().WriteTo.File(path: LogFile, shared: true, outputTemplate: $$"""[{Timestamp:HH:mm:ss.fff}] [{Level:u4}] [{{Path.GetFileName(Environment.ProcessPath)}} ({{Environment.ProcessId}})] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}""")
-                                                  .Enrich.FromLogContext()
-                                                  .CreateLogger();
-            Log.Information($"Welcome to Starshot v{AppVersion}\r\nSystem: {Environment.OSVersion}\r\nCommand Line: {Environment.CommandLine}");
+            var minLevel = AppConfig.LogLevelConfig switch
+            {
+                1 => Serilog.Events.LogEventLevel.Error,
+                2 => Serilog.Events.LogEventLevel.Warning,
+                4 => Serilog.Events.LogEventLevel.Debug,
+                _ => Serilog.Events.LogEventLevel.Information
+            };
+            var cfg = new LoggerConfiguration().Enrich.FromLogContext().MinimumLevel.Is(minLevel);
+            if (AppConfig.LogLevelConfig != 0)
+            {
+                cfg.WriteTo.File(path: LogFile, shared: true, outputTemplate: $$"""[{Timestamp:HH:mm:ss.fff}] [{Level:u4}] [{{Environment.ProcessId}}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}""");
+            }
+            Log.Logger = cfg.CreateLogger();
+            Log.Information($"Welcome to Starshot v{AppVersion}\r\nRuntime: {Environment.Version}\r\nCommand Line: {Environment.CommandLine}");
 
             var sc = new ServiceCollection();
             sc.AddMemoryCache();

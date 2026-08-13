@@ -1493,6 +1493,24 @@
                 return ResourceManager.GetString("Starshot_LogFolderRestartTip", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   查找类似 Log Level 的本地化字符串。
+        /// </summary>
+        public static string Starshot_LogLevel {
+            get {
+                return ResourceManager.GetString("Starshot_LogLevel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   查找类似 Off 的本地化字符串。
+        /// </summary>
+        public static string Starshot_LogLevelOff {
+            get {
+                return ResourceManager.GetString("Starshot_LogLevelOff", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   查找类似 Cursor Position 的本地化字符串。

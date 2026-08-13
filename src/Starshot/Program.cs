@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Microsoft.Win32.TaskScheduler;
+using Serilog;
 
 namespace Starshot;
 
@@ -86,26 +87,7 @@ public static class Program
 
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        string logFile = AppConfig.LogFile;
-        if (string.IsNullOrWhiteSpace(logFile))
-        {
-            string logFolder = Path.Combine(AppContext.BaseDirectory, "log");
-            Directory.CreateDirectory(logFolder);
-            logFile = Path.Combine(logFolder, $"Starshot_{DateTime.Now:yyMMdd}.log");
-        }
-        var sb = new StringBuilder();
-        sb.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Program Crash:");
-        sb.AppendLine(e.ExceptionObject.ToString());
-        if (e.ExceptionObject is Exception { Data.Count: > 0 } ex)
-        {
-            foreach (DictionaryEntry item in ex.Data)
-            {
-                sb.AppendLine($"{item.Key}: {item.Value}");
-            }
-        }
-        using var fs = File.Open(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
-        using var sw = new StreamWriter(fs);
-        sw.Write(sb);
+        Log.Fatal(e.ExceptionObject as Exception, "Program Crash");
     }
 }
 

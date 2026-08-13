@@ -613,6 +613,12 @@
   <data name="Starshot_LogFolderRestartTip" xml:space="preserve">
     <value>再起動後に反映</value>
   </data>
+  <data name="Starshot_LogLevel" xml:space="preserve">
+    <value>ログレベル</value>
+  </data>
+  <data name="Starshot_LogLevelOff" xml:space="preserve">
+    <value>オフ</value>
+  </data>
   <data name="Starshot_Change" xml:space="preserve">
     <value>変更</value>
   </data>

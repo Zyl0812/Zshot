@@ -298,6 +298,22 @@ public static partial class AppConfig
 
 
     /// <summary>
+    /// 日志级别：0=关 / 1=Error / 2=Warn / 3=Info(默认) / 4=Debug。重启生效。
+    /// </summary>
+    public static int LogLevelConfig
+    {
+        get => GetValue(
+#if DEBUG
+            4
+#else
+            3
+#endif
+        );
+        set => SetValue(value);
+    }
+
+
+    /// <summary>
     /// 截图文件夹，默认 我的图片/Starshot
     /// </summary>
     public static string? ScreenshotFolder

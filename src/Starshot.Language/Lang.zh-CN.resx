@@ -613,6 +613,12 @@
   <data name="Starshot_LogFolderRestartTip" xml:space="preserve">
     <value>重启后生效</value>
   </data>
+  <data name="Starshot_LogLevel" xml:space="preserve">
+    <value>日志级别</value>
+  </data>
+  <data name="Starshot_LogLevelOff" xml:space="preserve">
+    <value>关</value>
+  </data>
   <data name="Starshot_Change" xml:space="preserve">
     <value>更改</value>
   </data>

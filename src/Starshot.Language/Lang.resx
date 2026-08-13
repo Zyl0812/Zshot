@@ -613,6 +613,12 @@
   <data name="Starshot_LogFolderRestartTip" xml:space="preserve">
     <value>Restart to take effect</value>
   </data>
+  <data name="Starshot_LogLevel" xml:space="preserve">
+    <value>Log Level</value>
+  </data>
+  <data name="Starshot_LogLevelOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
   <data name="Starshot_Change" xml:space="preserve">
     <value>Change</value>
   </data>

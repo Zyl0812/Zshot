@@ -20,6 +20,14 @@ public static partial class AppConfig
 
     public static string LogFile { get; internal set; }
 
+    /// <summary>日志文件名：Starshot_{版本}_{yyMMdd}.log。AppVersion 已设用缓存，否则读 assembly 兜底（启动早期崩溃时 AppVersion 还没赋值）。</summary>
+    internal static string BuildLogFileName()
+    {
+        string ver = !string.IsNullOrEmpty(AppVersion) ? AppVersion
+            : typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0-local";
+        return $"Starshot_{ver}_{DateTime.Now:yyMMdd}.log";
+    }
+
 
 
 
@@ -29,11 +37,18 @@ public static partial class AppConfig
         string baseDir = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         UserDataFolder = Path.GetDirectoryName(baseDir) ?? baseDir;
 
+        // 版本号：Debug 构建显示 "Debug"（日志 Starshot_Debug_*.log + 启动 vDebug）；Release 读 assembly 内嵌
+#if DEBUG
+        AppVersion = "Debug";
+#else
+        AppVersion = typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0-local";
+#endif
+
         // 先用默认 LogFolder 算 CacheFolder/LogFile：欢迎页选壁纸要拷 bg/，
         // 而 DB 在欢迎页之后才创建，读不到用户配置的 LogFolder
         string logFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Starshot");
         CacheFolder = logFolder;
-        LogFile = Path.Combine(logFolder, "log", $"Starshot_{DateTime.Now:yyMMdd}.log");
+        LogFile = Path.Combine(logFolder, "log", BuildLogFileName());
         Directory.CreateDirectory(CacheFolder);
 
         // 首次启动（DB 不存在）弹欢迎页；用户关掉不完成则退出
@@ -79,9 +94,6 @@ public static partial class AppConfig
             }
         }
 
-        // 版本号编译时注入 exe（CI publish 传 -p:InformationalVersion），本地默认 0.0.0-local；不再读 version.ini
-        AppVersion = typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0-local";
-
         // 应用强调色与语言
         AccentColorHelper.ChangeAppAccentColor(AccentColor);
         SetLanguage(Language);
@@ -89,7 +101,7 @@ public static partial class AppConfig
         // DB 后读用户配置的 LogFolder 覆盖（首次 DB 没值，保持默认）
         logFolder = LogFolder;
         CacheFolder = logFolder;
-        LogFile = Path.Combine(logFolder, "log", $"Starshot_{DateTime.Now:yyMMdd}.log");
+        LogFile = Path.Combine(logFolder, "log", BuildLogFileName());
 
         Directory.CreateDirectory(CacheFolder);
         Directory.CreateDirectory(Path.GetDirectoryName(LogFile)!);

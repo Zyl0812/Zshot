@@ -146,7 +146,7 @@ public sealed partial class AppBackground : UserControl
 
             DisposeVideoResource();
 
-            _logger.LogInformation("UpdateBackground file={File} isVideo={IsVideo} fellBack={FellBack} lastFile={LastFile}", file, IsSupportedVideo(file), fellBackToImage, _lastFile);
+            _logger.LogDebug("UpdateBackground file={File} isVideo={IsVideo} fellBack={FellBack} lastFile={LastFile}", file, IsSupportedVideo(file), fellBackToImage, _lastFile);
             if (IsSupportedVideo(file))
             {
                 // 先加载随机图占位：视频成功（VideoFrameAvailable 首帧）会覆盖；卡死则保持图，全程不黑屏。
@@ -404,7 +404,7 @@ public sealed partial class AppBackground : UserControl
 
     private void StartMediaPlayer(string file)
     {
-        _logger.LogInformation("StartMediaPlayer {File}", file);
+        _logger.LogDebug("StartMediaPlayer {File}", file);
         _mediaPlayer = new MediaPlayer
         {
             IsLoopingEnabled = true,
@@ -424,7 +424,7 @@ public sealed partial class AppBackground : UserControl
 
     private void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
     {
-        _logger.LogInformation("MediaOpened, enter frame server + Play");
+        _logger.LogDebug("MediaOpened, enter frame server + Play");
         sender.IsVideoFrameServerEnabled = true;
         sender.Play();
         // MediaOpened 后 2s 仍无首帧 = 管线卡死。重建最多 2 次；仍卡则放弃视频、回退随机图片（不黑屏）。
@@ -477,7 +477,7 @@ public sealed partial class AppBackground : UserControl
                     BackgroundImageSource = _videoImageSource;
                     _mediaPlayerRetryCount = 0;
                     ReportNowPlaying(_lastFile);
-                    _logger.LogInformation("VideoFrameAvailable first frame {W}x{H}", w, h);
+                    _logger.LogDebug("VideoFrameAvailable first frame {W}x{H}", w, h);
                 }
                 sender.CopyFrameToVideoSurface(_videoSurface);
                 using var ds = _videoImageSource.CreateDrawingSession(Colors.Transparent);

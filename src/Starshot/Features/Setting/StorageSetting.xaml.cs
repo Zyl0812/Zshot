@@ -257,6 +257,20 @@ public sealed partial class StorageSetting : PageBase
     public string LogFolder { get; set => SetProperty(ref field, value); } = AppConfig.LogFolder;
 
 
+    public int LogLevel
+    {
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.LogLevelConfig = value;
+                InAppToast.MainWindow?.Information(null, Lang.Starshot_LogFolderRestartTip, 3000);
+            }
+        }
+    } = AppConfig.LogLevelConfig;
+
+
     [RelayCommand]
     private async Task ChangeLogFolder()
     {
