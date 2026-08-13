@@ -116,7 +116,7 @@ jobs:
         run: msbuild src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=${{ matrix.platform }}
 
       - name: Publish main app
-        run: dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=${{ matrix.platform }} -r win-${{ matrix.platform }}
+        run: dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=${{ matrix.platform }} -r win-${{ matrix.platform }} -p:Version=${{ needs.resolve-version.outputs.v }}
 
       - name: Remove unuse
         run: |
