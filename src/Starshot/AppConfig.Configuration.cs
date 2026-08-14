@@ -80,12 +80,12 @@ public static partial class AppConfig
             }
             else
             {
-                // 没选壁纸 → 默认用内置 vandesart.jpg（拷 Assets → cache/bg）
-                string bgPath = Path.Combine(CacheFolder, "bg", "vandesart.jpg");
+                // 没选壁纸 → 默认用内置 pic.jpg（拷 Assets → cache/bg）
+                string bgPath = Path.Combine(CacheFolder, "bg", "pic.jpg");
                 Directory.CreateDirectory(Path.GetDirectoryName(bgPath)!);
-                string assetPath = Path.Combine(AppContext.BaseDirectory, "Assets", "vandesart.jpg");
+                string assetPath = Path.Combine(AppContext.BaseDirectory, "Assets", "pic.jpg");
                 if (File.Exists(assetPath)) File.Copy(assetPath, bgPath, overwrite: true);
-                AppConfig.WallpaperFile = "vandesart.jpg";
+                AppConfig.WallpaperFile = "pic.jpg";
                 AppConfig.WallpaperMode = 1;
             }
             if (!string.IsNullOrWhiteSpace(welcome.ScreenshotFolderPath))

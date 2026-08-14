@@ -11,7 +11,7 @@
              mc:Ignorable="d">
 
     <Grid Loaded="Grid_Loaded">
-        <Image Source="ms-appx:///Assets/vandesart.jpg" Stretch="UniformToFill" />
+        <Image Source="ms-appx:///Assets/pic.jpg" Stretch="UniformToFill" />
         <Rectangle Fill="{ThemeResource ControlOnImageFillColorDefaultBrush}" />
 
         <StackPanel Margin="48,0,48,0" VerticalAlignment="Center" Spacing="20">
