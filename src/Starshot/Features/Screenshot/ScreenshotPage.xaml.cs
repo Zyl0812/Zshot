@@ -155,7 +155,6 @@ public sealed partial class ScreenshotPage : PageBase
                     {
                         continue;
                     }
-                    // todo 优化加载速度
                     if (ScreenshotHelper.IsSupportedExtension(file) /*&& !File.GetAttributes(file).HasFlag((System.IO.FileAttributes)0x440000)*/)
                     {
                         var item = new ScreenshotItem(file);
@@ -611,7 +610,6 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (UnauthorizedAccessException ex)
         {
-            // TODO 使用 RPC 删除
             InAppToast.MainWindow?.Warning(Lang.ImageViewWindow_UnableToDeleteTheFile, Lang.ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse, 5000);
             _logger.LogError(ex, "Failed to delete image file");
         }

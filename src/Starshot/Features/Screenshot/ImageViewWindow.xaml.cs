@@ -1288,7 +1288,6 @@ public sealed partial class ImageViewWindow : Window
         }
         catch (UnauthorizedAccessException ex)
         {
-            // TODO 使用 RPC 删除
             ShowInfo(InfoBarSeverity.Warning, Lang.ImageViewWindow_UnableToDeleteTheFile, Lang.ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse, 5000);
             _logger.LogError(ex, "Failed to delete image file");
         }
