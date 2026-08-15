@@ -34,8 +34,8 @@ public sealed partial class RegionCaptureWindow : WindowEx
     // 确认时从 _displayBitmap（冻结帧，已 tonemap 的 SDR）裁出的选区，供剪贴板直接复用，不再二次 tonemap
     public CanvasRenderTarget? SdrCrop { get; private set; }
 
-    private CanvasBitmap _canvasOriginal;   // 原始帧（裁剪用，可能 HDR），每次 SetCapture 更新
-    private CanvasBitmap _displayBitmap;     // 显示用（SDR 色调映射后），每次 SetCapture 重建
+    private CanvasBitmap _canvasOriginal;    // 原始帧（裁剪用，可能 HDR），每次 SetCapture 更新
+    private CanvasBitmap? _displayBitmap;    // 显示用（SDR 色调映射后），每次 SetCapture 重建；会话间为 null（CloseWindow 清引用）
     private float _scale;
     private readonly int _vx, _vy;  // 虚拟屏幕物理坐标原点（放大镜钳制到当前显示器用）
 
@@ -66,6 +66,10 @@ public sealed partial class RegionCaptureWindow : WindowEx
     // SDR 时它就是传入的 canvas（= composite），归调用方，不能动
     private bool _ownsDisplayBitmap;
     private bool _cleanedUp;
+    // 关窗移屏外方案配套：截图前的前台窗口（关窗时还焦点）、待移回屏内标记与节拍计数
+    private nint _prevForeground;
+    private bool _pendingMoveIn;
+    private int _moveInTick;
 
     // 单例：选区完成信号（替代 Closed），ScreenCaptureService await 它；窗口不 Close 只 Hide
     public TaskCompletionSource<bool> Completion { get; private set; }
@@ -118,21 +122,25 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
 
     /// <summary>
-    /// 每次截图调用：更新冻结帧 + 重置交互状态 + 显示。窗口单例复用（不 Close/不销毁 HWND，
-    /// 避免 DWM redirected surface 累积——WinUI Window.Close 不 destroy HWND，DWM surface 留着）。
+    /// 每次截图调用：更新冻结帧 + 重置交互状态 + 显示。窗口单例且永不 Hide——
+    /// 关窗时移到屏外保持 IsWindowVisible（合成管线不停摆），下次截图先把新帧 Present 上屏
+    /// 再移回屏内，从根上避免 Show 瞬间 DWM 先合成保留的旧会话帧（启动闪上次截图界面）。
     /// </summary>
     public void SetCapture(CanvasBitmap canvas, float sdrWhiteLevel, int physW, int physH)
     {
-        // swapChain（CloseWindow dispose 后此处重建；HWND 单例避 DWM 累积，swapChain 本进程每次释放）
-        if (_swapChain is null)
+        // swapChain 常驻（关窗只移屏外不销毁）；分辨率变了尺寸过期则重建
+        float needW = physW / _scale, needH = physH / _scale;
+        if (_swapChain is null
+            || Math.Abs((float)_swapChain.Size.Width - needW) > 0.5f
+            || Math.Abs((float)_swapChain.Size.Height - needH) > 0.5f)
         {
-            _swapChain = new CanvasSwapChain(CanvasDevice.GetSharedDevice(), physW / _scale, physH / _scale, _scale * 96f, DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, CanvasAlphaMode.Premultiplied);
+            try { Canvas.SwapChain = null; _swapChain?.Dispose(); } catch { }
+            _swapChain = new CanvasSwapChain(CanvasDevice.GetSharedDevice(), needW, needH, _scale * 96f, DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, CanvasAlphaMode.Premultiplied);
             Canvas.SwapChain = _swapChain;
         }
 
-        // 更新帧（旧的自有 _displayBitmap 先释放）
+        // 更新帧（旧的已在 CloseWindow 释放并清引用）
         _canvasOriginal = canvas;
-        if (_ownsDisplayBitmap) _displayBitmap?.Dispose();
         _displayBitmap = CreateDisplayBitmap(canvas, physW, physH, sdrWhiteLevel);
         _ownsDisplayBitmap = !ReferenceEquals(_displayBitmap, canvas);
 
@@ -157,9 +165,13 @@ public sealed partial class RegionCaptureWindow : WindowEx
         _isClosed = false;
         _cleanedUp = false;
         Completion = new TaskCompletionSource<bool>();
+        _prevForeground = (nint)User32.GetForegroundWindow();
 
         _renderTimer.Start();
-        Show();
+        Show();          // 首次显示；后续会话窗口一直可见（在屏外），no-op
+        Redraw();        // 屏外先把新冻结帧 Present 上屏（窗口可见，合成照常提交）
+        _pendingMoveIn = true;   // 第 2 个 tick（新帧确定已合成）再移回屏内，移回瞬间不可能是旧内容
+        _moveInTick = 0;
     }
 
 
@@ -306,7 +318,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void Redraw()
     {
-        if (_isClosed || _swapChain is null) return;
+        if (_isClosed || _swapChain is null || _displayBitmap is null) return;
 
         _dashOffset = (float)_timer.Elapsed.TotalSeconds * -15;
 
@@ -395,6 +407,17 @@ public sealed partial class RegionCaptureWindow : WindowEx
             DrawInfoBox(ds, $"X: {(int)(mx * _scale)} Y: {(int)(my * _scale)}", new Vector2(cbX, cbY));
         }
         _swapChain.Present();
+
+        // SetCapture 挂的移回任务：第 2 个 tick（首帧 Present 已过 16ms，新帧确定合成进 surface）移回屏内
+        if (_pendingMoveIn)
+        {
+            _moveInTick++;
+            if (_moveInTick >= 2)
+            {
+                _pendingMoveIn = false;
+                MoveOnscreen();
+            }
+        }
     }
 
 
@@ -420,6 +443,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void DrawMagnifier(CanvasDrawingSession ds, float mx, float my, float monLeft, float monTop, float monRight, float monBottom)
     {
+        if (_displayBitmap is null) return;
         int halfCount = MagnifierPixelCount / 2;
         int magSize = MagnifierPixelCount * MagnifierPixelSize;
         const int offset = 10;
@@ -587,12 +611,34 @@ public sealed partial class RegionCaptureWindow : WindowEx
             try { SdrCrop = CropDisplayToBgra(); } catch { }
         }
         _isClosed = true;
-        this.Hide();
-        // 本进程显存释放（swapChain + 自有 _displayBitmap）；HWND 单例留（DWM redirected surface 一块不累积）
-        try { Canvas.SwapChain = null; } catch { }
-        try { _swapChain?.Dispose(); _swapChain = null; } catch { }
+        // 不 Hide：移到屏外保持 IsWindowVisible，合成管线不停摆，
+        // 否则下次 Show 瞬间 DWM 先合成保留的旧会话帧（启动闪上次截图的完整界面）
+        User32.SetWindowPos(WindowHandle, IntPtr.Zero, -32000, -32000, 0, 0,
+            User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOACTIVATE);
+        // 交还焦点（屏外窗口不 Hide 仍持有键盘焦点，不还的话用户打字被吞）
+        if (_prevForeground != 0 && _prevForeground != (nint)WindowHandle)
+        {
+            try { User32.SetForegroundWindow(new HWND(_prevForeground)); } catch { }
+        }
         if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
+        // _displayBitmap 引用清掉（自有的已 dispose）；_canvasOriginal 不清：
+        // service 在 Completion 后还要 GetPhysicalSourceRect 读它（底层是 service 的 composite，由 service dispose）；
+        // swapChain 常驻不销毁（屏外窗口还靠它承接下次会话的 Present）
+        _displayBitmap = null;
+        _ownsDisplayBitmap = false;
         Completion?.TrySetResult(IsConfirmed);
+    }
+
+
+    /// <summary>移回虚拟屏幕原位（SetCapture 后第 2 个 tick 调：新帧已合成，移回瞬间不闪旧内容）。</summary>
+    private void MoveOnscreen()
+    {
+        int vx = User32.GetSystemMetrics((User32.SystemMetric)76);
+        int vy = User32.GetSystemMetrics((User32.SystemMetric)77);
+        int vw = User32.GetSystemMetrics((User32.SystemMetric)78);
+        int vh = User32.GetSystemMetrics((User32.SystemMetric)79);
+        User32.SetWindowPos(WindowHandle, IntPtr.Zero, vx, vy, vw, vh, User32.SetWindowPosFlags.SWP_NOZORDER);
+        Activate();
     }
 
     // 从 _displayBitmap 裁出选区为 B8G8R8A8 SDR（CF_DIB 要 BGRA）
