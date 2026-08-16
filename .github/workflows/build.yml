@@ -282,7 +282,7 @@ jobs:
           [System.IO.Compression.ZipFile]::CreateFromDirectory("build/release", $zip, [System.IO.Compression.CompressionLevel]::SmallestSize, $false)
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}
           path: |
@@ -305,12 +305,12 @@ jobs:
       PRE: ${{ inputs.prerelease }}
     steps:
       - name: Download x64 artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64
           path: upload/
       - name: Download arm64 artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64
           path: upload/
