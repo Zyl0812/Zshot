@@ -2107,7 +2107,7 @@
         }
         
         /// <summary>
-        ///   查找类似 Strongly recommended for the best look. Pick an image or video; if skipped, a built-in CC0 default image is used (the current window background). 的本地化字符串。
+        ///   查找类似 Strongly recommended for the best look.的本地化字符串。
         /// </summary>
         public static string Starshot_WelcomeWallpaperDesc {
             get {

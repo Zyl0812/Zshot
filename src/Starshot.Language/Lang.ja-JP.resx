@@ -653,7 +653,7 @@
     <value>MIT ライセンス</value>
   </data>
   <data name="Starshot_AboutDesc" xml:space="preserve">
-    <value>DXGIレイヤーからディスプレイ出力のR16G16B16A16Float scRGBフレームバッファを直接取得し、HDR輝度情報（数千nitまで）を完全に保持。16bit HDR AVIFまたはJPEG XLとしてBT2020+PQ伝達関数付きでエンコード。SDRディスプレイ自動フォールバック、領域キャプチャ、マルチフォーマット一括変換も搭載。</value>
+    <value>DXGIレイヤーからディスプレイ出力のR16G16B16A16Float scRGBフレームバッファを直接取得し、HDR輝度情報（数千nitまで）を完全に保持。16bit HDR AVIF、JPEG XL、PNGv3としてBT2020+PQ伝達関数付きでエンコード。SDRディスプレイ自動フォールバック、領域キャプチャ、マルチフォーマット一括変換も搭載。</value>
   </data>
   <data name="Starshot_AboutTagline" xml:space="preserve">
     <value>次世代のWindowsネイティブHDRスクリーンショットツール</value>
@@ -752,7 +752,7 @@
     <value>カスタム壁紙</value>
   </data>
   <data name="Starshot_WelcomeWallpaperDesc" xml:space="preserve">
-    <value>最高の外観のために壁紙の設定をお勧めします。画像または動画を選択できます。スキップすると組み込みのCC0画像（現在の背景）が使用されます。</value>
+    <value>最高の外観のために壁紙の設定をお勧めします。画像または動画を選択できます。スキップすると組み込みの画像（現在の背景）が使用されます。</value>
   </data>
   <data name="Starshot_WelcomePickWallpaper" xml:space="preserve">
     <value>壁紙を選択</value>

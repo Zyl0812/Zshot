@@ -653,7 +653,7 @@
     <value>MIT 许可证</value>
   </data>
   <data name="Starshot_AboutDesc" xml:space="preserve">
-    <value>Starshot 直接从 DXGI 层获取显示器输出的原始 R16G16B16A16Float scRGB 帧缓冲，完整保留 HDR 亮度信息（可达数千 nit），编码为 16bit HDR AVIF 或 JPEG XL，色彩空间写入 BT2020 + PQ 传输函数元数据。同时提供 SDR 显示器自动降级、区域截图、多格式批量转换等通用截图工具应有的功能。</value>
+    <value>Starshot 直接从 DXGI 层获取显示器输出的原始 R16G16B16A16Float scRGB 帧缓冲，完整保留 HDR 亮度信息（可达数千 nit），编码为 16bit HDR AVIF、JPEG XL 或 PNGv3，色彩空间写入 BT2020 + PQ 传输函数元数据。同时提供 SDR 显示器自动降级、区域截图、多格式批量转换等通用截图工具应有的功能。</value>
   </data>
   <data name="Starshot_AboutTagline" xml:space="preserve">
     <value>新一代 Windows 原生 HDR 截图工具</value>
@@ -752,7 +752,7 @@
     <value>自定义壁纸</value>
   </data>
   <data name="Starshot_WelcomeWallpaperDesc" xml:space="preserve">
-    <value>强烈建议设置一张壁纸以获得最佳外观。可选择图片或视频文件；不设置则使用内置默认图片（CC0 协议），即当前窗口背景所示。</value>
+    <value>强烈建议设置一张壁纸以获得最佳外观。可选择图片或视频文件；不设置则使用内置默认图片，即当前窗口背景所示。</value>
   </data>
   <data name="Starshot_WelcomePickWallpaper" xml:space="preserve">
     <value>选择壁纸</value>
