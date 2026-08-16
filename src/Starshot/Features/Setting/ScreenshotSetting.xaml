@@ -35,6 +35,7 @@
                 <cwc:Segmented SelectedIndex="{x:Bind ScreenshotHDRFormat, Mode=TwoWay}">
                     <cwc:SegmentedItem Content="AVIF" />
                     <cwc:SegmentedItem Content="JPEG XL" />
+                    <cwc:SegmentedItem Content="PNGv3" />
                 </cwc:Segmented>
             </StackPanel>
 

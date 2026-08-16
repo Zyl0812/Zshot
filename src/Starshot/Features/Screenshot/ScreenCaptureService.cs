@@ -397,7 +397,7 @@ internal class ScreenCaptureService
 
         // 扩展名：HDR 输出走 HDR 格式；SDR（含 deleteHDR）走 SDR 格式
         string extension = outputIsHDR
-            ? (AppConfig.ScreenCaptureHDRFormat switch { 1 => "jxl", _ => "avif" })
+            ? (AppConfig.ScreenCaptureHDRFormat switch { 1 => "jxl", 2 => "png", _ => "avif" })
             : (AppConfig.ScreenCaptureSDRFormat switch { 1 => "avif", 2 => "jxl", _ => "png" });
 
         string filePath = Path.Combine(screenshotFolder,
