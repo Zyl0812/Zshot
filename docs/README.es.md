@@ -8,7 +8,7 @@
 
 **Next-generation Windows-native HDR Screenshot Tool**
 
-Captura 16bit de pipeline completo · Captura de región · Codificación AVIF / JPEG XL · Gestión del color
+Captura 16bit de pipeline completo · Captura de región · Codificación AVIF / JPEG XL / PNGv3 · Gestión del color
 
 [![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../../releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
@@ -26,7 +26,7 @@ Captura 16bit de pipeline completo · Captura de región · Codificación AVIF /
 
 La herramienta de recortes integrada de Windows (Snipping Tool, Win+Shift+S) solo puede capturar imágenes SDR de 8 bits incluso en monitores HDR: el compositor del sistema comprime los fotogramas HDR de 16 bits, lo que provoca recorte de altas luces y reducción de la gama de colores, resultando en capturas apagadas, sobreexpuestas o con errores de mapeo de color. Las herramientas de captura de pantalla más comunes también están limitadas por el pipeline tradicional GDI/BitBlt y no pueden procesar datos HDR.
 
-Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB desde la capa DXGI, preservando completamente la información de luminancia HDR (hasta miles de nits). Las capturas se codifican como AVIF o JPEG XL HDR de 16 bits con metadatos de espacio de color BT.2020 y función de transferencia PQ. También ofrece degradación automática para pantallas SDR, captura de región, conversión por lotes multiformato y todo lo que se espera de una herramienta de captura de propósito general.
+Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB desde la capa DXGI, preservando completamente la información de luminancia HDR (hasta miles de nits). Las capturas se codifican como AVIF, JPEG XL o PNGv3 HDR de 16 bits con metadatos de espacio de color BT.2020 y función de transferencia PQ. También ofrece degradación automática para pantallas SDR, captura de región, conversión por lotes multiformato y todo lo que se espera de una herramienta de captura de propósito general.
 
 **Características principales**
 
@@ -34,7 +34,7 @@ Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB des
 - 🧠 **Detección inteligente HDR/SDR**: distingue automáticamente el contenido HDR real del contenido SDR envuelto en un formato HDR, evitando ocupar espacio en vano.
 - ✂️ **Captura de región**: superposición multimonitor con fotograma congelado, detección de ventanas y lupa para selección precisa al píxel.
 - 📋 **Soporte de portapapeles** — Las capturas se copian automáticamente al portapapeles; explorar el historial de imágenes del portapapeles en una página dedicada, vista previa / recopiar / eliminar
-- 🗂️ **Soporte multiformato**: AVIF / JPEG XL / UHDR JPEG / PNG, incluyendo herramienta de conversión por lotes.
+- 🗂️ **Soporte multiformato**: AVIF / JPEG XL / PNGv3 / UHDR JPEG / PNG, incluyendo herramienta de conversión por lotes.
 - 🖥️ **Multimonitor**: la captura de región puede seleccionar abarcando varios monitores, componiendo directamente imágenes que cruzan los límites de pantalla.
 - 🔄 **Comprobación automática de actualizaciones**: comprobación integrada; al detectar una nueva versión, descarga por streaming, extracción y reemplazo.
 
@@ -95,7 +95,7 @@ Todos los atajos se pueden personalizar en la configuración.
 La mayoría de las herramientas de captura solo obtienen SDR de 8 bits incluso en pantallas HDR: el fotograma scRGB de punto flotante de 16 bits del compositor del sistema se comprime a SDR con altas luces recortadas y gama reducida. Starshot captura el **framebuffer HDR bruto**:
 
 1. **Captura HDR**: cuando la pantalla informa modo HDR, solicita el formato de píxel `R16G16B16A16Float` para obtener los datos scRGB de punto flotante completos (luminancia de hasta miles de nits)
-2. **Guardado HDR**: AVIF / JPEG XL de 16 bits, espacio de color BT.2020 + función de transferencia PQ. Las altas luces no se recortan, la gama no se reduce
+2. **Guardado HDR**: AVIF / JPEG XL / PNGv3 de 16 bits, espacio de color BT.2020 + función de transferencia PQ. Las altas luces no se recortan, la gama no se reduce
 3. **Cálculo de maxCLL**: el efecto de histograma de Win2D calcula la luminancia máxima del contenido, usada para distinguir el contenido HDR real del contenido SDR en contenedor HDR
 4. **Gestión del color**: lee el perfil ICC de la pantalla para extraer los primarios de gama reales, escribe los chunks cICP/ICC en el archivo. HDR es siempre BT.2020; para SDR está desactivado por defecto (BT.709) y se puede activar opcionalmente (lee la gama real del ICC); al activarlo primero verifica la configuración de color de la pantalla y no se puede habilitar si es inválida (p. ej. máquinas virtuales, dispositivos sin perfil ICC)
 
@@ -145,7 +145,7 @@ El `Clipboard.SetContent` de WinRT en aplicaciones WinUI no empaquetadas no es f
 ### Guardado
 
 - **Estructura plana** (sin subcarpetas). Por defecto `Imágenes\Starshot`, personalizable.
-- **Formato SDR** (PNG / AVIF / JPEG XL; por defecto PNG) y **formato HDR** (AVIF / JPEG XL; por defecto AVIF) configurados por separado.
+- **Formato SDR** (PNG / AVIF / JPEG XL; por defecto PNG) y **formato HDR** (AVIF / JPEG XL / PNGv3; por defecto AVIF) configurados por separado.
 - Niveles de calidad: Medio / Alto / Sin pérdidas.
 - Metadatos XMP (CreatorTool = Starshot).
 - Codificación serializada (SemaphoreSlim) para evitar conflictos de codificación concurrente.
@@ -153,12 +153,13 @@ El `Clipboard.SetContent` de WinRT en aplicaciones WinUI no empaquetadas no es f
 
 #### Formatos admitidos
 
-| Formato    | Profundidad de bits             | Soporte HDR                         | Caso de uso                          |
-| ---------- | ------------------------------- | ----------------------------------- | ------------------------------------ |
-| PNG        | 8 bits / 16 bits                | Se puede guardar pero mala compatibilidad | SDR por defecto, sin pérdidas       |
-| AVIF       | 8 bits / 10 bits / 12 bits      | HDR completo                        | HDR por defecto, alta compresión     |
-| JPEG XL    | 8 bits / 16 bits                | HDR completo                        | Alternativa HDR, compresión reversible |
-| UHDR JPEG  | 8 bits + gain map               | Respaldo HDR compatible con SDR     | Salida HDR adicional                 |
+| Formato    | Profundidad de bits             | Soporte HDR                                       | Caso de uso                          |
+| ---------- | ------------------------------- | ------------------------------------------------- | ------------------------------------ |
+| PNG        | 8 bits / 16 bits                | —                                                 | SDR por defecto, sin pérdidas        |
+| AVIF       | 8 bits / 10 bits / 12 bits      | HDR completo                                      | HDR por defecto, alta compresión     |
+| JPEG XL    | 8 bits / 16 bits                | HDR completo                                      | Alternativa HDR, compresión reversible |
+| PNGv3      | 16 bits                         | HDR vía cICP (navegadores; visores casi no lo admiten) | Alternativa HDR                  |
+| UHDR JPEG  | 8 bits + gain map               | Respaldo HDR compatible con SDR                  | Salida HDR adicional                 |
 
 ### Plantillas de nombre de archivo
 
@@ -397,6 +398,13 @@ Esto suele ser un problema de los códecs de imagen del sistema Windows (extensi
 - **Webp Image Extensions**
 
 Reinicia Starshot después de actualizar. Si el problema persiste, [abre un Issue](../../../issues/new) adjuntando una captura de pantalla.
+
+</details>
+
+<details>
+<summary><b>¿El PNG HDR (PNGv3) se ve grisáceo/oscuro en los visores de imágenes?</b></summary>
+
+El HDR de PNGv3 (tercera edición del PNG del W3C, finalizada en 2025) depende de metadatos cICP que marcan BT.2020 + PQ: una norma muy reciente. Chrome / Edge / Firefox lo renderizan correctamente en HDR, pero la mayoría de los visores (por ejemplo, Fotos de Windows) aún lo decodifican como un PNG normal, por lo que se ve grisáceo/oscuro. Es el estado actual del ecosistema, no un archivo dañado. Para máxima compatibilidad elige AVIF (el formato HDR dominante) o activa el respaldo UHDR JPEG.
 
 </details>
 

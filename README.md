@@ -6,7 +6,7 @@
 
 **Next-generation Windows-native HDR Screenshot Tool**
 
-Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL Encoding · Color Management
+Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL / PNGv3 Encoding · Color Management
 
 [![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
@@ -24,7 +24,7 @@ Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL Encoding · Colo
 
 Windows' built-in screenshot tool (Snipping Tool, Win+Shift+S) can only capture 8-bit SDR images even on HDR displays — the system compositor compresses 16-bit HDR frames on output, highlights are clipped, the color gamut is narrowed, resulting in screenshots that appear washed out, overexposed, or have incorrect color mapping. Common third-party screenshot tools are likewise limited by the traditional GDI/BitBlt capture pipeline and cannot perceive HDR data.
 
-Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from the DXGI layer, fully preserving HDR luminance information (up to thousands of nits). Screenshots are encoded as 16bit HDR AVIF or JPEG XL with BT.2020 color space and PQ transfer function metadata. It also provides SDR display auto-degradation, region screenshot, multi-format batch conversion, and everything else you'd expect from a general-purpose screenshot tool.
+Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from the DXGI layer, fully preserving HDR luminance information (up to thousands of nits). Screenshots are encoded as 16bit HDR AVIF, JPEG XL, or PNGv3 with BT.2020 color space and PQ transfer function metadata. It also provides SDR display auto-degradation, region screenshot, multi-format batch conversion, and everything else you'd expect from a general-purpose screenshot tool.
 
 **Key Features**
 
@@ -32,7 +32,7 @@ Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from th
 - 🧠 **Smart HDR/SDR Detection** — Automatically distinguishes genuine HDR content from SDR content wrapped in an HDR format, avoiding wasted space.
 - ✂️ **Region Screenshot** — Frozen-frame multi-monitor overlay with window detection and magnifier for pixel-precise selection.
 - 📋 **Clipboard Support** — Screenshots auto-copy to clipboard; browse clipboard history images in a dedicated page, preview / recopy / delete
-- 🗂️ **Multi-format Support** — AVIF / JPEG XL / UHDR JPEG / PNG, including a batch conversion tool.
+- 🗂️ **Multi-format Support** — AVIF / JPEG XL / PNGv3 / UHDR JPEG / PNG, including a batch conversion tool.
 - 🖥️ **Multi-Monitor** — Region screenshots can span across monitors, composing captures that cross screen boundaries.
 - 🔄 **Auto Update Check** — Built-in update check; on a new release it streams the download, extracts, and replaces in place.
 
@@ -93,7 +93,7 @@ All shortcuts can be customized in Settings.
 Most screenshot tools can only capture 8bit SDR even on HDR displays — the system compositor's 16bit floating-point scRGB output gets crushed into SDR with clipped highlights and narrowed gamut. Starshot captures the **raw HDR framebuffer**:
 
 1. **HDR Capture**: When the display reports HDR, requests `R16G16B16A16Float` pixel format to obtain the full scRGB floating-point data (luminance up to thousands of nits).
-2. **HDR Save**: 16bit AVIF / JPEG XL with BT.2020 color space + PQ transfer function. Highlights are not clipped, gamut is not narrowed.
+2. **HDR Save**: 16bit AVIF / JPEG XL / PNGv3 with BT.2020 color space + PQ transfer function. Highlights are not clipped, gamut is not narrowed.
 3. **maxCLL Calculation**: Win2D histogram effect computes the maximum content light level, used to distinguish genuine HDR content from SDR content in an HDR container.
 4. **Color Management**: Reads the display ICC profile to extract real gamut primaries, writes cICP/ICC chunks into the output file. HDR is always BT.2020; for SDR it defaults to off (BT.709) and can optionally be enabled (reads the ICC real gamut) — enabling first probes the monitor's color configuration, and cannot be turned on if it's invalid (e.g. VMs, devices without an ICC profile).
 
@@ -143,7 +143,7 @@ The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (defer
 ### Save
 
 - **Flat structure** (no subfolders). Defaults to `Pictures\Starshot`, customizable.
-- **SDR format** (PNG / AVIF / JPEG XL; default PNG) and **HDR format** (AVIF / JPEG XL; default AVIF) configured separately.
+- **SDR format** (PNG / AVIF / JPEG XL; default PNG) and **HDR format** (AVIF / JPEG XL / PNGv3; default AVIF) configured separately.
 - Quality levels: Medium / High / Lossless.
 - XMP metadata (CreatorTool = Starshot).
 - Serialized encoding (SemaphoreSlim) to avoid concurrent encoding conflicts.
@@ -151,12 +151,13 @@ The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (defer
 
 #### Supported Formats
 
-| Format     | Bit Depth             | HDR Support                | Use Case                    |
-| ---------- | --------------------- | -------------------------- | --------------------------- |
-| PNG        | 8bit / 16bit          | Storable but poor compat   | SDR default, lossless       |
-| AVIF       | 8bit / 10bit / 12bit  | Full HDR                   | HDR default, high compression |
-| JPEG XL    | 8bit / 16bit          | Full HDR                   | HDR alternative, reversible |
-| UHDR JPEG  | 8bit + gain map       | SDR-compatible HDR fallback | HDR bonus output            |
+| Format     | Bit Depth             | HDR Support                                      | Use Case                    |
+| ---------- | --------------------- | ------------------------------------------------ | --------------------------- |
+| PNG        | 8bit / 16bit          | —                                                | SDR default, lossless       |
+| AVIF       | 8bit / 10bit / 12bit  | Full HDR                                         | HDR default, high compression |
+| JPEG XL    | 8bit / 16bit          | Full HDR                                         | HDR alternative, reversible |
+| PNGv3      | 16bit                 | cICP-tagged HDR; browsers yes, viewers mostly no | HDR alternative             |
+| UHDR JPEG  | 8bit + gain map       | SDR-compatible HDR fallback                      | HDR bonus output            |
 
 ### Filename Templates
 
@@ -395,6 +396,13 @@ This is typically a Windows system image codec issue (AVIF / HEIF / JPEG XL exte
 - **Webp Image Extensions**
 
 Restart Starshot after updating. If the issue persists, please [submit an Issue](../../issues/new) with a screenshot attached.
+
+</details>
+
+<details>
+<summary><b>HDR PNG (PNGv3) looks grayish/dim in image viewers?</b></summary>
+
+HDR in PNGv3 (W3C PNG Third Edition, finalized in 2025) relies on cICP metadata tagging BT.2020 + PQ — a brand-new standard. Chrome / Edge / Firefox render its HDR correctly, but most image viewers (e.g. Windows Photos) still decode it as a plain PNG, so it looks grayish/dim. This is the current ecosystem, not a broken file. For broad compatibility choose AVIF (the mainstream HDR format) or enable the UHDR JPEG fallback.
 
 </details>
 

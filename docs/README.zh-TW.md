@@ -8,7 +8,7 @@
 
 **Next-generation Windows-native HDR Screenshot Tool**
 
-16bit 全鏈路擷取 · 區域截圖 · AVIF / JPEG XL 編碼 · 色彩管理
+16bit 全鏈路擷取 · 區域截圖 · AVIF / JPEG XL / PNGv3 編碼 · 色彩管理
 
 [![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../../releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
@@ -26,7 +26,7 @@
 
 Windows 內建的截圖工具（Snipping Tool、Win+Shift+S）在 HDR 顯示器上依然只能截出 8bit SDR 影像——系統合成器將 16bit HDR 幀壓縮輸出，高光被截斷，色域被收窄，導致截圖發灰/過曝/色彩映射錯誤。市面上常見的截圖工具同樣受限於傳統 GDI/BitBlt 截圖管線，無法感知 HDR 資料。
 
-Starshot 直接從 DXGI 層獲取顯示器輸出的原始 `R16G16B16A16Float` scRGB 幀緩衝，完整保留 HDR 亮度資訊（可達數千 nit），編碼為 16bit HDR AVIF 或 JPEG XL，色彩空間寫入 BT2020 + PQ 傳輸函數中繼資料。同時提供 SDR 顯示器自動降級、區域截圖、多格式批次轉換等通用截圖工具應有的功能。
+Starshot 直接從 DXGI 層獲取顯示器輸出的原始 `R16G16B16A16Float` scRGB 幀緩衝，完整保留 HDR 亮度資訊（可達數千 nit），編碼為 16bit HDR AVIF、JPEG XL 或 PNGv3，色彩空間寫入 BT2020 + PQ 傳輸函數中繼資料。同時提供 SDR 顯示器自動降級、區域截圖、多格式批次轉換等通用截圖工具應有的功能。
 
 **核心特點**
 
@@ -34,7 +34,7 @@ Starshot 直接從 DXGI 層獲取顯示器輸出的原始 `R16G16B16A16Float` sc
 - 🧠 **智慧 HDR/SDR 判定**——自動區分真實 HDR 內容與 HDR 格式包裹的 SDR 內容，避免無謂佔空間
 - ✂️ **區域截圖**——凍結幀多顯示器覆蓋層，視窗偵測 + 放大鏡精確選點
 - 📋 **剪貼板支援**——截圖可自動寫入剪貼簿，獨立頁面瀏覽剪貼簿歷史圖片，預覽 / 重新複製 / 刪除
-- 🗂️ **多格式支援**——AVIF / JPEG XL / UHDR JPEG / PNG，含批次轉換工具
+- 🗂️ **多格式支援**——AVIF / JPEG XL / PNGv3 / UHDR JPEG / PNG，含批次轉換工具
 - 🖥️ **多顯示器**——區域截圖可跨螢幕框選，直接組合截取橫跨多屏的影像
 - 🔄 **自動檢查更新**——內建更新檢查，發現新版串流下載解壓替換
 
@@ -95,7 +95,7 @@ SDR 顯示器上，Starshot 自動走標準 SDR 截圖路徑，是一款通用�
 大多數截圖工具在 HDR 顯示器上也只能截 8bit SDR——系統合成器輸出的 16bit 浮點 scRGB 幀被壓成 SDR，高光截斷、色域收窄。Starshot 截取**原始 HDR 幀緩衝**：
 
 1. **HDR 擷取**：顯示器報告 HDR 時，請求 `R16G16B16A16Float` 像素格式，獲取完整 scRGB 浮點資料（亮度可達數千 nit）
-2. **HDR 儲存**：16bit AVIF / JPEG XL，BT2020 色域 + PQ 傳輸函數。高光不截斷，色域不收窄
+2. **HDR 儲存**：16bit AVIF / JPEG XL / PNGv3，BT2020 色域 + PQ 傳輸函數。高光不截斷，色域不收窄
 3. **maxCLL 計算**：Win2D 直方圖效果計算最大內容亮度，用於區分真正 HDR 內容與 HDR 格式的 SDR 內容
 4. **色彩管理**：讀取顯示器 ICC profile 解析真實色域基色，寫入檔案的 cICP/ICC chunk。HDR 恆為 BT2020；SDR 預設關閉（BT709），可選開啟（讀取 ICC 真實色域）——開啟前會先探測顯示器的色彩配置，若無效（如虛擬機、無 ICC profile 的裝置）則無法開啟
 
@@ -145,7 +145,7 @@ HDR 截圖可同時儲存一份 Ultra HDR JPEG（SDR 基圖 + HDR gain map），
 ### 儲存
 
 - **扁平結構**（無子資料夾），預設 `我的圖片\Starshot`，可自訂
-- **SDR 格式**（PNG / AVIF / JPEG XL，預設 PNG）和 **HDR 格式**（AVIF / JPEG XL，預設 AVIF）分開設定
+- **SDR 格式**（PNG / AVIF / JPEG XL，預設 PNG）和 **HDR 格式**（AVIF / JPEG XL / PNGv3，預設 AVIF）分開設定
 - 品質：中 / 高 / 無損
 - XMP 中繼資料（CreatorTool = Starshot）
 - 編碼序列化（SemaphoreSlim），避免並發編碼衝突
@@ -153,12 +153,13 @@ HDR 截圖可同時儲存一份 Ultra HDR JPEG（SDR 基圖 + HDR gain map），
 
 #### 支援的格式
 
-| 格式      | 色深                 | HDR 支援               | 用途               |
-| --------- | -------------------- | ---------------------- | ------------------ |
-| PNG       | 8bit / 16bit         | HDR 格式可存但相容性差 | SDR 預設，無損     |
-| AVIF      | 8bit / 10bit / 12bit | 完整 HDR               | HDR 預設，高壓縮比 |
-| JPEG XL   | 8bit / 16bit         | 完整 HDR               | HDR 備選，可逆壓縮 |
-| UHDR JPEG | 8bit + gain map      | SDR 相容 HDR 回退      | HDR 額外產出       |
+| 格式      | 色深                 | HDR 支援                                      | 用途               |
+| --------- | -------------------- | --------------------------------------------- | ------------------ |
+| PNG       | 8bit / 16bit         | —                                             | SDR 預設，無損     |
+| AVIF      | 8bit / 10bit / 12bit | 完整 HDR                                      | HDR 預設，高壓縮比 |
+| JPEG XL   | 8bit / 16bit         | 完整 HDR                                      | HDR 備選，可逆壓縮 |
+| PNGv3     | 16bit                | cICP 標註，瀏覽器支援（圖片檢視器普遍不支援） | HDR 備選           |
+| UHDR JPEG | 8bit + gain map      | SDR 相容 HDR 回退                             | HDR 額外產出       |
 
 ### 檔案名稱範本
 
@@ -398,6 +399,13 @@ dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
 - **Webp Image Extensions**
 
 更新後重啟 Starshot。如果問題持續，請 [提交 Issue](../../../issues/new) 並附上截圖。
+
+</details>
+
+<details>
+<summary><b>HDR PNG（PNGv3）在圖片檢視器裡顯示偏灰/偏暗？</b></summary>
+
+PNGv3（W3C PNG 第三版，2025 年定稿）的 HDR 依靠 cICP 中繼資料標註 BT.2020 + PQ，是剛落地的標準。目前 Chrome / Edge / Firefox 等瀏覽器可以正確渲染其 HDR 效果，但大多數圖片檢視器（如 Windows 相片）仍把它當普通 PNG 解碼，顯示會偏灰/偏暗——這是生態現狀，不是檔案損壞。需要廣泛相容請選 AVIF（HDR 分發主流），或開啟 UHDR JPEG 回退。
 
 </details>
 
