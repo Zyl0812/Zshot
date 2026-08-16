@@ -199,8 +199,8 @@ jobs:
             $recentPreviews = $releases[0..($stableIdx - 1)] | Where-Object { $_.prerelease }
           }
 
-          # 选 diff target（线性发布；不解析版本号）
-          # stable：本级 preview + 前 5 个 stable
+          # 选 diff target（线性发布；不解析版本号——仅线起点 .0 一处例外）
+          # stable：本级 preview + 前 5 个 stable + 当前 minor 线的 .0（如 2.1.100 → 2.1.0，卡老 patch 的用户也能走差分；已在前 5 内则不重复）
           # preview：本级 preview + 上一个 stable（1 个）
           $targetTags = [System.Collections.Generic.List[string]]::new()
           foreach ($r in $recentPreviews) {
@@ -211,6 +211,18 @@ jobs:
           } else {
             $releases | Where-Object { -not $_.prerelease } | Select-Object -First 5 | ForEach-Object {
               if ($_.tag_name -ne $newTag -and -not $targetTags.Contains($_.tag_name)) { $targetTags.Add($_.tag_name) }
+            }
+            # 线起点保底：当前 a.b.c → a.b.0。已是 .0 本身 / 已在集合 / release 不存在（线从非 0 起步）都不加
+            $parts = $newTag.Split('.')
+            if ($parts.Count -ge 2) {
+              $lineStart = "$($parts[0]).$($parts[1]).0"
+              if ($lineStart -ne $newTag -and -not $targetTags.Contains($lineStart)) {
+                $lineStartRelease = $releases | Where-Object { -not $_.prerelease -and $_.tag_name -eq $lineStart } | Select-Object -First 1
+                if ($lineStartRelease) {
+                  $targetTags.Add($lineStart)
+                  Write-Host "Line-start delta added: $lineStart -> $newTag"
+                }
+              }
             }
           }
 
