@@ -321,21 +321,21 @@ Garde globale `Interlocked.CompareExchange`. Les modes plein écran, région et 
 
 ### Configuration de build
 
-|                    | Debug                                          | Release                                                                                                |
-| ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Runtime .NET       | Framework-dependent (non autonome)             | Autonome                                                                                               |
-| Bibliothèques natives | win-x64 uniquement (RuntimeIdentifier, à plat dans la racine de sortie) | Identique à Debug                                                                                      |
-| Trim               | Non                                            | Partiel                                                                                                |
-| ReadyToRun         | Non                                            | Oui                                                                                                    |
-| Nettoyage suppl.   | —                                              | Supprime DirectML.dll / onnxruntime.dll / NpuDetect (composants WinML/AI du Windows App SDK, non utilisés) |
-| Chemin de sortie   | `build/app/`                                   | `build/release/app/` + lanceur copié dans `build/release/`                                             |
-| Taille             | ~80 Mo                                         | Plus petite (Trim + suppression des bibliothèques IA)                                                  |
+|                    | Debug                              | Release                                                  |
+| ------------------ | ---------------------------------- | -------------------------------------------------------- |
+| Runtime .NET       | Autonome                            | Autonome                                                 |
+| Bibliothèques natives | win-x64 uniquement (RuntimeIdentifier par défaut) | Identique à Debug ; arm64 nécessite un `-r win-arm64` explicite |
+| Trim               | Non appliqué (pas de trimming)     | Partiel                                                  |
+| Optimiseur AOT CsWinRT | Désactivé (builds plus rapides) | Activé — garantit que l'interop WinRT survit au trimming |
+| ReadyToRun         | Non appliqué (JIT standard)        | Précompilé AOT                                           |
+| Chemin de sortie   | `build/app/`                       | `build/release/app/` ; le lanceur est copié vers `build/release/` s'il a été compilé avant |
+| Taille             | ~260 Mo (le runtime autonome domine) | Plus petite (Trim)                                     |
 
 ## Compiler depuis les sources
 
 ### Prérequis
 
-- Visual Studio 2022 / 2026 (avec Développement Desktop C++ et Développement Desktop .NET)
+- Visual Studio 2026 (avec Développement Desktop C++ et Développement Desktop .NET)
 - SDK .NET 10
 - Windows SDK 10.0.26100
 

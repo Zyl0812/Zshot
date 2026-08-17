@@ -322,21 +322,21 @@ C++ 原生程式（~400KB）。讀 `version.ini` 決定啟動 `app-{version}/Sta
 
 ### 建構設定
 
-|              | Debug                                       | Release                                                                                         |
-| ------------ | ------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| .NET Runtime | Framework-dependent（不打包）               | 自包含                                                                                          |
-| 原生庫       | 僅 win-x64（RuntimeIdentifier，鋪到輸出根） | 同 Debug                                                                                        |
-| Trim         | 否                                          | partial                                                                                         |
-| ReadyToRun   | 否                                          | 是                                                                                              |
-| 額外清理     | —                                           | 刪除 DirectML.dll / onnxruntime.dll / NpuDetect（Windows App SDK 的 WinML/AI 組件，本應用不用） |
-| 輸出路徑     | `build/app/`                                | `build/release/app/` + 啟動器拷到 `build/release/`                                              |
-| 大小         | ~80MB                                       | 更小（Trim + 刪 AI 庫）                                                                         |
+|                    | Debug                                | Release                                                           |
+| ------------------ | ------------------------------------ | ----------------------------------------------------------------- |
+| .NET Runtime       | 自包含                               | 自包含                                                            |
+| 原生庫             | 僅 win-x64（預設 RuntimeIdentifier） | 同 Debug；arm64 需明確 `-r win-arm64`                             |
+| Trim               | 不生效（不裁剪）                     | 部分（partial）                                                   |
+| CsWinRT AOT 最佳化器 | 關（建置快）                       | 開，Trim 下保證 WinRT interop 不被裁壞                            |
+| ReadyToRun         | 不生效（標準 JIT）                   | AOT 預編譯                                                        |
+| 輸出路徑           | `build/app/`                         | `build/release/app/`；若先編譯了啟動器會自動拷到 `build/release/` |
+| 大小               | ~260MB（自包含 runtime 佔大頭）      | 更小（Trim）                                                      |
 
 ## 從原始碼建構
 
 ### 環境需求
 
-- Visual Studio 2022 / 2026（含 C++ 桌面開發、.NET 桌面開發）
+- Visual Studio 2026（含 C++ 桌面開發、.NET 桌面開發）
 - .NET 10 SDK
 - Windows SDK 10.0.26100
 

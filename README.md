@@ -78,11 +78,11 @@ Download the archive from [Releases](../../releases), extract it, and run `Stars
 
 ## Quick Start
 
-| Action                                                              | Default Shortcut |
-| ------------------------------------------------------------------- | ---------------- |
-| Full-screen screenshot                                              | Alt+W            |
-| Region screenshot (save file + copy to clipboard after selection)   | Alt+Q            |
-| Region copy only (copy to clipboard only, no file saved)            | Alt+A            |
+| Action                                                            | Default Shortcut |
+| ----------------------------------------------------------------- | ---------------- |
+| Full-screen screenshot                                            | Alt+W            |
+| Region screenshot (save file + copy to clipboard after selection) | Alt+Q            |
+| Region copy only (copy to clipboard only, no file saved)          | Alt+A            |
 
 All shortcuts can be customized in Settings.
 
@@ -114,11 +114,11 @@ The region screenshot overlay **intentionally** tone-maps HDR frames to SDR for 
 
 ### Three Screenshot Modes
 
-| Mode              | Target                                          | Clipboard Format      | File Saved |
-| ----------------- | ----------------------------------------------- | --------------------- | ---------- |
-| Full-screen       | Entire monitor (foreground window / cursor screen, switchable) | CF_HDROP (file)       | Yes        |
-| Region            | Marquee selection / click-to-window             | CF_DIB (BGRA bitmap)  | Yes        |
-| Region Copy Only  | Marquee selection / click-to-window             | CF_DIB (BGRA bitmap)  | No         |
+| Mode             | Target                                                         | Clipboard Format     | File Saved |
+| ---------------- | -------------------------------------------------------------- | -------------------- | ---------- |
+| Full-screen      | Entire monitor (foreground window / cursor screen, switchable) | CF_HDROP (file)      | Yes        |
+| Region           | Marquee selection / click-to-window                            | CF_DIB (BGRA bitmap) | Yes        |
+| Region Copy Only | Marquee selection / click-to-window                            | CF_DIB (BGRA bitmap) | No         |
 
 All three modes share the same HDR detection, color management, filename templates, save pipeline, and info toast.
 
@@ -151,28 +151,28 @@ The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (defer
 
 #### Supported Formats
 
-| Format     | Bit Depth             | HDR Support                                      | Use Case                    |
-| ---------- | --------------------- | ------------------------------------------------ | --------------------------- |
-| PNG        | 8bit / 16bit          | —                                                | SDR default, lossless       |
-| AVIF       | 8bit / 10bit / 12bit  | Full HDR                                         | HDR default, high compression |
-| JPEG XL    | 8bit / 16bit          | Full HDR                                         | HDR alternative, reversible |
-| PNGv3      | 16bit                 | cICP-tagged HDR; browsers yes, viewers mostly no | HDR alternative             |
-| UHDR JPEG  | 8bit + gain map       | SDR-compatible HDR fallback                      | HDR bonus output            |
+| Format    | Bit Depth            | HDR Support                                      | Use Case                      |
+| --------- | -------------------- | ------------------------------------------------ | ----------------------------- |
+| PNG       | 8bit / 16bit         | —                                                | SDR default, lossless         |
+| AVIF      | 8bit / 10bit / 12bit | Full HDR                                         | HDR default, high compression |
+| JPEG XL   | 8bit / 16bit         | Full HDR                                         | HDR alternative, reversible   |
+| PNGv3     | 16bit                | cICP-tagged HDR; browsers yes, viewers mostly no | HDR alternative               |
+| UHDR JPEG | 8bit + gain map      | SDR-compatible HDR fallback                      | HDR bonus output              |
 
 ### Filename Templates
 
 Full-screen and region screenshots use **independent templates**.
 
-| Placeholder                                                 | Meaning                                  | Example             |
-| ----------------------------------------------------------- | ---------------------------------------- | ------------------- |
-| `{process}`                                                 | Process name (no extension)              | `explorer`          |
-| `{processPath}`                                             | EXE filename (with extension)            | `explorer.exe`      |
-| `{title}`                                                   | Window title (trimmed + configurable truncation) | `Genshin Impact`    |
-| `{timestamp}`                                               | Unix timestamp                           | `1721234567`        |
-| `{time}`                                                    | yyyyMMdd_HHmmssff                        | `20260718_14302512` |
-| `{date}`                                                    | yyyyMMdd                                 | `20260718`          |
-| `{width}` `{height}`                                        | Image dimensions (px)                    | `1920` `1080`       |
-| `{year}` `{month}` `{day}` `{hour}` `{minute}` `{second}`   | Time components                          |                     |
+| Placeholder                                               | Meaning                                          | Example             |
+| --------------------------------------------------------- | ------------------------------------------------ | ------------------- |
+| `{process}`                                               | Process name (no extension)                      | `explorer`          |
+| `{processPath}`                                           | EXE filename (with extension)                    | `explorer.exe`      |
+| `{title}`                                                 | Window title (trimmed + configurable truncation) | `Genshin Impact`    |
+| `{timestamp}`                                             | Unix timestamp                                   | `1721234567`        |
+| `{time}`                                                  | yyyyMMdd_HHmmssff                                | `20260718_14302512` |
+| `{date}`                                                  | yyyyMMdd                                         | `20260718`          |
+| `{width}` `{height}`                                      | Image dimensions (px)                            | `1920` `1080`       |
+| `{year}` `{month}` `{day}` `{hour}` `{minute}` `{second}` | Time components                                  |                     |
 
 Illegal filename characters are uniformly replaced with `_`.
 
@@ -214,10 +214,10 @@ After a screenshot, a thumbnail + status toast pops up (does not interfere with 
 
 ### Batch Format Conversion
 
-| Conversion Direction               | Engine                                |
-| ---------------------------------- | ------------------------------------- |
-| JPG / PNG → AVIF / JXL             | avifenc.exe / cjxl.exe (CLI)          |
-| AVIF / JXL → JPG / PNG             | avifdec.exe / djxl.exe (CLI)          |
+| Conversion Direction                | Engine                                  |
+| ----------------------------------- | --------------------------------------- |
+| JPG / PNG → AVIF / JXL              | avifenc.exe / cjxl.exe (CLI)            |
+| AVIF / JXL → JPG / PNG              | avifdec.exe / djxl.exe (CLI)            |
 | JXR / WEBP / HEIC etc. → AVIF / JXL | In-process ImageSaver (avifEncoderLite) |
 
 ### Personalization
@@ -299,19 +299,19 @@ Native C++ program (~400KB). Reads `version.ini` to decide whether to launch `ap
 
 ### Tech Stack
 
-| Layer                       | Technology                                                         |
-| --------------------------- | ------------------------------------------------------------------ |
-| UI Framework                | WinUI 3 (Windows App SDK 1.8)                                      |
-| Runtime                     | .NET 10                                                            |
-| Graphics                    | Win2D 1.3 (D3D11 interop, HDR tone mapping, histogram effects)     |
-| Codecs                      | Starward.Codec NuGet (libavif / libjxl / UltraHDR P/Invoke wrapper) |
-| Data Storage                | SQLite + Dapper                                                    |
-| Logging                     | Serilog                                                            |
-| System Tray                 | H.NotifyIcon.WinUI                                                 |
-| Thumbnails                  | Scighost.WinUI ImageEx + custom CachedImage                        |
-| Region Overlay              | Win2D CanvasControl (frozen-frame rendering + selection drawing)   |
-| Clipboard                   | Win32 native API (OpenClipboard / SetClipboardData)                |
-| Launcher                    | Native C++ (v145 toolset, static CRT)                              |
+| Layer          | Technology                                                          |
+| -------------- | ------------------------------------------------------------------- |
+| UI Framework   | WinUI 3 (Windows App SDK 1.8)                                       |
+| Runtime        | .NET 10                                                             |
+| Graphics       | Win2D 1.3 (D3D11 interop, HDR tone mapping, histogram effects)      |
+| Codecs         | Starward.Codec NuGet (libavif / libjxl / UltraHDR P/Invoke wrapper) |
+| Data Storage   | SQLite + Dapper                                                     |
+| Logging        | Serilog                                                             |
+| System Tray    | H.NotifyIcon.WinUI                                                  |
+| Thumbnails     | Scighost.WinUI ImageEx + custom CachedImage                         |
+| Region Overlay | Win2D CanvasControl (frozen-frame rendering + selection drawing)    |
+| Clipboard      | Win32 native API (OpenClipboard / SetClipboardData)                 |
+| Launcher       | Native C++ (v145 toolset, static CRT)                               |
 
 ### Re-entry Protection
 
@@ -319,21 +319,21 @@ Native C++ program (~400KB). Reads `version.ini` to decide whether to launch `ap
 
 ### Build Configuration
 
-|               | Debug                                          | Release                                                                                             |
-| ------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| .NET Runtime  | Framework-dependent (not self-contained)       | Self-contained                                                                                      |
-| Native Libs   | win-x64 only (RuntimeIdentifier, laid flat in output root) | Same as Debug                                                                                       |
-| Trim          | No                                             | Partial                                                                                             |
-| ReadyToRun    | No                                             | Yes                                                                                                 |
-| Extra Cleanup | —                                              | Deletes DirectML.dll / onnxruntime.dll / NpuDetect (WinML/AI components from Windows App SDK, unused) |
-| Output Path   | `build/app/`                                   | `build/release/app/` + launcher copied to `build/release/`                                          |
-| Size          | ~80MB                                          | Smaller (Trim + AI lib removal)                                                                     |
+|                       | Debug                                     | Release                                                                                |
+| --------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| .NET Runtime          | Self-contained                            | Self-contained                                                                         |
+| Native Libs           | win-x64 only (default RuntimeIdentifier)  | Same as Debug; arm64 requires an explicit `-r win-arm64`                               |
+| Trim                  | Not applied (no trimming)                 | Partial                                                                                |
+| CsWinRT AOT Optimizer | Off (faster builds)                       | On — keeps WinRT interop trim-safe                                                     |
+| ReadyToRun            | Not applied (standard JIT)                | AOT precompiled                                                                        |
+| Output Path           | `build/app/`                              | `build/release/app/`; the launcher is copied to `build/release/` if it was built first |
+| Size                  | ~260MB (self-contained runtime dominates) | Smaller (Trim)                                                                         |
 
 ## Build from Source
 
 ### Prerequisites
 
-- Visual Studio 2022 / 2026 (with C++ Desktop Development and .NET Desktop Development)
+- Visual Studio 2026 (with C++ Desktop Development and .NET Desktop Development)
 - .NET 10 SDK
 - Windows SDK 10.0.26100
 

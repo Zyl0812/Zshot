@@ -322,21 +322,21 @@ C++ ネイティブプログラム（~400KB）。`version.ini` を読み取り�
 
 ### ビルド構成
 
-|                  | Debug                                       | Release                                                                                             |
-| ---------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| .NET Runtime     | Framework-dependent（パッケージ化なし）     | 自己完結型                                                                                          |
-| ネイティブライブラリ | win-x64 のみ（RuntimeIdentifier、出力ルートにフラット配置） | Debug と同じ                                                                                        |
-| Trim             | いいえ                                      | partial                                                                                             |
-| ReadyToRun       | いいえ                                      | はい                                                                                                |
-| 追加クリーンアップ | —                                           | DirectML.dll / onnxruntime.dll / NpuDetect を削除（Windows App SDK の WinML/AI コンポーネント、本アプリ未使用） |
-| 出力パス         | `build/app/`                                | `build/release/app/` + ランチャーを `build/release/` にコピー                                       |
-| サイズ           | ~80MB                                       | より小さい（Trim + AI ライブラリ削除）                                                              |
+|                  | Debug                                        | Release                                                  |
+| ---------------- | -------------------------------------------- | -------------------------------------------------------- |
+| .NET Runtime     | 自己完結型                                   | 自己完結型                                               |
+| ネイティブライブラリ | win-x64 のみ（デフォルト RuntimeIdentifier） | Debug と同じ；arm64 は明示的な `-r win-arm64` が必要     |
+| Trim             | 無効（トリムなし）                           | 部分的（partial）                                        |
+| CsWinRT AOT オプティマイザー | オフ（ビルド高速）                | オン，Trim 下で WinRT interop が削られないことを保証     |
+| ReadyToRun       | 無効（通常の JIT）                           | AOT 事前コンパイル                                       |
+| 出力パス         | `build/app/`                                 | `build/release/app/`；ランチャーを先にビルドしていれば `build/release/` に自動コピー |
+| サイズ           | ~260MB（自己完結ランタイムが大半）           | より小さい（Trim）                                       |
 
 ## ソースからビルド
 
 ### 環境要件
 
-- Visual Studio 2022 / 2026（C++ デスクトップ開発、.NET デスクトップ開発を含む）
+- Visual Studio 2026（C++ デスクトップ開発、.NET デスクトップ開発を含む）
 - .NET 10 SDK
 - Windows SDK 10.0.26100
 
