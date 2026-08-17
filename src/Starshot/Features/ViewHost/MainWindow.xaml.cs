@@ -42,6 +42,8 @@ public sealed partial class MainWindow : WindowEx
         InitializeComponent();
         WindowEx.MainWindowId = AppWindow.Id;
         Title = "Starshot";
+        // 任务管理器图标：AppWindow.SetIcon 走系统图标管线（LoadIcon 直挂 WM_SETICON 会被拉伸畸形）
+        SetIcon();
         AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AdaptTitleBarButtonColorToActuallTheme();

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.TaskScheduler;
 using Serilog;
@@ -17,11 +18,17 @@ namespace Starshot;
 public static class Program
 {
 
+    // 未打包应用没注册 AppUserModelID，任务管理器用隐式 AUMID 解析应用图标常失败 → 空白图标。
+    // 显式设置后按此 ID 分组解析（配合 MainWindow 的 AppWindow.SetIcon）
+    [DllImport("shell32.dll")]
+    private static extern void SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string appID);
+
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler", " 3.0.0.2411")]
     [global::System.STAThreadAttribute]
     static int Main(string[] args)
     {
+        SetCurrentProcessExplicitAppUserModelID("loliri.Starshot");
         // 提权子进程：--manage-task create/delete，以管理员权限调 TaskScheduler API 创建/删除任务后退出
         if (args.Length > 0 && args[0] == "--manage-task")
         {
