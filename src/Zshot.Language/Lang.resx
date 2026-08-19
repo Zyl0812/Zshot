@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DownloadGamePage_Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="DownloadGamePage_Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="GameSettingPage_Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="GameSettingPage_High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="GameSettingPage_FullScreen" xml:space="preserve">
+    <value>Full Screen</value>
+  </data>
+  <data name="Common_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="MainPage_Launcher" xml:space="preserve">
+    <value>MainPage</value>
+  </data>
+  <data name="SettingPage_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SettingPage_FollowSystem" xml:space="preserve">
+    <value>Follow System</value>
+  </data>
+  <data name="ScreenshotPage_ScreenshotFolderDoesNotExist" xml:space="preserve">
+    <value>Screenshot folder does not exist</value>
+  </data>
+  <data name="Common_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="LauncherPage_ConfirmDelete" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="ImageViewPage_ZoomOut" xml:space="preserve">
+    <value>Zoom out</value>
+  </data>
+  <data name="ImageViewPage_ZoomIn" xml:space="preserve">
+    <value>Zoom in</value>
+  </data>
+  <data name="Common_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Common_Clipboard" xml:space="preserve">
+    <value>Clipboard</value>
+  </data>
+  <data name="ClipboardPage_NotEnabled" xml:space="preserve">
+    <value>Clipboard history is not enabled</value>
+  </data>
+  <data name="ClipboardPage_GoToSettings" xml:space="preserve">
+    <value>Go to Windows clipboard settings</value>
+  </data>
+  <data name="ClipboardPage_NoImages" xml:space="preserve">
+    <value>No images in clipboard history</value>
+  </data>
+  <data name="GachaImportAndExportWindow_Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MaxLuminance" xml:space="preserve">
+    <value>Max Luminance</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MonitorInformation" xml:space="preserve">
+    <value>Monitor Information</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_ColorSpace" xml:space="preserve">
+    <value>Color Space</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_PeakLuminance" xml:space="preserve">
+    <value>Peak Luminance</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MaxFullScreenLuminance" xml:space="preserve">
+    <value>Max Full-Screen Luminance</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_SDRWhiteLuminance" xml:space="preserve">
+    <value>SDR White Luminance</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ScreenshotSaved" xml:space="preserve">
+    <value>Screenshot Saved</value>
+  </data>
+  <data name="ScreenshotPage_ManageScreenshotFolders" xml:space="preserve">
+    <value>Manage Screenshot Folders</value>
+  </data>
+  <data name="ScreenshotFolderManageDialog_AddFolder" xml:space="preserve">
+    <value>Add Folder</value>
+  </data>
+  <data name="Common_Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ScreenshotFailed" xml:space="preserve">
+    <value>Screenshot Failed</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_CheckTheLogForMoreInformation" xml:space="preserve">
+    <value>Check the log for more information.</value>
+  </data>
+  <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
+    <value>Images from the following folders will be displayed in the gallery.</value>
+  </data>
+  <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
+    <value>Open in Explorer</value>
+  </data>
+  <data name="ImageViewWindow_OpenWith" xml:space="preserve">
+    <value>Open with</value>
+  </data>
+  <data name="ImageViewWindow_Previous" xml:space="preserve">
+    <value>Previous</value>
+    <comment>Previous Image</comment>
+  </data>
+  <data name="ImageViewWindow_Next" xml:space="preserve">
+    <value>Next</value>
+    <comment>Next Image</comment>
+  </data>
+  <data name="ImageViewWindow_ShowGallery" xml:space="preserve">
+    <value>Show Gallery</value>
+  </data>
+  <data name="ImageViewWindow_FitToWindow" xml:space="preserve">
+    <value>Fit to Window</value>
+    <comment>Zoom image fit to window</comment>
+  </data>
+  <data name="ImageViewWindow_CopyFile" xml:space="preserve">
+    <value>Copy File</value>
+  </data>
+  <data name="ImageViewWindow_CopyPath" xml:space="preserve">
+    <value>Copy Path</value>
+  </data>
+  <data name="ImageViewWindow_CopyImage" xml:space="preserve">
+    <value>Copy Image</value>
+  </data>
+  <data name="Common_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ImageViewWindow_ImageInformation" xml:space="preserve">
+    <value>Image Information</value>
+  </data>
+  <data name="ImageViewWindow_EditImage" xml:space="preserve">
+    <value>Edit Image</value>
+  </data>
+  <data name="ImageViewWindow_DisplayMode" xml:space="preserve">
+    <value>Display Mode</value>
+  </data>
+  <data name="ImageViewWindow_SDRMappedLuminance" xml:space="preserve">
+    <value>SDR Mapped Luminance</value>
+  </data>
+  <data name="ImageViewWindow_ExportImage" xml:space="preserve">
+    <value>Export Image</value>
+  </data>
+  <data name="ImageViewWindow_DeleteImageFile" xml:space="preserve">
+    <value>Delete Image File</value>
+  </data>
+  <data name="ImageViewWindow_CopiedToClipboard" xml:space="preserve">
+    <value>Copied to clipboard.</value>
+  </data>
+  <data name="ImageViewWindow_FileDoesNotExist" xml:space="preserve">
+    <value>File does not exist.</value>
+  </data>
+  <data name="ImageViewWindow_OpenWithDefaultApp" xml:space="preserve">
+    <value>Open with Default App</value>
+  </data>
+  <data name="ImageViewWindow_NoImageToDisplay" xml:space="preserve">
+    <value>No Image to Display</value>
+  </data>
+  <data name="Common_OpenFiles" xml:space="preserve">
+    <value>Open Files</value>
+  </data>
+  <data name="ImageViewWindow_OpenNewFiles" xml:space="preserve">
+    <value>Open New Files</value>
+  </data>
+  <data name="ImageViewWindow_FailedToDisplayImage" xml:space="preserve">
+    <value>Failed to Display Image</value>
+  </data>
+  <data name="ImageViewWindow_FailedToSaveImage" xml:space="preserve">
+    <value>Failed to Save Image</value>
+  </data>
+  <data name="ImageViewWindow_FailedToDeleteImageFile" xml:space="preserve">
+    <value>Failed to Delete Image File</value>
+  </data>
+  <data name="ImageViewWindow_UnableToDeleteTheFile" xml:space="preserve">
+    <value>Unable to Delete the File</value>
+  </data>
+  <data name="ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
+    <value>Insufficient permissions or the file is in use.</value>
+  </data>
+  <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
+    <value>Click to Set Shortcut Keys</value>
+  </data>
+  <data name="HotkeyInput_DeleteShortcut" xml:space="preserve">
+    <value>Delete shortcut</value>
+  </data>
+  <data name="HotkeyInput_PressTheShortcutKeys" xml:space="preserve">
+    <value>Press the Shortcut Keys</value>
+  </data>
+  <data name="HotkeyManager_TheShortcutKeys0IsAlreadyInUse" xml:space="preserve">
+    <value>The shortcut keys ({0}) is already in use.</value>
+  </data>
+  <data name="HotkeyManager_FailedToRegisterTheShortcutKeys0" xml:space="preserve">
+    <value>Failed to register the shortcut keys ({0}).</value>
+  </data>
+  <data name="HotkeyManager_TheShortcutKeys0IsAlreadyInUsePleaseModifyItInSettingsPage" xml:space="preserve">
+    <value>The shortcut keys ({0}) is already in use. Please modify it in Settings page.</value>
+  </data>
+  <data name="HotkeyManager_FailedToRegisterTheShortcutKeys0PleaseRetryInSettingsPage" xml:space="preserve">
+    <value>Failed to register the shortcut keys ({0}). Please retry in Settings page.</value>
+  </data>
+  <data name="HotkeySetting_FailedToRegisterTheShortcutKeys" xml:space="preserve">
+    <value>Failed to register the shortcut keys.</value>
+  </data>
+  <data name="ScreenshotSetting_AutoConvertToSDRImage" xml:space="preserve">
+    <value>Auto Convert to SDR Image</value>
+  </data>
+  <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
+    <value>Auto Copy Screenshot File</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFile" xml:space="preserve">
+    <value>Auto Save Screenshot</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
+    <value>Save the finished screenshot to the folder below. The copy-only hotkey never writes a file.</value>
+  </data>
+  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
+    <value>Copy as JPG</value>
+  </data>
+  <data name="ScreenshotPage_MultiSelect" xml:space="preserve">
+    <value>Multi Select</value>
+  </data>
+  <data name="ScreenshotPage_Total0Files" xml:space="preserve">
+    <value>Total {0} files.</value>
+  </data>
+  <data name="ScreenshotSetting_Lossless" xml:space="preserve">
+    <value>Lossless</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ProcessingImage" xml:space="preserve">
+    <value>Processing Image</value>
+  </data>
+  <data name="ScreenshotPage_BatchConvert" xml:space="preserve">
+    <value>Batch Convert</value>
+  </data>
+  <data name="ScreenshotPage_Recopy" xml:space="preserve">
+    <value>Recopy</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Quality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="ImageBatchConvertWindow_StartConvert" xml:space="preserve">
+    <value>Start Convert</value>
+  </data>
+  <data name="Common_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="ImageBatchConvertWindow_OutputFolder" xml:space="preserve">
+    <value>Output Folder</value>
+  </data>
+  <data name="ImageBatchConvertWindow_OriginalFileFolder" xml:space="preserve">
+    <value>Original File Folder</value>
+  </data>
+  <data name="ImageBatchConvertWindow_SelectOutputFormat" xml:space="preserve">
+    <value>Select Output Format</value>
+  </data>
+  <data name="ImageBatchConvertWindow_NoReadOrWritePermission" xml:space="preserve">
+    <value>No read or write permission</value>
+  </data>
+  <data name="ImageBatchConvertWindow_ConvertFailed" xml:space="preserve">
+    <value>Convert failed</value>
+  </data>
+  <data name="ImageBatchConvertWindow_IfOutputFileExists" xml:space="preserve">
+    <value>If Output File Exists</value>
+  </data>
+  <data name="ImageBatchConvertWindow_SkipDefault" xml:space="preserve">
+    <value>Skip (Default)</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Overwrite" xml:space="preserve">
+    <value>Overwrite</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Common_Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Common_Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="ImageBatchConvertWindow_ImageBatchConvert" xml:space="preserve">
+    <value>Image Batch Convert</value>
+  </data>
+  <data name="ScreenshotSetting_ClearSuccessfully" xml:space="preserve">
+    <value>Clear Successfully</value>
+  </data>
+  <data name="ScreenshotSetting_ClearFailed" xml:space="preserve">
+    <value>Clear Failed</value>
+  </data>
+  <data name="Common_CopiedToClipboard" xml:space="preserve">
+    <value>Copied to clipboard.</value>
+  </data>
+  <data name="ScreenshotSetting_ColorManagement" xml:space="preserve">
+    <value>Color Management</value>
+  </data>
+  <data name="Zshot_Nav_Gallery" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="Zshot_Nav_Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Zshot_Nav_Hotkey" xml:space="preserve">
+    <value>Hotkeys</value>
+  </data>
+  <data name="Zshot_Nav_Screenshot" xml:space="preserve">
+    <value>Screenshot</value>
+  </data>
+  <data name="Zshot_Nav_Storage" xml:space="preserve">
+    <value>Storage</value>
+  </data>
+  <data name="Zshot_Nav_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Zshot_Nav_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Zshot_SplashTagline" xml:space="preserve">
+    <value>Next-generation Windows-native HDR Screenshot Tool</value>
+  </data>
+  <data name="Zshot_WallpaperNotFound" xml:space="preserve">
+    <value>Wallpaper file not found. Config cleared and reset to None.</value>
+  </data>
+  <data name="Zshot_Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="Zshot_ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Zshot_ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Zshot_Acrylic" xml:space="preserve">
+    <value>Acrylic Effect</value>
+  </data>
+  <data name="Zshot_AccentColor" xml:space="preserve">
+    <value>Accent Color</value>
+  </data>
+  <data name="Zshot_ApplyCurrentColor" xml:space="preserve">
+    <value>Custom Color</value>
+  </data>
+  <data name="Zshot_Wallpaper" xml:space="preserve">
+    <value>Wallpaper</value>
+  </data>
+  <data name="Zshot_WallpaperModeNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Zshot_WallpaperModeImage" xml:space="preserve">
+    <value>Single Image</value>
+  </data>
+  <data name="Zshot_WallpaperModeFolder" xml:space="preserve">
+    <value>Folder Random</value>
+  </data>
+  <data name="Zshot_WallpaperModeVideo" xml:space="preserve">
+    <value>Specified Video</value>
+  </data>
+  <data name="Zshot_WallpaperFolderVideoOnly" xml:space="preserve">
+    <value>Prefer Video</value>
+  </data>
+  <data name="Zshot_WallpaperFolderVideoOnlyDesc" xml:space="preserve">
+    <value>Picks videos first; falls back to a random image if the video can't initialize</value>
+  </data>
+  <data name="Zshot_WallpaperNowPlaying" xml:space="preserve">
+    <value>NowPlaying</value>
+  </data>
+  <data name="Zshot_WallpaperVideoFallbackToImage" xml:space="preserve">
+    <value>No video in folder, picked a random image instead</value>
+  </data>
+  <data name="Zshot_WallpaperChooseImage" xml:space="preserve">
+    <value>Choose Image</value>
+  </data>
+  <data name="Zshot_WallpaperChooseFolder" xml:space="preserve">
+    <value>Choose Folder</value>
+  </data>
+  <data name="Zshot_WallpaperChooseVideo" xml:space="preserve">
+    <value>Choose Video</value>
+  </data>
+  <data name="Zshot_AccentFromWallpaper" xml:space="preserve">
+    <value>Accent from Wallpaper</value>
+  </data>
+  <data name="Zshot_PathNone" xml:space="preserve">
+    <value>Not Selected</value>
+  </data>
+  <data name="Zshot_DisableCertificateValidation" xml:space="preserve">
+    <value>Disable Certificate Validation</value>
+  </data>
+  <data name="Zshot_HotkeyScreenshot" xml:space="preserve">
+    <value>Screenshot</value>
+  </data>
+  <data name="Zshot_HotkeyRegion" xml:space="preserve">
+    <value>Region Capture</value>
+  </data>
+  <data name="Zshot_HotkeyRegionCopy" xml:space="preserve">
+    <value>Region Copy Only</value>
+  </data>
+  <data name="Zshot_HotkeyScreenshotDesc" xml:space="preserve">
+    <value>Capture the whole monitor (foreground window / cursor screen, switchable in Screenshot settings).</value>
+  </data>
+  <data name="Zshot_HotkeyRegionDesc" xml:space="preserve">
+    <value>Drag a region or click a window. Saves a file.</value>
+  </data>
+  <data name="Zshot_HotkeyRegionCopyDesc" xml:space="preserve">
+    <value>Drag a region or click a window. Copies the bitmap to the clipboard only; no file is saved.</value>
+  </data>
+  <data name="Zshot_SDRFormat" xml:space="preserve">
+    <value>SDR Format</value>
+  </data>
+  <data name="Zshot_HDRFormat" xml:space="preserve">
+    <value>HDR Format</value>
+  </data>
+  <data name="Zshot_Quality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="Zshot_ColorManagementDesc" xml:space="preserve">
+    <value>Reads the monitor's ICC profile to parse the real color gamut and writes the cICP/ICC chunk into the file. HDR is always BT2020; for SDR, on = real gamut from ICC, off = BT709. Enabling first probes the monitor; if the color config is invalid (e.g. VM, missing ICC), it cannot be turned on.</value>
+  </data>
+  <data name="Zshot_ColorManagementUnavailable" xml:space="preserve">
+    <value>The monitor's color configuration is invalid (common on VMs or devices without an ICC profile). Color management cannot be enabled.</value>
+  </data>
+  <data name="Zshot_AutoConvertSDRDesc" xml:space="preserve">
+    <value>HDR screenshots also save an SDR copy (Ultra HDR JPEG).</value>
+  </data>
+  <data name="Zshot_DeleteHDRIfSDR" xml:space="preserve">
+    <value>Delete HDR if SDR Content</value>
+  </data>
+  <data name="Zshot_DeleteHDRIfSDRDesc" xml:space="preserve">
+    <value>When an HDR-format frame is actually SDR content (maxCLL below threshold), automatically convert to SDR and delete the HDR file. The format follows the SDR storage format.</value>
+  </data>
+  <data name="Zshot_MonitorSource" xml:space="preserve">
+    <value>Capture Monitor</value>
+  </data>
+  <data name="Zshot_MonitorForeground" xml:space="preserve">
+    <value>Foreground Window</value>
+  </data>
+  <data name="Zshot_MonitorCursor" xml:space="preserve">
+    <value>Cursor Position</value>
+  </data>
+  <data name="Zshot_FilenameTemplate" xml:space="preserve">
+    <value>Filename Template</value>
+  </data>
+  <data name="Zshot_RegionFilenameTemplate" xml:space="preserve">
+    <value>Region Filename Template</value>
+  </data>
+  <data name="Zshot_ClickToInsert" xml:space="preserve">
+    <value>Click to insert at cursor; see </value>
+  </data>
+  <data name="Zshot_AutoStartInvalidCleared" xml:space="preserve">
+    <value>Startup entry points to a missing program and has been removed</value>
+  </data>
+  <data name="Zshot_ClickToInsertSuffix" xml:space="preserve">
+    <value> filename templates</value>
+  </data>
+  <data name="Zshot_CheckUpdate" xml:space="preserve">
+    <value>Check for Updates</value>
+  </data>
+  <data name="Zshot_UpdateAvailableTitle" xml:space="preserve">
+    <value>New version available!</value>
+  </data>
+  <data name="Zshot_UpdateNow" xml:space="preserve">
+    <value>Update Now</value>
+  </data>
+  <data name="Zshot_UpdateDelta" xml:space="preserve">
+    <value>Delta Update</value>
+  </data>
+  <data name="Zshot_RemindLater" xml:space="preserve">
+    <value>Remind Me Later</value>
+  </data>
+  <data name="Zshot_IgnoreThisVersion" xml:space="preserve">
+    <value>Skip This Version</value>
+  </data>
+  <data name="Zshot_LatestVersion" xml:space="preserve">
+    <value>You're on the latest version</value>
+  </data>
+  <data name="Zshot_UpdateFailed" xml:space="preserve">
+    <value>Update Failed</value>
+  </data>
+  <data name="Zshot_TitleMaxLength" xml:space="preserve">
+    <value>Title max length (0 = no truncation)</value>
+  </data>
+  <data name="Zshot_ScreenshotFolder" xml:space="preserve">
+    <value>Screenshot Folder</value>
+  </data>
+  <data name="Zshot_LogFolder" xml:space="preserve">
+    <value>Log Folder</value>
+  </data>
+  <data name="Zshot_LogFolderRestartTip" xml:space="preserve">
+    <value>Restart to take effect</value>
+  </data>
+  <data name="Zshot_LogLevel" xml:space="preserve">
+    <value>Log Level</value>
+  </data>
+  <data name="Zshot_LogLevelOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Zshot_Change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Zshot_StorageStats" xml:space="preserve">
+    <value>Storage Usage</value>
+  </data>
+  <data name="Zshot_ClearCache" xml:space="preserve">
+    <value>Clear Cache</value>
+  </data>
+  <data name="Zshot_StatsScreenshots" xml:space="preserve">
+    <value>Screenshots</value>
+  </data>
+  <data name="Zshot_StatsImageCache" xml:space="preserve">
+    <value>Thumbnail Cache</value>
+  </data>
+  <data name="Zshot_StatsWallpaper" xml:space="preserve">
+    <value>Wallpaper</value>
+  </data>
+  <data name="Zshot_StatsLog" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="Zshot_SystemTray" xml:space="preserve">
+    <value>System Tray</value>
+  </data>
+  <data name="Zshot_AutoStart" xml:space="preserve">
+    <value>Launch on Startup</value>
+  </data>
+  <data name="Zshot_AutoStartMinimized" xml:space="preserve">
+    <value>Start Minimized to Tray</value>
+  </data>
+  <data name="Zshot_AboutLicense" xml:space="preserve">
+    <value>MIT License</value>
+  </data>
+  <data name="Zshot_AboutDesc" xml:space="preserve">
+    <value>Zshot pulls the raw R16G16B16A16Float scRGB frame buffer straight from the DXGI layer, fully preserving HDR luminance (up to thousands of nits), and encodes it as 16bit HDR AVIF, JPEG XL, or PNGv3 with BT2020 + PQ transfer-function metadata written into the color space. It also ships the features a general screenshot tool should have: automatic fallback on SDR displays, region capture, and multi-format batch conversion.</value>
+  </data>
+  <data name="Zshot_AboutTagline" xml:space="preserve">
+    <value>Next-generation native Windows HDR screenshot tool</value>
+  </data>
+  <data name="Zshot_AboutThanksTitle" xml:space="preserve">
+    <value>Acknowledgements</value>
+  </data>
+  <data name="Zshot_AboutThanksStarward" xml:space="preserve">
+    <value>Screenshot core, codec engine, and window framework all originate from Starward, developed by @Scighost.</value>
+  </data>
+  <data name="Zshot_AboutThanksShareX" xml:space="preserve">
+    <value>Reference for the window detection and interaction design of the region capture overlay.</value>
+  </data>
+  <data name="Zshot_AboutProjectHome" xml:space="preserve">
+    <value>Project Homepage</value>
+  </data>
+  <data name="Zshot_OpenDataFolder" xml:space="preserve">
+    <value>Open Data Folder</value>
+  </data>
+  <data name="Zshot_BackupDatabase" xml:space="preserve">
+    <value>Back Up Database</value>
+  </data>
+  <data name="Zshot_LastBackup" xml:space="preserve">
+    <value>Last Backup</value>
+  </data>
+  <data name="Zshot_BackupSuccess" xml:space="preserve">
+    <value>Database Backed Up</value>
+  </data>
+  <data name="Zshot_BackupFailed" xml:space="preserve">
+    <value>Database Backup Failed</value>
+  </data>
+  <data name="Zshot_StatsBackup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="Zshot_CheckPrerelease" xml:space="preserve">
+    <value>Check Pre-release Versions</value>
+  </data>
+  <data name="Zshot_DataFolder" xml:space="preserve">
+    <value>Data Folder</value>
+  </data>
+  <data name="Zshot_UpdateLinks" xml:space="preserve">
+    <value>Links</value>
+  </data>
+  <data name="Zshot_UpdateReleasePage" xml:space="preserve">
+    <value>Release Page</value>
+  </data>
+  <data name="Zshot_UpdateFull" xml:space="preserve">
+    <value>Full Update</value>
+  </data>
+  <data name="Zshot_UpdateVerifying" xml:space="preserve">
+    <value>Verifying integrity…</value>
+  </data>
+  <data name="Zshot_UpdateArchitecture" xml:space="preserve">
+    <value>Architecture</value>
+  </data>
+  <data name="Zshot_UpdateChannel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="Zshot_UpdateBuildTime" xml:space="preserve">
+    <value>Release Time</value>
+  </data>
+  <data name="Zshot_GithubApiNoProxy" xml:space="preserve">
+    <value>GitHub API direct (no proxy)</value>
+  </data>
+  <data name="Zshot_DeltaUpdateMaxLayers" xml:space="preserve">
+    <value>Delta Update Max Layers</value>
+  </data>
+  <data name="Zshot_Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Zshot_RestartToTakeEffect" xml:space="preserve">
+    <value>Restart to take effect</value>
+  </data>
+  <data name="Zshot_WelcomeHello" xml:space="preserve">
+    <value>Hi there!</value>
+  </data>
+  <data name="Zshot_WelcomeIntro" xml:space="preserve">
+    <value>Looks like it's your first time in Zshot. This is a quick welcome page to set up a few things.</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiTitle" xml:space="preserve">
+    <value>DXGI Interface</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiSupported" xml:space="preserve">
+    <value>Supported. All screenshot features are available.</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported1" xml:space="preserve">
+    <value>Not supported in the current environment.</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported2" xml:space="preserve">
+    <value>Screenshot features will not work; crashes are expected.</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported3" xml:space="preserve">
+    <value>Other features may still work; use at your own discretion.</value>
+  </data>
+  <data name="Zshot_WelcomeWallpaperTitle" xml:space="preserve">
+    <value>Custom Wallpaper</value>
+  </data>
+  <data name="Zshot_WelcomeWallpaperDesc" xml:space="preserve">
+    <value>Strongly recommended for the best look. Pick an image or video; if skipped, a built-in default image is used (the current window background).</value>
+  </data>
+  <data name="Zshot_WelcomePickWallpaper" xml:space="preserve">
+    <value>Pick Wallpaper</value>
+  </data>
+  <data name="Zshot_WelcomeScreenshotFolderTitle" xml:space="preserve">
+    <value>Screenshot Folder</value>
+  </data>
+  <data name="Zshot_WelcomeScreenshotFolderDesc" xml:space="preserve">
+    <value>Where screenshots are saved. Defaults to Pictures\Zshot if unchanged.</value>
+  </data>
+  <data name="Zshot_WelcomePickFolder" xml:space="preserve">
+    <value>Pick Folder</value>
+  </data>
+  <data name="Zshot_WelcomeStart" xml:space="preserve">
+    <value>Launch Zshot!</value>
+  </data>
+  <data name="Zshot_InfoCopied" xml:space="preserve">
+    <value>Copied</value>
+  </data>
+  <data name="Zshot_DebugExtractTitle" xml:space="preserve">
+    <value>Streaming Extract Test</value>
+  </data>
+  <data name="Zshot_DebugSection" xml:space="preserve">
+    <value>Debug</value>
+  </data>
+  <data name="Zshot_DebugSelect" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="Zshot_DebugExtract" xml:space="preserve">
+    <value>Extract</value>
+  </data>
+  <data name="Zshot_DebugUrlEmpty" xml:space="preserve">
+    <value>URL and path cannot be empty</value>
+  </data>
+  <data name="Zshot_DebugExtractDone" xml:space="preserve">
+    <value>Done!</value>
+  </data>
+  <data name="Zshot_DebugExtractFailed" xml:space="preserve">
+    <value>Failed: </value>
+  </data>
+  <data name="Zshot_Update" xml:space="preserve">
+    <value>Update source</value>
+  </data>
+  <data name="Zshot_UpdateSource" xml:space="preserve">
+    <value>Update source</value>
+  </data>
+  <data name="Zshot_General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Zshot_PriorityStart" xml:space="preserve">
+    <value>High priority start</value>
+  </data>
+  <data name="Zshot_TaskInvalid" xml:space="preserve">
+    <value>High priority start task points to a missing program, please turn it off manually in Settings</value>
+  </data>
+  <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
+    <value>← To change this option, turn off high priority start first</value>
+  </data>
+</root>

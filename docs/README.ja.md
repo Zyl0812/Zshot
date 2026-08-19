@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="../src/logo.png" width="120" alt="Starshot Logo">
+<img src="../src/logo.png" width="120" alt="Zshot Logo">
 
-# Starshot
+# Zshot
 
 **次世代 Windows ネイティブ HDR スクリーンショットツール**
 
@@ -10,8 +10,8 @@
 
 16bit フルパイプラインキャプチャ · 領域スクリーンショット · AVIF / JPEG XL / PNGv3 エンコード · カラーマネジメント
 
-[![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../../releases)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
+[![Release](https://img.shields.io/github/v/release/Zyl0812/Zshot?style=flat-square)](../../../releases)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/Zyl0812/Zshot?tab=MIT-1-ov-file)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows)](../../../releases)
 
 [ダウンロード](../../../releases) · [クイックスタート](#クイックスタート) · [機能詳細](#機能詳細) · [ソースからビルド](#ソースからビルド)
@@ -22,11 +22,11 @@
 
 ---
 
-## なぜ Starshot が必要か
+## なぜ Zshot が必要か
 
 Windows標準のスクリーンショットツール（Snipping Tool、Win+Shift+S）は、HDRディスプレイ上でも8bit SDR画像しかキャプチャできません。システムコンポジターが16bit HDRフレームを圧縮して出力するため、ハイライトがクリップされ、色域が狭められ、スクリーンショットが色あせたり、白飛びしたり、色のマッピングが崩れたりします。一般的なスクリーンショットツールも従来のGDI/BitBltキャプチャパイプラインに制限されており、HDRデータを認識できません。
 
-Starshot は DXGI レイヤーからディスプレイ出力の生の `R16G16B16A16Float` scRGB フレームバッファを直接取得し、HDR 輝度情報（数千 nit に達する）を完全に保持します。16bit HDR AVIF、JPEG XL、PNGv3 としてエンコードし、BT.2020 色空間 + PQ 伝達関数のメタデータを書き込みます。同時に、SDR ディスプレイ自動デグレード、領域スクリーンショット、マルチフォーマットバッチ変換など、汎用スクリーンショットツールに期待される機能も提供します。
+Zshot は DXGI レイヤーからディスプレイ出力の生の `R16G16B16A16Float` scRGB フレームバッファを直接取得し、HDR 輝度情報（数千 nit に達する）を完全に保持します。16bit HDR AVIF、JPEG XL、PNGv3 としてエンコードし、BT.2020 色空間 + PQ 伝達関数のメタデータを書き込みます。同時に、SDR ディスプレイ自動デグレード、領域スクリーンショット、マルチフォーマットバッチ変換など、汎用スクリーンショットツールに期待される機能も提供します。
 
 **主な特徴**
 
@@ -49,9 +49,9 @@ Starshot は DXGI レイヤーからディスプレイ出力の生の `R16G16B16
 </td>
 <td align="center" width="50%">
 
-**Starshot（Ultra HDR JPEG）**
+**Zshot（Ultra HDR JPEG）**
 
-<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Starshot Ultra HDR JPEG preserving full highlight detail via gain map">
+<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Zshot Ultra HDR JPEG preserving full highlight detail via gain map">
 </td>
 </tr>
 </table>
@@ -62,7 +62,7 @@ Starshot は DXGI レイヤーからディスプレイ出力の生の `R16G16B16
 > [!NOTE]
 > GitHub プラットフォームは AVIF レンダリングをサポートしていないため、上記は Ultra HDR JPEG で表示しています。AVIF 原画は[こちら](https://r2.cialo.site/endfield/3840x2160.dlaa.avif)でご覧いただけます。
 
-SDR ディスプレイでは、Starshot は自動的に標準 SDR スクリーンショットパスに切り替わり、汎用スクリーンショットツールとして動作します。HDR ディスプレイでは、現在数少ない HDR データを完全に保持できるデスクトップスクリーンショットソリューションです。
+SDR ディスプレイでは、Zshot は自動的に標準 SDR スクリーンショットパスに切り替わり、汎用スクリーンショットツールとして動作します。HDR ディスプレイでは、現在数少ない HDR データを完全に保持できるデスクトップスクリーンショットソリューションです。
 
 ## システム要件
 
@@ -72,7 +72,7 @@ SDR ディスプレイでは、Starshot は自動的に標準 SDR スクリー�
 
 ## ダウンロード
 
-[Releases](../../../releases) から圧縮パッケージをダウンロードし、解凍後にルートディレクトリの `Starshot.exe` ランチャーを実行してください。インストール不要、解凍するだけですぐに使用可能です。
+[Releases](../../../releases) から圧縮パッケージをダウンロードし、解凍後にルートディレクトリの `Zshot.exe` ランチャーを実行してください。インストール不要、解凍するだけですぐに使用可能です。
 
 ## スクリーンショット
 
@@ -92,7 +92,7 @@ SDR ディスプレイでは、Starshot は自動的に標準 SDR スクリー�
 
 ### HDR スクリーンショットパイプライン
 
-ほとんどのスクリーンショットツールは HDR ディスプレイ上でも 8bit SDR しかキャプチャできません。システムコンポジターが出力する 16bit 浮動小数点 scRGB フレームが SDR に圧縮され、ハイライトがクリップされ、色域が狭められます。Starshot は**生の HDR フレームバッファ**をキャプチャします：
+ほとんどのスクリーンショットツールは HDR ディスプレイ上でも 8bit SDR しかキャプチャできません。システムコンポジターが出力する 16bit 浮動小数点 scRGB フレームが SDR に圧縮され、ハイライトがクリップされ、色域が狭められます。Zshot は**生の HDR フレームバッファ**をキャプチャします：
 
 1. **HDR キャプチャ**：ディスプレイが HDR を報告した場合、`R16G16B16A16Float` ピクセルフォーマットを要求し、完全な scRGB 浮動小数点データ（輝度は数千 nit に達する）を取得します
 2. **HDR 保存**：16bit AVIF / JPEG XL / PNGv3、BT.2020 色域 + PQ 伝達関数。ハイライトはクリップされず、色域は狭まりません
@@ -101,7 +101,7 @@ SDR ディスプレイでは、Starshot は自動的に標準 SDR スクリー�
 
 #### SDR コンテンツの取り扱い
 
-HDR ディスプレイでは、デスクトップと SDR アプリケーションも HDR フォーマット（R16G16B16A16Float）でキャプチャされますが、コンテンツの輝度は実際には SDR レベルです。これに対する Starshot の処理：
+HDR ディスプレイでは、デスクトップと SDR アプリケーションも HDR フォーマット（R16G16B16A16Float）でキャプチャされますが、コンテンツの輝度は実際には SDR レベルです。これに対する Zshot の処理：
 
 - **デフォルト**：引き続き HDR フォーマットで保存（16bit）、**8bit トーンマッピングは行わず**、劣化や色ずれを防止します
 - **SDR コンテンツの HDR 削除スイッチ**（オプション）：有効にすると maxCLL 閾値で検出し、基準に満たないコンテンツは自動的に SDR に変換（ユーザー設定の SDR 保存形式に従う）し、HDR ファイルを削除して容量を節約します
@@ -136,7 +136,7 @@ HDR スクリーンショットは Ultra HDR JPEG（SDR ベース画像 + HDR �
 
 ### クリップボード
 
-パッケージ化されていない WinUI アプリの WinRT `Clipboard.SetContent` は信頼性が低く（遅延レンダリング + Flush 問題、コンテンツが他のアプリケーションに届かないことがよくあります）、Starshot は Win32 ネイティブ API（`OpenClipboard` / `SetClipboardData`）を直接使用します：
+パッケージ化されていない WinUI アプリの WinRT `Clipboard.SetContent` は信頼性が低く（遅延レンダリング + Flush 問題、コンテンツが他のアプリケーションに届かないことがよくあります）、Zshot は Win32 ネイティブ API（`OpenClipboard` / `SetClipboardData`）を直接使用します：
 
 - **全画面スクリーンショット**：CF_HDROP（ファイルドロップ形式）、エクスプローラーやチャットアプリに貼り付けて直接ファイルを取得
 - **領域スクリーンショット**：CF_DIB（BGRA ビットマップ）、オーバーレイから切り取った SDR ビットマップを直接クリップボードに配置、ファイル読み取りなし、再エンコードなし、二次トーンマッピングなし
@@ -144,10 +144,10 @@ HDR スクリーンショットは Ultra HDR JPEG（SDR ベース画像 + HDR �
 
 ### 保存
 
-- **フラット構造**（サブフォルダなし）、デフォルトは `ピクチャ\Starshot`、カスタマイズ可能
+- **フラット構造**（サブフォルダなし）、デフォルトは `ピクチャ\Zshot`、カスタマイズ可能
 - **SDR フォーマット**（PNG / AVIF / JPEG XL、デフォルト PNG）と **HDR フォーマット**（AVIF / JPEG XL / PNGv3、デフォルト AVIF）を個別に設定
 - 品質：中 / 高 / ロスレス
-- XMP メタデータ（CreatorTool = Starshot）
+- XMP メタデータ（CreatorTool = Zshot）
 - エンコード直列化（SemaphoreSlim）、並行エンコード競合を防止
 - **ストレージ統計**：設定ページでスクリーンショット / サムネイルキャッシュ / 壁紙 / ログ / バックアップの各占有容量を表示、更新とワンクリックキャッシュクリアに対応（孤立した壁紙ファイルも合わせてクリーンアップ）
 
@@ -247,7 +247,7 @@ HDR スクリーンショットは Ultra HDR JPEG（SDR ベース画像 + HDR �
 
 ### 起動時の自動起動
 
-- レジストリ `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`、ランチャー（ルート `Starshot.exe`）を指します
+- レジストリ `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`、ランチャー（ルート `Zshot.exe`）を指します
 - オプション `--hide` でトレイに最小化して起動（トレイが有効である必要あり）
 - スイッチはレジストリをリアルタイム読み取り（データベースキャッシュなし）：タスクマネージャーからの無効化は StartupApproved のみを変更し、Run エントリを削除しないため、スイッチは依然としてオンと表示されます
 - 起動時に自動起動エントリが指す exe の存在を確認し、存在しない場合は自動的に起動エントリを削除してトースト通知
@@ -267,7 +267,7 @@ HDR スクリーンショットは Ultra HDR JPEG（SDR ベース画像 + HDR �
 - 領域スクリーンショットオーバーレイの HDR フレームは SDR として表示されます（WinUI CanvasControl が SDR スワップチェーンを使用）；保存されるファイルには影響しません
 - カスタム壁紙は `UniformToFill` でウィンドウを埋めますが、WinUI のクロップは中央揃えではなく、現在は**左上**揃えです。例えば、狭い（縦向き）壁紙を広いウィンドウに表示すると、上半分のみが表示されます（中央ではなく上部からクロップ）
 - 領域スクリーンショットオーバーレイを開いた瞬間、カーソルはまだシステムデフォルトの形状です。**マウスを 1 回動かすと**十字カーソルが表示されます（WinUI `ProtectedCursor` は要素上に既にある静止ポインタに対して即時に効果を発揮しません。1 回動かして pointer イベントをトリガーすると正常になります）
-- 領域スクリーンショットで一部のウィンドウにカーソルを合わせると、座標ボックスに負の値（例: `-11,-11`）が表示されることがあります。これは Windows DWM が報告するウィンドウ拡張フレーム境界（画面外の影/枠を含む）であり、Starshot はそのまま読み取ります——画面外部分は見えず、スクリーンショットには影響しません
+- 領域スクリーンショットで一部のウィンドウにカーソルを合わせると、座標ボックスに負の値（例: `-11,-11`）が表示されることがあります。これは Windows DWM が報告するウィンドウ拡張フレーム境界（画面外の影/枠を含む）であり、Zshot はそのまま読み取ります——画面外部分は見えず、スクリーンショットには影響しません
 - 動画壁紙は起動時に MF メディアパイプラインの競合により初期化に失敗することがあります（断続的、完全には解決されていません）；読み込み中は動画と同じディレクトリのランダムな画像がプレースホルダーとして表示され、動画が止まったままの場合はその画像が保持されます——黒画面にはなりません
 
 ## アーキテクチャ
@@ -276,15 +276,15 @@ HDR スクリーンショットは Ultra HDR JPEG（SDR ベース画像 + HDR �
 
 ```
 ルート/
-  Starshot.exe            ← C++ ランチャー（version.ini を読み取り、どの app ディレクトリを起動するか決定）
-  StarshotDatabase.db     ← SQLite 設定データベース
+  Zshot.exe            ← C++ ランチャー（version.ini を読み取り、どの app ディレクトリを起動するか決定）
+  ZshotDatabase.db     ← SQLite 設定データベース
   version.ini             ← バージョン番号（CI/CD リリースのみ、ローカルビルドにはなし）
   app-{version}/          ← メインプログラムディレクトリ（CI/CD リリースはバージョン付き、ローカルビルドは app/）
-    Starshot.exe          ← メインプログラム（WinUI 3 / .NET 10）
+    Zshot.exe          ← メインプログラム（WinUI 3 / .NET 10）
     *.dll                 ← 依存ライブラリ
     avifenc.exe 等        ← コーデックツール（Starward.Codec NuGet より）
   backup/                 ← データベースバックアップ
-%LOCALAPPDATA%/Starshot/ （デフォルト、設定可能）
+%LOCALAPPDATA%/Zshot/ （デフォルト、設定可能）
   log/                    ← ログ
   bg/                     ← 壁紙
   thumb/                  ← サムネイルキャッシュ
@@ -292,7 +292,7 @@ HDR スクリーンショットは Ultra HDR JPEG（SDR ベース画像 + HDR �
 
 ### ランチャー
 
-C++ ネイティブプログラム（~400KB）。`version.ini` を読み取り、`app-{version}/Starshot.exe` を起動するか（version.ini がない場合は `app/`、debug/local ビルド）を決定します。`--clean`（または `--clean=<pid>`）付きで起動すると、`app-*` ディレクトリを走査して現在のバージョン以外を削除します。
+C++ ネイティブプログラム（~400KB）。`version.ini` を読み取り、`app-{version}/Zshot.exe` を起動するか（version.ini がない場合は `app/`、debug/local ビルド）を決定します。`--clean`（または `--clean=<pid>`）付きで起動すると、`app-*` ディレクトリを走査して現在のバージョン以外を削除します。
 
 ### トレイとバックグラウンド起動
 
@@ -343,36 +343,36 @@ C++ ネイティブプログラム（~400KB）。`version.ini` を読み取り�
 ### 手順
 
 ```bash
-git clone https://github.com/loliri/Starshot
-cd Starshot
+git clone https://github.com/Zyl0812/Zshot
+cd Zshot
 
 # === Debug ===
 # メインプログラムをビルド（build/app/ に出力）
-dotnet build src/Starshot/Starshot.csproj -c Debug -p:Platform=x64
+dotnet build src/Zshot/Zshot.csproj -c Debug -p:Platform=x64
 
-# ランチャーをビルド（build/Starshot.exe に出力、VS の MSBuild が必要）
-"C:\Program Files\Microsoft Visual Studio\<バージョン>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# ランチャーをビルド（build/Zshot.exe に出力、VS の MSBuild が必要）
+"C:\Program Files\Microsoft Visual Studio\<バージョン>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# 実行：build/Starshot.exe（ランチャー）または build/app/Starshot.exe（メインプログラム）
+# 実行：build/Zshot.exe（ランチャー）または build/app/Zshot.exe（メインプログラム）
 
 # === Release 公開 ===
-# 1. 最初にランチャーをビルド（build/Starshot.exe に出力）
-"C:\Program Files\Microsoft Visual Studio\<バージョン>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# 1. 最初にランチャーをビルド（build/Zshot.exe に出力）
+"C:\Program Files\Microsoft Visual Studio\<バージョン>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# 2. メインプログラムを公開（build/release/app/ に出力、ランチャーを build/release/Starshot.exe に自動コピー + AI ライブラリ削除）
-dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
+# 2. メインプログラムを公開（build/release/app/ に出力、ランチャーを build/release/Zshot.exe に自動コピー + AI ライブラリ削除）
+dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=x64
 
 # 完了後のディレクトリ構造：
 # build/release/
-#   Starshot.exe        ← ランチャー（自動コピー）
+#   Zshot.exe        ← ランチャー（自動コピー）
 #   app/
-#     Starshot.exe      ← メインプログラム（自己完結型 + trim + R2R）
+#     Zshot.exe      ← メインプログラム（自己完結型 + trim + R2R）
 #     *.dll / avifenc.exe 等
 ```
 
 ## 国際化（i18n）
 
-翻訳は `src/Starshot.Language/` の `.resx` ファイルに基づきます（`Lang.resx` が英語デフォルト、`Lang.zh-CN.resx` 等が各言語）。また `GeneralSetting` の言語 ComboBox にオプションを追加 + `LanguageIndex` マッピングも必要です。
+翻訳は `src/Zshot.Language/` の `.resx` ファイルに基づきます（`Lang.resx` が英語デフォルト、`Lang.zh-CN.resx` 等が各言語）。また `GeneralSetting` の言語 ComboBox にオプションを追加 + `LanguageIndex` マッピングも必要です。
 
 翻訳の貢献歓迎：リポジトリを fork → `Lang.resx` を `Lang.{あなたの言語}.resx` にコピー → 翻訳 → PR を送信。
 
@@ -391,14 +391,14 @@ dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
 <details>
 <summary><b>スクリーンショットライブラリ（ホームページ）の画像の色がおかしい / 乱れている</b></summary>
 
-これは通常、Windows システムの画像デコーダー（AVIF / HEIF / JPEG XL 拡張機能）の問題であり、Starshot のバグではありません。Microsoft Store で以下のコンポーネントを検索して更新してみてください：
+これは通常、Windows システムの画像デコーダー（AVIF / HEIF / JPEG XL 拡張機能）の問題であり、Zshot のバグではありません。Microsoft Store で以下のコンポーネントを検索して更新してみてください：
 
 - **AV1 Video Extension**
 - **HEIF Image Extensions**
 - **HEVC Video Extensions**
 - **Webp Image Extensions**
 
-更新後に Starshot を再起動してください。問題が解決しない場合は、スクリーンショットを添付して [Issue を送信](../../../issues/new) してください。
+更新後に Zshot を再起動してください。問題が解決しない場合は、スクリーンショットを添付して [Issue を送信](../../../issues/new) してください。
 
 </details>
 
@@ -426,7 +426,7 @@ HDR ディスプレイを使用している場合、Windows HDR スイッチが�
 <details>
 <summary><b>スクリーンショット後にクリップボードから貼り付けられない</b></summary>
 
-Starshot は Win32 ネイティブクリップボード API を使用して書き込んでおり、理論的には WinRT よりも信頼性が高いです。それでも貼り付けに失敗する場合は、対象アプリケーションが対応するクリップボード形式（CF_HDROP ファイル / CF_DIB ビットマップ）をサポートしていない可能性があります。エクスプローラー（ファイル）またはペイント（ビットマップ）に貼り付けて検証してみてください。
+Zshot は Win32 ネイティブクリップボード API を使用して書き込んでおり、理論的には WinRT よりも信頼性が高いです。それでも貼り付けに失敗する場合は、対象アプリケーションが対応するクリップボード形式（CF_HDROP ファイル / CF_DIB ビットマップ）をサポートしていない可能性があります。エクスプローラー（ファイル）またはペイント（ビットマップ）に貼り付けて検証してみてください。
 
 </details>
 

@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="../src/logo.png" width="120" alt="Starshot Logo">
+<img src="../src/logo.png" width="120" alt="Zshot Logo">
 
-# Starshot
+# Zshot
 
 **新一代 Windows 原生 HDR 截图工具**
 
@@ -10,8 +10,8 @@
 
 16bit 全链路捕获 · 区域截图 · AVIF / JPEG XL / PNGv3 编码 · 色彩管理
 
-[![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../../releases)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
+[![Release](https://img.shields.io/github/v/release/Zyl0812/Zshot?style=flat-square)](../../../releases)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/Zyl0812/Zshot?tab=MIT-1-ov-file)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows)](../../../releases)
 
 [下载](../../../releases) · [快速上手](#快速上手) · [功能详解](#功能详解) · [从源码构建](#从源码构建)
@@ -22,11 +22,11 @@
 
 ---
 
-## 为什么需要 Starshot
+## 为什么需要 Zshot
 
 Windows 自带的截图工具（Snipping Tool、Win+Shift+S）在 HDR 显示器上依然只能截出 8bit SDR 图像——系统合成器把 16bit HDR 帧压缩输出，高光被截断，色域被收窄，导致截图发灰/过曝/色彩映射错误。市面上常见的截图工具同样受限于传统 GDI/BitBlt 截图管线，无法感知 HDR 数据。
 
-Starshot 直接从 DXGI 层获取显示器输出的原始 `R16G16B16A16Float` scRGB 帧缓冲，完整保留 HDR 亮度信息（可达数千 nit），编码为 16bit HDR AVIF、JPEG XL 或 PNGv3，色彩空间写入 BT2020 + PQ 传输函数元数据。同时提供 SDR 显示器自动降级、区域截图、多格式批量转换等通用截图工具应有的功能。
+Zshot 直接从 DXGI 层获取显示器输出的原始 `R16G16B16A16Float` scRGB 帧缓冲，完整保留 HDR 亮度信息（可达数千 nit），编码为 16bit HDR AVIF、JPEG XL 或 PNGv3，色彩空间写入 BT2020 + PQ 传输函数元数据。同时提供 SDR 显示器自动降级、区域截图、多格式批量转换等通用截图工具应有的功能。
 
 **核心特点**
 
@@ -49,9 +49,9 @@ Starshot 直接从 DXGI 层获取显示器输出的原始 `R16G16B16A16Float` sc
 </td>
 <td align="center" width="50%">
 
-**Starshot（Ultra HDR JPEG）**
+**Zshot（Ultra HDR JPEG）**
 
-<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Starshot Ultra HDR JPEG preserving full highlight detail via gain map">
+<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Zshot Ultra HDR JPEG preserving full highlight detail via gain map">
 </td>
 </tr>
 </table>
@@ -62,7 +62,7 @@ Starshot 直接从 DXGI 层获取显示器输出的原始 `R16G16B16A16Float` sc
 > [!NOTE]
 > 由于 GitHub 平台不支持 AVIF 渲染，因此展示的是 Ultra HDR JPEG。AVIF 原图可以点击 [这里查看](https://r2.cialo.site/endfield/3840x2160.dlaa.avif)。
 
-SDR 显示器上，Starshot 自动走标准 SDR 截图路径，是一款通用截图工具；HDR 显示器上，它是目前少数能够完整保留 HDR 数据的桌面截图方案。
+SDR 显示器上，Zshot 自动走标准 SDR 截图路径，是一款通用截图工具；HDR 显示器上，它是目前少数能够完整保留 HDR 数据的桌面截图方案。
 
 ## 系统要求
 
@@ -72,7 +72,7 @@ SDR 显示器上，Starshot 自动走标准 SDR 截图路径，是一款通用�
 
 ## 下载
 
-从 [Releases](../../../releases) 下载压缩包，解压后运行根目录的 `Starshot.exe` 启动器。无需安装，解压即用。
+从 [Releases](../../../releases) 下载压缩包，解压后运行根目录的 `Zshot.exe` 启动器。无需安装，解压即用。
 
 ## 软件截图
 
@@ -92,7 +92,7 @@ SDR 显示器上，Starshot 自动走标准 SDR 截图路径，是一款通用�
 
 ### HDR 截图管线
 
-大多数截图工具在 HDR 显示器上也只能截 8bit SDR——系统合成器输出的 16bit 浮点 scRGB 帧被压成 SDR，高光截断、色域收窄。Starshot 截取**原始 HDR 帧缓冲**：
+大多数截图工具在 HDR 显示器上也只能截 8bit SDR——系统合成器输出的 16bit 浮点 scRGB 帧被压成 SDR，高光截断、色域收窄。Zshot 截取**原始 HDR 帧缓冲**：
 
 1. **HDR 捕获**：显示器报告 HDR 时，请求 `R16G16B16A16Float` 像素格式，获取完整 scRGB 浮点数据（亮度可达数千 nit）
 2. **HDR 保存**：16bit AVIF / JPEG XL / PNGv3，BT2020 色域 + PQ 传输函数。高光不截断，色域不收窄
@@ -101,7 +101,7 @@ SDR 显示器上，Starshot 自动走标准 SDR 截图路径，是一款通用�
 
 #### SDR 内容处理
 
-HDR 显示器上，桌面和 SDR 应用也以 HDR 格式（R16G16B16A16Float）捕获，但内容亮度实际是 SDR 级别。对此 Starshot 的处理：
+HDR 显示器上，桌面和 SDR 应用也以 HDR 格式（R16G16B16A16Float）捕获，但内容亮度实际是 SDR 级别。对此 Zshot 的处理：
 
 - **默认**：仍以 HDR 格式保存（16bit），**不做 8bit 色调映射**，避免降级偏色
 - **SDR 内容删 HDR 开关**（可选）：启用后检测 maxCLL 阈值，内容不达标则自动转 SDR（遵循用户设置的 SDR 存储格式）并删除 HDR 文件，节省空间
@@ -136,7 +136,7 @@ HDR 截图可同时保存一份 Ultra HDR JPEG（SDR 基图 + HDR gain map），
 
 ### 剪贴板
 
-非打包 WinUI 应用的 WinRT `Clipboard.SetContent` 不可靠（延迟渲染 + Flush 问题，内容经常到不了其它应用）。Starshot 直接用 Win32 原生 API（`OpenClipboard` / `SetClipboardData`）：
+非打包 WinUI 应用的 WinRT `Clipboard.SetContent` 不可靠（延迟渲染 + Flush 问题，内容经常到不了其它应用）。Zshot 直接用 Win32 原生 API（`OpenClipboard` / `SetClipboardData`）：
 
 - **全屏截图**：CF_HDROP（文件拖放格式），粘贴进资源管理器/聊天软件直接得到文件
 - **区域截图**：CF_DIB（BGRA 位图），从覆盖层裁好的 SDR 位图直接放剪贴板，不读文件、不重编码、不二次色调映射
@@ -144,10 +144,10 @@ HDR 截图可同时保存一份 Ultra HDR JPEG（SDR 基图 + HDR gain map），
 
 ### 保存
 
-- **扁平结构**（无子文件夹），默认 `我的图片\Starshot`，可自定义
+- **扁平结构**（无子文件夹），默认 `我的图片\Zshot`，可自定义
 - **SDR 格式**（PNG / AVIF / JPEG XL，默认 PNG）和 **HDR 格式**（AVIF / JPEG XL / PNGv3，默认 AVIF）分开设置
 - 质量：中 / 高 / 无损
-- XMP 元数据（CreatorTool = Starshot）
+- XMP 元数据（CreatorTool = Zshot）
 - 编码串行化（SemaphoreSlim），避免并发编码冲突
 - **存储统计**：设置页显示截图 / 缩略图缓存 / 壁纸 / 日志 / 备份 各自占用空间，支持刷新与一键清理缓存（顺带清理孤儿壁纸文件）
 
@@ -247,7 +247,7 @@ HDR 截图可同时保存一份 Ultra HDR JPEG（SDR 基图 + HDR gain map），
 
 ### 开机自启
 
-- 注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`，指向启动器（根目录 `Starshot.exe`）
+- 注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`，指向启动器（根目录 `Zshot.exe`）
 - 可选 `--hide` 最小化到托盘启动（需托盘已开启）
 - 开关实时读注册表（不缓存数据库）：任务管理器禁用只动 StartupApproved、不删 Run 项，开关仍显示开
 - 启动时检测自启项指向的 exe 是否存在，不存在则自动清除启动项并 toast 提示
@@ -267,7 +267,7 @@ HDR 截图可同时保存一份 Ultra HDR JPEG（SDR 基图 + HDR gain map），
 - 区域截图覆盖层 HDR 帧显示为 SDR（WinUI CanvasControl 走 SDR 交换链）；保存的文件不受影响
 - 自定义壁纸按 `UniformToFill` 铺满，但 WinUI 的裁剪不居中，目前是**左上**对齐，比如窄（竖向）壁纸在宽窗口里会只显示上半部分（从顶部裁剪而非居中）
 - 区域截图覆盖层打开瞬间，光标仍是系统默认形状，**需移动一次鼠标后十字光标才出现**（WinUI `ProtectedCursor` 对已在元素上的静止指针不立即生效，移动一次触发 pointer 事件后即正常）
-- 区域截图悬停某些窗口时，坐标框可能显示负值（如 `-11,-11`）。这是 Windows DWM 报告的窗口扩展边界（含屏外阴影/边框），Starshot 如实读取——屏外部分不可见，不影响截图结果
+- 区域截图悬停某些窗口时，坐标框可能显示负值（如 `-11,-11`）。这是 Windows DWM 报告的窗口扩展边界（含屏外阴影/边框），Zshot 如实读取——屏外部分不可见，不影响截图结果
 - 视频壁纸启动时可能因 MF 媒体管线竞争初始化失败（间歇，未根治）；加载时先显示视频同目录的随机图片作占位，卡死则保持占位图，不黑屏
 
 ## 架构
@@ -276,15 +276,15 @@ HDR 截图可同时保存一份 Ultra HDR JPEG（SDR 基图 + HDR gain map），
 
 ```
 根目录/
-  Starshot.exe            ← C++ 启动器（读 version.ini 决定启哪个 app 目录）
-  StarshotDatabase.db     ← SQLite 设置数据库
+  Zshot.exe            ← C++ 启动器（读 version.ini 决定启哪个 app 目录）
+  ZshotDatabase.db     ← SQLite 设置数据库
   version.ini             ← 版本号（仅 CI/CD release 有，本地构建无）
   app-{version}/          ← 主程序目录（CI/CD release 版本化，本地构建为 app/）
-    Starshot.exe          ← 主程序（WinUI 3 / .NET 10）
+    Zshot.exe          ← 主程序（WinUI 3 / .NET 10）
     *.dll                 ← 依赖库
     avifenc.exe 等        ← 编解码工具（来自 Starward.Codec NuGet）
   backup/                 ← 数据库备份
-%LOCALAPPDATA%/Starshot/ （默认，可配置）
+%LOCALAPPDATA%/Zshot/ （默认，可配置）
   log/                    ← 日志
   bg/                     ← 壁纸
   thumb/                  ← 缩略图缓存
@@ -292,7 +292,7 @@ HDR 截图可同时保存一份 Ultra HDR JPEG（SDR 基图 + HDR gain map），
 
 ### 启动器
 
-C++ 原生程序（~400KB）。读 `version.ini` 决定启动 `app-{version}/Starshot.exe`（无 version.ini 则 `app/`，debug/local 构建）。带 `--clean`（或 `--clean=<pid>`）参数启动时遍历 `app-*` 目录删除非当前版本。
+C++ 原生程序（~400KB）。读 `version.ini` 决定启动 `app-{version}/Zshot.exe`（无 version.ini 则 `app/`，debug/local 构建）。带 `--clean`（或 `--clean=<pid>`）参数启动时遍历 `app-*` 目录删除非当前版本。
 
 ### 托盘与后台启动
 
@@ -343,36 +343,36 @@ C++ 原生程序（~400KB）。读 `version.ini` 决定启动 `app-{version}/Sta
 ### 步骤
 
 ```bash
-git clone https://github.com/loliri/Starshot
-cd Starshot
+git clone https://github.com/Zyl0812/Zshot
+cd Zshot
 
 # === Debug ===
 # 构建主程序（输出到 build/app/）
-dotnet build src/Starshot/Starshot.csproj -c Debug -p:Platform=x64
+dotnet build src/Zshot/Zshot.csproj -c Debug -p:Platform=x64
 
-# 构建启动器（输出到 build/Starshot.exe，需要 VS 的 MSBuild）
-"C:\Program Files\Microsoft Visual Studio\<版本>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# 构建启动器（输出到 build/Zshot.exe，需要 VS 的 MSBuild）
+"C:\Program Files\Microsoft Visual Studio\<版本>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# 运行：build/Starshot.exe（启动器）或 build/app/Starshot.exe（主程序）
+# 运行：build/Zshot.exe（启动器）或 build/app/Zshot.exe（主程序）
 
 # === Release 发布 ===
-# 1. 先构建启动器（输出到 build/Starshot.exe）
-"C:\Program Files\Microsoft Visual Studio\<版本>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# 1. 先构建启动器（输出到 build/Zshot.exe）
+"C:\Program Files\Microsoft Visual Studio\<版本>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# 2. 发布主程序（输出到 build/release/app/，自动拷启动器到 build/release/Starshot.exe + 删 AI 库）
-dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
+# 2. 发布主程序（输出到 build/release/app/，自动拷启动器到 build/release/Zshot.exe + 删 AI 库）
+dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=x64
 
 # 完成后的目录结构：
 # build/release/
-#   Starshot.exe        ← 启动器（自动拷贝）
+#   Zshot.exe        ← 启动器（自动拷贝）
 #   app/
-#     Starshot.exe      ← 主程序（自包含 + trim + R2R）
+#     Zshot.exe      ← 主程序（自包含 + trim + R2R）
 #     *.dll / avifenc.exe 等
 ```
 
 ## 国际化（i18n）
 
-翻译基于 `src/Starshot.Language/` 下的 `.resx` 资源文件（`Lang.resx` 为英文默认，`Lang.zh-CN.resx` 等为各语言）。另外还需在 `GeneralSetting` 的语言 ComboBox 加选项 + `LanguageIndex` 映射。
+翻译基于 `src/Zshot.Language/` 下的 `.resx` 资源文件（`Lang.resx` 为英文默认，`Lang.zh-CN.resx` 等为各语言）。另外还需在 `GeneralSetting` 的语言 ComboBox 加选项 + `LanguageIndex` 映射。
 
 欢迎贡献翻译：fork 仓库 → 复制 `Lang.resx` 为 `Lang.{你的语言}.resx` → 翻译 → 提交 PR。
 
@@ -391,14 +391,14 @@ dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
 <details>
 <summary><b>截图库（首页）图片颜色异常 / 乱色</b></summary>
 
-这通常是 Windows 系统图像解码器（AVIF / HEIF / JPEG XL 扩展）的问题，不是 Starshot 的 bug。尝试在 Microsoft Store 中搜索并更新以下组件：
+这通常是 Windows 系统图像解码器（AVIF / HEIF / JPEG XL 扩展）的问题，不是 Zshot 的 bug。尝试在 Microsoft Store 中搜索并更新以下组件：
 
 - **AV1 Video Extension**
 - **HEIF Image Extensions**
 - **HEVC Video Extensions**
 - **Webp Image Extensions**
 
-更新后重启 Starshot。如果问题持续，请 [提交 Issue](../../../issues/new) 并附上截图。
+更新后重启 Zshot。如果问题持续，请 [提交 Issue](../../../issues/new) 并附上截图。
 
 </details>
 
@@ -426,12 +426,15 @@ PNGv3（W3C PNG 第三版，2025 年定稿）的 HDR 依靠 cICP 元数据标注
 <details>
 <summary><b>截图后剪贴板粘贴不出来</b></summary>
 
-Starshot 使用 Win32 原生剪贴板 API 写入，理论上比 WinRT 更可靠。如果仍粘贴失败，可能是目标应用不支持对应的剪贴板格式（CF_HDROP 文件 / CF_DIB 位图）。尝试粘贴到资源管理器（文件）或画图（位图）验证。
+Zshot 使用 Win32 原生剪贴板 API 写入，理论上比 WinRT 更可靠。如果仍粘贴失败，可能是目标应用不支持对应的剪贴板格式（CF_HDROP 文件 / CF_DIB 位图）。尝试粘贴到资源管理器（文件）或画图（位图）验证。
 
 </details>
 
+Zshot 是基于 [Starshot](https://github.com/loliri/Starshot)（MIT）二次开发的独立产品，不是 Starshot 官方版本。
+
 ## 致谢
 
+- [Starshot](https://github.com/loliri/Starshot) — HDR 捕获 / 编解码 / 覆盖层底座，作者 [@loliri](https://github.com/loliri)。
 - [Starward](https://github.com/Scighost/Starward) — 截图核心、编解码引擎、窗口框架均源自 Starward，由 [@Scighost](https://github.com/Scighost) 开发
 - [ShareX](https://github.com/ShareX/ShareX) — 区域截图覆盖层的窗口检测和交互设计参考
 

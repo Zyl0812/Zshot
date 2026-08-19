@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="DownloadGamePage_Pause" xml:space="preserve">
+    <value>一時停止</value>
+  </data>
+  <data name="DownloadGamePage_Stop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="GameSettingPage_Medium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="GameSettingPage_High" xml:space="preserve">
+    <value>高</value>
+  </data>
+  <data name="GameSettingPage_FullScreen" xml:space="preserve">
+    <value>フルスクリーン</value>
+  </data>
+  <data name="Common_Apply" xml:space="preserve">
+    <value>適用</value>
+  </data>
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="MainPage_Launcher" xml:space="preserve">
+    <value>ホームページ</value>
+  </data>
+  <data name="SettingPage_Language" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="SettingPage_FollowSystem" xml:space="preserve">
+    <value>システムに従う</value>
+  </data>
+  <data name="ScreenshotPage_ScreenshotFolderDoesNotExist" xml:space="preserve">
+    <value>スクリーンショットフォルダが見つかりません</value>
+  </data>
+  <data name="Common_Exit" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="LauncherPage_ConfirmDelete" xml:space="preserve">
+    <value>削除の確認</value>
+  </data>
+  <data name="ImageViewPage_ZoomOut" xml:space="preserve">
+    <value>縮小</value>
+  </data>
+  <data name="ImageViewPage_ZoomIn" xml:space="preserve">
+    <value>拡大</value>
+  </data>
+  <data name="Common_Open" xml:space="preserve">
+    <value>開く</value>
+  </data>
+  <data name="Common_Clipboard" xml:space="preserve">
+    <value>クリップボード</value>
+  </data>
+  <data name="ClipboardPage_NotEnabled" xml:space="preserve">
+    <value>クリップボード履歴が有効ではありません</value>
+  </data>
+  <data name="ClipboardPage_GoToSettings" xml:space="preserve">
+    <value>Windows クリップボード設定を開く</value>
+  </data>
+  <data name="ClipboardPage_NoImages" xml:space="preserve">
+    <value>クリップボード履歴に画像がありません</value>
+  </data>
+  <data name="GachaImportAndExportWindow_Import" xml:space="preserve">
+    <value>インポート</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MaxLuminance" xml:space="preserve">
+    <value>最大輝度</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MonitorInformation" xml:space="preserve">
+    <value>ディスプレイ情報</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_ColorSpace" xml:space="preserve">
+    <value>カラースペース</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_PeakLuminance" xml:space="preserve">
+    <value>ピーク輝度</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MaxFullScreenLuminance" xml:space="preserve">
+    <value>最大フルスクリーン輝度</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_SDRWhiteLuminance" xml:space="preserve">
+    <value>SDR 白色輝度</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ScreenshotSaved" xml:space="preserve">
+    <value>スクリーンショットを保存しました</value>
+  </data>
+  <data name="ScreenshotPage_ManageScreenshotFolders" xml:space="preserve">
+    <value>スクリーンショットフォルダを管理</value>
+  </data>
+  <data name="ScreenshotFolderManageDialog_AddFolder" xml:space="preserve">
+    <value>フォルダを追加</value>
+  </data>
+  <data name="Common_Remove" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ScreenshotFailed" xml:space="preserve">
+    <value>スクリーンショットの撮影に失敗しました</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_CheckTheLogForMoreInformation" xml:space="preserve">
+    <value>詳細はログを確認してください。</value>
+  </data>
+  <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
+    <value>ギャラリーには、以下のフォルダの画像が表示されます。</value>
+  </data>
+  <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
+    <value>エクスプローラーで開く</value>
+  </data>
+  <data name="ImageViewWindow_OpenWith" xml:space="preserve">
+    <value>次で開く:</value>
+  </data>
+  <data name="ImageViewWindow_Previous" xml:space="preserve">
+    <value>前へ</value>
+    <comment>Previous Image</comment>
+  </data>
+  <data name="ImageViewWindow_Next" xml:space="preserve">
+    <value>次へ</value>
+    <comment>Next Image</comment>
+  </data>
+  <data name="ImageViewWindow_ShowGallery" xml:space="preserve">
+    <value>ギャラリーを表示</value>
+  </data>
+  <data name="ImageViewWindow_FitToWindow" xml:space="preserve">
+    <value>ウィンドウに合わせる</value>
+    <comment>Zoom image fit to window</comment>
+  </data>
+  <data name="ImageViewWindow_CopyFile" xml:space="preserve">
+    <value>ファイルをコピー</value>
+  </data>
+  <data name="ImageViewWindow_CopyPath" xml:space="preserve">
+    <value>パスをコピー</value>
+  </data>
+  <data name="ImageViewWindow_CopyImage" xml:space="preserve">
+    <value>画像をコピー</value>
+  </data>
+  <data name="Common_Edit" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="ImageViewWindow_ImageInformation" xml:space="preserve">
+    <value>画像情報</value>
+  </data>
+  <data name="ImageViewWindow_EditImage" xml:space="preserve">
+    <value>画像を編集</value>
+  </data>
+  <data name="ImageViewWindow_DisplayMode" xml:space="preserve">
+    <value>表示モード</value>
+  </data>
+  <data name="ImageViewWindow_SDRMappedLuminance" xml:space="preserve">
+    <value>SDR マッピングされた輝度</value>
+  </data>
+  <data name="ImageViewWindow_ExportImage" xml:space="preserve">
+    <value>画像をエクスポート</value>
+  </data>
+  <data name="ImageViewWindow_DeleteImageFile" xml:space="preserve">
+    <value>画像ファイルを削除</value>
+  </data>
+  <data name="ImageViewWindow_CopiedToClipboard" xml:space="preserve">
+    <value>クリップボードにコピーしました。</value>
+  </data>
+  <data name="ImageViewWindow_FileDoesNotExist" xml:space="preserve">
+    <value>ファイルが見つかりません。</value>
+  </data>
+  <data name="ImageViewWindow_OpenWithDefaultApp" xml:space="preserve">
+    <value>既定のアプリで開く</value>
+  </data>
+  <data name="ImageViewWindow_NoImageToDisplay" xml:space="preserve">
+    <value>表示する画像がありません</value>
+  </data>
+  <data name="Common_OpenFiles" xml:space="preserve">
+    <value>ファイルを開く</value>
+  </data>
+  <data name="ImageViewWindow_OpenNewFiles" xml:space="preserve">
+    <value>新しいファイルを開く</value>
+  </data>
+  <data name="ImageViewWindow_FailedToDisplayImage" xml:space="preserve">
+    <value>画像の表示に失敗しました</value>
+  </data>
+  <data name="ImageViewWindow_FailedToSaveImage" xml:space="preserve">
+    <value>画像の保存に失敗しました</value>
+  </data>
+  <data name="ImageViewWindow_FailedToDeleteImageFile" xml:space="preserve">
+    <value>画像の削除に失敗しました</value>
+  </data>
+  <data name="ImageViewWindow_UnableToDeleteTheFile" xml:space="preserve">
+    <value>ファイルを削除できませんでした</value>
+  </data>
+  <data name="ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
+    <value>権限が不足しているか、ファイルが使用中です。</value>
+  </data>
+  <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
+    <value>クリックしてショートカットキーを設定</value>
+  </data>
+  <data name="HotkeyInput_DeleteShortcut" xml:space="preserve">
+    <value>ショートカットキーを削除</value>
+  </data>
+  <data name="HotkeyInput_PressTheShortcutKeys" xml:space="preserve">
+    <value>ショートカットキーを押す</value>
+  </data>
+  <data name="HotkeyManager_TheShortcutKeys0IsAlreadyInUse" xml:space="preserve">
+    <value>ショートカットキー（{0}）は既に使用されています。</value>
+  </data>
+  <data name="HotkeyManager_FailedToRegisterTheShortcutKeys0" xml:space="preserve">
+    <value>ショートカットキー（{0}）を登録できませんでした。</value>
+  </data>
+  <data name="HotkeyManager_TheShortcutKeys0IsAlreadyInUsePleaseModifyItInSettingsPage" xml:space="preserve">
+    <value>ショートカットキー（{0}）は既に使用されています。設定ページで変更してください。</value>
+  </data>
+  <data name="HotkeyManager_FailedToRegisterTheShortcutKeys0PleaseRetryInSettingsPage" xml:space="preserve">
+    <value>ショートカットキー（{0}）を登録できませんでした。設定ページで再試行してください。</value>
+  </data>
+  <data name="HotkeySetting_FailedToRegisterTheShortcutKeys" xml:space="preserve">
+    <value>ショートカットキーを登録できませんでした。</value>
+  </data>
+  <data name="ScreenshotSetting_AutoConvertToSDRImage" xml:space="preserve">
+    <value>SDR 画像に自動変換</value>
+  </data>
+  <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
+    <value>スクショファイルの自動コピー</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFile" xml:space="preserve">
+    <value>スクリーンショットを自動保存</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
+    <value>完了後に下のフォルダーへ保存します。コピー専用ホットキーはファイルを書きません。</value>
+  </data>
+  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
+    <value>JPG としてコピー</value>
+  </data>
+  <data name="ScreenshotPage_MultiSelect" xml:space="preserve">
+    <value>複数選択</value>
+  </data>
+  <data name="ScreenshotPage_Total0Files" xml:space="preserve">
+    <value>合計 {0} ファイル。</value>
+  </data>
+  <data name="ScreenshotSetting_Lossless" xml:space="preserve">
+    <value>ロスレス</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ProcessingImage" xml:space="preserve">
+    <value>画像処理中</value>
+  </data>
+  <data name="ScreenshotPage_BatchConvert" xml:space="preserve">
+    <value>一括変換</value>
+  </data>
+  <data name="ScreenshotPage_Recopy" xml:space="preserve">
+    <value>再コピー</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Quality" xml:space="preserve">
+    <value>品質</value>
+  </data>
+  <data name="ImageBatchConvertWindow_StartConvert" xml:space="preserve">
+    <value>変換を開始</value>
+  </data>
+  <data name="Common_Clear" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="ImageBatchConvertWindow_OutputFolder" xml:space="preserve">
+    <value>出力先</value>
+  </data>
+  <data name="ImageBatchConvertWindow_OriginalFileFolder" xml:space="preserve">
+    <value>元のファイルフォルダー</value>
+  </data>
+  <data name="ImageBatchConvertWindow_SelectOutputFormat" xml:space="preserve">
+    <value>出力形式を選択</value>
+  </data>
+  <data name="ImageBatchConvertWindow_NoReadOrWritePermission" xml:space="preserve">
+    <value>読み取りまたは書き込みの権限がありません</value>
+  </data>
+  <data name="ImageBatchConvertWindow_ConvertFailed" xml:space="preserve">
+    <value>変換できませんでした</value>
+  </data>
+  <data name="ImageBatchConvertWindow_IfOutputFileExists" xml:space="preserve">
+    <value>出力ファイルが存在した場合</value>
+  </data>
+  <data name="ImageBatchConvertWindow_SkipDefault" xml:space="preserve">
+    <value>スキップ（デフォルト）</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Overwrite" xml:space="preserve">
+    <value>上書き</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Rename" xml:space="preserve">
+    <value>名前を変更</value>
+  </data>
+  <data name="Common_Success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="Common_Failed" xml:space="preserve">
+    <value>失敗</value>
+  </data>
+  <data name="ImageBatchConvertWindow_ImageBatchConvert" xml:space="preserve">
+    <value>画像一括変換</value>
+  </data>
+  <data name="ScreenshotSetting_ClearSuccessfully" xml:space="preserve">
+    <value>正常に削除しました</value>
+  </data>
+  <data name="ScreenshotSetting_ClearFailed" xml:space="preserve">
+    <value>失敗を削除</value>
+  </data>
+  <data name="Common_CopiedToClipboard" xml:space="preserve">
+    <value>クリップボードにコピーしました。</value>
+  </data>
+  <data name="ScreenshotSetting_ColorManagement" xml:space="preserve">
+    <value>カラーマネジメント</value>
+  </data>
+  <data name="Zshot_Nav_Gallery" xml:space="preserve">
+    <value>ギャラリー</value>
+  </data>
+  <data name="Zshot_Nav_Appearance" xml:space="preserve">
+    <value>外観</value>
+  </data>
+  <data name="Zshot_Nav_Hotkey" xml:space="preserve">
+    <value>ショートカット</value>
+  </data>
+  <data name="Zshot_Nav_Screenshot" xml:space="preserve">
+    <value>スクリーンショット</value>
+  </data>
+  <data name="Zshot_Nav_Storage" xml:space="preserve">
+    <value>ストレージ</value>
+  </data>
+  <data name="Zshot_Nav_Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Zshot_Nav_About" xml:space="preserve">
+    <value>について</value>
+  </data>
+  <data name="Zshot_SplashTagline" xml:space="preserve">
+    <value>次世代のWindowsネイティブHDRスクリーンショットツール</value>
+  </data>
+  <data name="Zshot_WallpaperNotFound" xml:space="preserve">
+    <value>壁紙ファイルが見つかりません。設定をクリアして「なし」に戻りました。</value>
+  </data>
+  <data name="Zshot_Theme" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
+  <data name="Zshot_ThemeLight" xml:space="preserve">
+    <value>ライト</value>
+  </data>
+  <data name="Zshot_ThemeDark" xml:space="preserve">
+    <value>ダーク</value>
+  </data>
+  <data name="Zshot_Acrylic" xml:space="preserve">
+    <value>アクリル効果</value>
+  </data>
+  <data name="Zshot_AccentColor" xml:space="preserve">
+    <value>アクセントカラー</value>
+  </data>
+  <data name="Zshot_ApplyCurrentColor" xml:space="preserve">
+    <value>カスタムカラー</value>
+  </data>
+  <data name="Zshot_Wallpaper" xml:space="preserve">
+    <value>壁紙</value>
+  </data>
+  <data name="Zshot_WallpaperModeNone" xml:space="preserve">
+    <value>なし</value>
+  </data>
+  <data name="Zshot_WallpaperModeImage" xml:space="preserve">
+    <value>画像指定</value>
+  </data>
+  <data name="Zshot_WallpaperModeFolder" xml:space="preserve">
+    <value>フォルダーランダム</value>
+  </data>
+  <data name="Zshot_WallpaperModeVideo" xml:space="preserve">
+    <value>動画指定</value>
+  </data>
+  <data name="Zshot_WallpaperFolderVideoOnly" xml:space="preserve">
+    <value>動画優先</value>
+  </data>
+  <data name="Zshot_WallpaperFolderVideoOnlyDesc" xml:space="preserve">
+    <value>動画を優先して選択；動画を初期化できない場合はランダムな画像に切り替えます</value>
+  </data>
+  <data name="Zshot_WallpaperNowPlaying" xml:space="preserve">
+    <value>再生中</value>
+  </data>
+  <data name="Zshot_WallpaperVideoFallbackToImage" xml:space="preserve">
+    <value>フォルダーに動画がありません。画像をランダムに選択しました</value>
+  </data>
+  <data name="Zshot_WallpaperChooseImage" xml:space="preserve">
+    <value>画像を選択</value>
+  </data>
+  <data name="Zshot_WallpaperChooseFolder" xml:space="preserve">
+    <value>フォルダーを選択</value>
+  </data>
+  <data name="Zshot_WallpaperChooseVideo" xml:space="preserve">
+    <value>動画を選択</value>
+  </data>
+  <data name="Zshot_AccentFromWallpaper" xml:space="preserve">
+    <value>壁紙から自動アクセントカラー</value>
+  </data>
+  <data name="Zshot_PathNone" xml:space="preserve">
+    <value>未選択</value>
+  </data>
+  <data name="Zshot_DisableCertificateValidation" xml:space="preserve">
+    <value>証明書の検証を無効化</value>
+  </data>
+  <data name="Zshot_HotkeyScreenshot" xml:space="preserve">
+    <value>スクリーンショット</value>
+  </data>
+  <data name="Zshot_HotkeyRegion" xml:space="preserve">
+    <value>領域キャプチャ</value>
+  </data>
+  <data name="Zshot_HotkeyRegionCopy" xml:space="preserve">
+    <value>領域コピーのみ</value>
+  </data>
+  <data name="Zshot_HotkeyScreenshotDesc" xml:space="preserve">
+    <value>モニター全体をキャプチャ（前面ウィンドウ/カーソル画面、設定で切替可）。ファイルを保存しクリップボードにもコピー。</value>
+  </data>
+  <data name="Zshot_HotkeyRegionDesc" xml:space="preserve">
+    <value>領域をドラッグ、またはウィンドウをクリック。ファイルを保存しビットマップをクリップボードにコピー。</value>
+  </data>
+  <data name="Zshot_HotkeyRegionCopyDesc" xml:space="preserve">
+    <value>領域をドラッグ、またはウィンドウをクリック。ビットマップをクリップボードにコピーするのみでファイルは保存しない。</value>
+  </data>
+  <data name="Zshot_SDRFormat" xml:space="preserve">
+    <value>SDR形式</value>
+  </data>
+  <data name="Zshot_HDRFormat" xml:space="preserve">
+    <value>HDR形式</value>
+  </data>
+  <data name="Zshot_Quality" xml:space="preserve">
+    <value>品質</value>
+  </data>
+  <data name="Zshot_ColorManagementDesc" xml:space="preserve">
+    <value>ディスプレイのICCプロファイルを読み取り実際の色域を解析し、ファイルにcICP/ICCチャンクを書き込む。HDRは常にBT2020。SDRはオン=ICCの実際の色域、オフ=BT709。有効化前にディスプレイのカラー設定を検証し、異常（VMやICCなし）の場合はオンにできません。</value>
+  </data>
+  <data name="Zshot_ColorManagementUnavailable" xml:space="preserve">
+    <value>ディスプレイのカラー設定が異常です（VMやICCプロファイルのないデバイスで発生しやすい）。色彩管理を有効にできません。</value>
+  </data>
+  <data name="Zshot_AutoConvertSDRDesc" xml:space="preserve">
+    <value>HDR画像をSDRコピー（Ultra HDR JPEG）も同時保存します。</value>
+  </data>
+  <data name="Zshot_DeleteHDRIfSDR" xml:space="preserve">
+    <value>SDR内容ならHDRを削除</value>
+  </data>
+  <data name="Zshot_DeleteHDRIfSDRDesc" xml:space="preserve">
+    <value>HDR形式だが内容はSDR（maxCLLが閾値以下）の場合、自動的にSDRに変換しHDRファイルを削除。上の自動変換設定より優先。</value>
+  </data>
+  <data name="Zshot_MonitorSource" xml:space="preserve">
+    <value>キャプチャ対象モニター</value>
+  </data>
+  <data name="Zshot_MonitorForeground" xml:space="preserve">
+    <value>前面ウィンドウ</value>
+  </data>
+  <data name="Zshot_MonitorCursor" xml:space="preserve">
+    <value>カーソル位置</value>
+  </data>
+  <data name="Zshot_FilenameTemplate" xml:space="preserve">
+    <value>ファイル名テンプレート</value>
+  </data>
+  <data name="Zshot_RegionFilenameTemplate" xml:space="preserve">
+    <value>領域用ファイル名テンプレート</value>
+  </data>
+  <data name="Zshot_ClickToInsert" xml:space="preserve">
+    <value>クリックでカーソル位置に挿入</value>
+  </data>
+  <data name="Zshot_AutoStartInvalidCleared" xml:space="preserve">
+    <value>スタートアップ項目の参照先プログラムは存在しないため自動的に削除されました</value>
+  </data>
+  <data name="Zshot_ClickToInsertSuffix" xml:space="preserve">
+    <value> ファイル名テンプレート</value>
+  </data>
+  <data name="Zshot_CheckUpdate" xml:space="preserve">
+    <value>アップデートを確認</value>
+  </data>
+  <data name="Zshot_UpdateAvailableTitle" xml:space="preserve">
+    <value>新しいバージョンがあります！</value>
+  </data>
+  <data name="Zshot_UpdateNow" xml:space="preserve">
+    <value>今すぐ更新</value>
+  </data>
+  <data name="Zshot_UpdateDelta" xml:space="preserve">
+    <value>差分更新</value>
+  </data>
+  <data name="Zshot_RemindLater" xml:space="preserve">
+    <value>後で通知</value>
+  </data>
+  <data name="Zshot_IgnoreThisVersion" xml:space="preserve">
+    <value>このバージョンをスキップ</value>
+  </data>
+  <data name="Zshot_LatestVersion" xml:space="preserve">
+    <value>最新バージョンです</value>
+  </data>
+  <data name="Zshot_UpdateFailed" xml:space="preserve">
+    <value>更新に失敗しました</value>
+  </data>
+  <data name="Zshot_TitleMaxLength" xml:space="preserve">
+    <value>タイトル最大文字数（0=切り捨てなし）</value>
+  </data>
+  <data name="Zshot_ScreenshotFolder" xml:space="preserve">
+    <value>スクリーンショットフォルダー</value>
+  </data>
+  <data name="Zshot_LogFolder" xml:space="preserve">
+    <value>ログフォルダー</value>
+  </data>
+  <data name="Zshot_LogFolderRestartTip" xml:space="preserve">
+    <value>再起動後に反映</value>
+  </data>
+  <data name="Zshot_LogLevel" xml:space="preserve">
+    <value>ログレベル</value>
+  </data>
+  <data name="Zshot_LogLevelOff" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="Zshot_Change" xml:space="preserve">
+    <value>変更</value>
+  </data>
+  <data name="Zshot_StorageStats" xml:space="preserve">
+    <value>ストレージ使用量</value>
+  </data>
+  <data name="Zshot_ClearCache" xml:space="preserve">
+    <value>キャッシュを消去</value>
+  </data>
+  <data name="Zshot_StatsScreenshots" xml:space="preserve">
+    <value>スクリーンショット</value>
+  </data>
+  <data name="Zshot_StatsImageCache" xml:space="preserve">
+    <value>サムネイルキャッシュ</value>
+  </data>
+  <data name="Zshot_StatsWallpaper" xml:space="preserve">
+    <value>壁紙</value>
+  </data>
+  <data name="Zshot_StatsLog" xml:space="preserve">
+    <value>ログ</value>
+  </data>
+  <data name="Zshot_SystemTray" xml:space="preserve">
+    <value>システムトレイ</value>
+  </data>
+  <data name="Zshot_AutoStart" xml:space="preserve">
+    <value>起動時に自動実行</value>
+  </data>
+  <data name="Zshot_AutoStartMinimized" xml:space="preserve">
+    <value>トレイに最小化して起動</value>
+  </data>
+  <data name="Zshot_AboutLicense" xml:space="preserve">
+    <value>MIT ライセンス</value>
+  </data>
+  <data name="Zshot_AboutDesc" xml:space="preserve">
+    <value>DXGIレイヤーからディスプレイ出力のR16G16B16A16Float scRGBフレームバッファを直接取得し、HDR輝度情報（数千nitまで）を完全に保持。16bit HDR AVIF、JPEG XL、PNGv3としてBT2020+PQ伝達関数付きでエンコード。SDRディスプレイ自動フォールバック、領域キャプチャ、マルチフォーマット一括変換も搭載。</value>
+  </data>
+  <data name="Zshot_AboutTagline" xml:space="preserve">
+    <value>次世代のWindowsネイティブHDRスクリーンショットツール</value>
+  </data>
+  <data name="Zshot_AboutThanksTitle" xml:space="preserve">
+    <value>謝辞</value>
+  </data>
+  <data name="Zshot_AboutThanksStarward" xml:space="preserve">
+    <value>スクリーンショットコア、コーデックエンジン、ウィンドウフレームワークはStarward（@Scighost）のコードを基にしています。</value>
+  </data>
+  <data name="Zshot_AboutThanksShareX" xml:space="preserve">
+    <value>領域キャプチャオーバーレイのウィンドウ検出とインタラクション設計を参考にしました。</value>
+  </data>
+  <data name="Zshot_AboutProjectHome" xml:space="preserve">
+    <value>プロジェクトホームページ</value>
+  </data>
+  <data name="Zshot_OpenDataFolder" xml:space="preserve">
+    <value>データフォルダーを開く</value>
+  </data>
+  <data name="Zshot_BackupDatabase" xml:space="preserve">
+    <value>データベースをバックアップ</value>
+  </data>
+  <data name="Zshot_LastBackup" xml:space="preserve">
+    <value>前回のバックアップ</value>
+  </data>
+  <data name="Zshot_BackupSuccess" xml:space="preserve">
+    <value>データベースをバックアップしました</value>
+  </data>
+  <data name="Zshot_BackupFailed" xml:space="preserve">
+    <value>データベースのバックアップに失敗しました</value>
+  </data>
+  <data name="Zshot_StatsBackup" xml:space="preserve">
+    <value>バックアップ</value>
+  </data>
+  <data name="Zshot_CheckPrerelease" xml:space="preserve">
+    <value>プレリリース版を含める</value>
+  </data>
+  <data name="Zshot_DataFolder" xml:space="preserve">
+    <value>データフォルダー</value>
+  </data>
+  <data name="Zshot_UpdateLinks" xml:space="preserve">
+    <value>リンク</value>
+  </data>
+  <data name="Zshot_UpdateReleasePage" xml:space="preserve">
+    <value>リリースページ</value>
+  </data>
+  <data name="Zshot_UpdateFull" xml:space="preserve">
+    <value>完全更新</value>
+  </data>
+  <data name="Zshot_UpdateVerifying" xml:space="preserve">
+    <value>整合性を検証中…</value>
+  </data>
+  <data name="Zshot_UpdateArchitecture" xml:space="preserve">
+    <value>アーキテクチャ</value>
+  </data>
+  <data name="Zshot_UpdateChannel" xml:space="preserve">
+    <value>チャネル</value>
+  </data>
+  <data name="Zshot_UpdateBuildTime" xml:space="preserve">
+    <value>公開日時</value>
+  </data>
+  <data name="Zshot_GithubApiNoProxy" xml:space="preserve">
+    <value>GitHub API 直結（プロキシ不使用）</value>
+  </data>
+  <data name="Zshot_DeltaUpdateMaxLayers" xml:space="preserve">
+    <value>差分更新の最大階層数</value>
+  </data>
+  <data name="Zshot_Advanced" xml:space="preserve">
+    <value>詳細</value>
+  </data>
+  <data name="Zshot_RestartToTakeEffect" xml:space="preserve">
+    <value>再起動後に反映</value>
+  </data>
+  <data name="Zshot_WelcomeHello" xml:space="preserve">
+    <value>こんにちは！</value>
+  </data>
+  <data name="Zshot_WelcomeIntro" xml:space="preserve">
+    <value>Zshotへようこそ。初回起動のため、簡単な初期設定を行います。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiTitle" xml:space="preserve">
+    <value>DXGIインターフェース</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiSupported" xml:space="preserve">
+    <value>サポートされています。すべてのスクリーンショット機能が利用可能です。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported1" xml:space="preserve">
+    <value>現在の環境ではサポートされていません。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported2" xml:space="preserve">
+    <value>スクリーンショット機能は動作せず、クラッシュする可能性があります。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported3" xml:space="preserve">
+    <value>その他の機能は部分的に動作する可能性があります。自己責任でご利用ください。</value>
+  </data>
+  <data name="Zshot_WelcomeWallpaperTitle" xml:space="preserve">
+    <value>カスタム壁紙</value>
+  </data>
+  <data name="Zshot_WelcomeWallpaperDesc" xml:space="preserve">
+    <value>最高の外観のために壁紙の設定をお勧めします。画像または動画を選択できます。スキップすると組み込みの画像（現在の背景）が使用されます。</value>
+  </data>
+  <data name="Zshot_WelcomePickWallpaper" xml:space="preserve">
+    <value>壁紙を選択</value>
+  </data>
+  <data name="Zshot_WelcomeScreenshotFolderTitle" xml:space="preserve">
+    <value>スクリーンショットの保存先</value>
+  </data>
+  <data name="Zshot_WelcomeScreenshotFolderDesc" xml:space="preserve">
+    <value>スクリーンショットの保存場所を指定します。変更しない場合、デフォルトでピクチャフォルダーのZshotディレクトリに保存されます。</value>
+  </data>
+  <data name="Zshot_WelcomePickFolder" xml:space="preserve">
+    <value>フォルダーを選択</value>
+  </data>
+  <data name="Zshot_WelcomeStart" xml:space="preserve">
+    <value>Zshotを起動！</value>
+  </data>
+  <data name="Zshot_InfoCopied" xml:space="preserve">
+    <value>コピーしました</value>
+  </data>
+  <data name="Zshot_DebugExtractTitle" xml:space="preserve">
+    <value>ストリーミング展開テスト</value>
+  </data>
+  <data name="Zshot_DebugSection" xml:space="preserve">
+    <value>デバッグ</value>
+  </data>
+  <data name="Zshot_DebugSelect" xml:space="preserve">
+    <value>参照</value>
+  </data>
+  <data name="Zshot_DebugExtract" xml:space="preserve">
+    <value>展開</value>
+  </data>
+  <data name="Zshot_DebugUrlEmpty" xml:space="preserve">
+    <value>URLとパスは必須です</value>
+  </data>
+  <data name="Zshot_DebugExtractDone" xml:space="preserve">
+    <value>完了！</value>
+  </data>
+  <data name="Zshot_DebugExtractFailed" xml:space="preserve">
+    <value>失敗：</value>
+  </data>
+  <data name="Zshot_Update" xml:space="preserve">
+    <value>更新元</value>
+  </data>
+  <data name="Zshot_UpdateSource" xml:space="preserve">
+    <value>更新サーバー</value>
+  </data>
+  <data name="Zshot_General" xml:space="preserve">
+    <value>全般</value>
+  </data>
+  <data name="Zshot_PriorityStart" xml:space="preserve">
+    <value>高優先起動</value>
+  </data>
+  <data name="Zshot_TaskInvalid" xml:space="preserve">
+    <value>この高優先度スタートアップタスクが参照しているプログラムは存在しません、設定から手動で無効にしてください</value>
+  </data>
+  <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
+    <value>← このオプションを変更するには、先に高優先起動をオフにしてください</value>
+  </data>
+</root>

@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="DownloadGamePage_Pause" xml:space="preserve">
+    <value>暂停</value>
+  </data>
+  <data name="DownloadGamePage_Stop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="GameSettingPage_Medium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="GameSettingPage_High" xml:space="preserve">
+    <value>高</value>
+  </data>
+  <data name="GameSettingPage_FullScreen" xml:space="preserve">
+    <value>全屏</value>
+  </data>
+  <data name="Common_Apply" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="Common_Refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="MainPage_Launcher" xml:space="preserve">
+    <value>主页面</value>
+  </data>
+  <data name="SettingPage_Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="SettingPage_FollowSystem" xml:space="preserve">
+    <value>跟随系统</value>
+  </data>
+  <data name="ScreenshotPage_ScreenshotFolderDoesNotExist" xml:space="preserve">
+    <value>截图文件夹不存在</value>
+  </data>
+  <data name="Common_Exit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+  <data name="LauncherPage_ConfirmDelete" xml:space="preserve">
+    <value>确认删除</value>
+  </data>
+  <data name="ImageViewPage_ZoomOut" xml:space="preserve">
+    <value>缩小</value>
+  </data>
+  <data name="ImageViewPage_ZoomIn" xml:space="preserve">
+    <value>放大</value>
+  </data>
+  <data name="Common_Open" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="Common_Clipboard" xml:space="preserve">
+    <value>剪贴板</value>
+  </data>
+  <data name="ClipboardPage_NotEnabled" xml:space="preserve">
+    <value>未开启剪贴板历史功能</value>
+  </data>
+  <data name="ClipboardPage_GoToSettings" xml:space="preserve">
+    <value>前往 Windows 剪贴板设置</value>
+  </data>
+  <data name="ClipboardPage_NoImages" xml:space="preserve">
+    <value>剪贴板历史中暂无图片</value>
+  </data>
+  <data name="GachaImportAndExportWindow_Import" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MaxLuminance" xml:space="preserve">
+    <value>最大亮度</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MonitorInformation" xml:space="preserve">
+    <value>显示器信息</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_ColorSpace" xml:space="preserve">
+    <value>颜色空间</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_PeakLuminance" xml:space="preserve">
+    <value>峰值亮度</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_MaxFullScreenLuminance" xml:space="preserve">
+    <value>最大全屏亮度</value>
+  </data>
+  <data name="GenshinHDRLuminanceSettingDialog_SDRWhiteLuminance" xml:space="preserve">
+    <value>SDR 白色亮度</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ScreenshotSaved" xml:space="preserve">
+    <value>截图已保存</value>
+  </data>
+  <data name="ScreenshotPage_ManageScreenshotFolders" xml:space="preserve">
+    <value>管理截图文件夹</value>
+  </data>
+  <data name="ScreenshotFolderManageDialog_AddFolder" xml:space="preserve">
+    <value>添加文件夹</value>
+  </data>
+  <data name="Common_Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ScreenshotFailed" xml:space="preserve">
+    <value>截图失败</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_CheckTheLogForMoreInformation" xml:space="preserve">
+    <value>查看日志了解更多信息</value>
+  </data>
+  <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
+    <value>以下文件夹中的图片都会显示在图库中</value>
+  </data>
+  <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
+    <value>在资源管理器中打开</value>
+  </data>
+  <data name="ImageViewWindow_OpenWith" xml:space="preserve">
+    <value>打开方式</value>
+  </data>
+  <data name="ImageViewWindow_Previous" xml:space="preserve">
+    <value>上一个</value>
+    <comment>Previous Image</comment>
+  </data>
+  <data name="ImageViewWindow_Next" xml:space="preserve">
+    <value>下一个</value>
+    <comment>Next Image</comment>
+  </data>
+  <data name="ImageViewWindow_ShowGallery" xml:space="preserve">
+    <value>显示图库</value>
+  </data>
+  <data name="ImageViewWindow_FitToWindow" xml:space="preserve">
+    <value>适应窗口大小</value>
+    <comment>Zoom image fit to window</comment>
+  </data>
+  <data name="ImageViewWindow_CopyFile" xml:space="preserve">
+    <value>复制文件</value>
+  </data>
+  <data name="ImageViewWindow_CopyPath" xml:space="preserve">
+    <value>复制路径</value>
+  </data>
+  <data name="ImageViewWindow_CopyImage" xml:space="preserve">
+    <value>复制图像</value>
+  </data>
+  <data name="Common_Edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="ImageViewWindow_ImageInformation" xml:space="preserve">
+    <value>图像信息</value>
+  </data>
+  <data name="ImageViewWindow_EditImage" xml:space="preserve">
+    <value>编辑图像</value>
+  </data>
+  <data name="ImageViewWindow_DisplayMode" xml:space="preserve">
+    <value>显示模式</value>
+  </data>
+  <data name="ImageViewWindow_SDRMappedLuminance" xml:space="preserve">
+    <value>SDR 映射亮度</value>
+  </data>
+  <data name="ImageViewWindow_ExportImage" xml:space="preserve">
+    <value>导出图像</value>
+  </data>
+  <data name="ImageViewWindow_DeleteImageFile" xml:space="preserve">
+    <value>删除图像文件</value>
+  </data>
+  <data name="ImageViewWindow_CopiedToClipboard" xml:space="preserve">
+    <value>已复制到剪贴板</value>
+  </data>
+  <data name="ImageViewWindow_FileDoesNotExist" xml:space="preserve">
+    <value>文件不存在</value>
+  </data>
+  <data name="ImageViewWindow_OpenWithDefaultApp" xml:space="preserve">
+    <value>使用默认应用打开</value>
+  </data>
+  <data name="ImageViewWindow_NoImageToDisplay" xml:space="preserve">
+    <value>没有要显示的图像</value>
+  </data>
+  <data name="Common_OpenFiles" xml:space="preserve">
+    <value>打开文件</value>
+  </data>
+  <data name="ImageViewWindow_OpenNewFiles" xml:space="preserve">
+    <value>打开新文件</value>
+  </data>
+  <data name="ImageViewWindow_FailedToDisplayImage" xml:space="preserve">
+    <value>图像加载失败</value>
+  </data>
+  <data name="ImageViewWindow_FailedToSaveImage" xml:space="preserve">
+    <value>保存图像失败</value>
+  </data>
+  <data name="ImageViewWindow_FailedToDeleteImageFile" xml:space="preserve">
+    <value>删除图像文件失败</value>
+  </data>
+  <data name="ImageViewWindow_UnableToDeleteTheFile" xml:space="preserve">
+    <value>无法删除文件</value>
+  </data>
+  <data name="ImageViewWindow_InsufficientPermissionsOrTheFileIsInUse" xml:space="preserve">
+    <value>没有权限或文件正在使用</value>
+  </data>
+  <data name="HotkeyInput_ClickToSetShortcutKeys" xml:space="preserve">
+    <value>点击设置快捷键</value>
+  </data>
+  <data name="HotkeyInput_DeleteShortcut" xml:space="preserve">
+    <value>删除快捷键</value>
+  </data>
+  <data name="HotkeyInput_PressTheShortcutKeys" xml:space="preserve">
+    <value>按下快捷键</value>
+  </data>
+  <data name="HotkeyManager_TheShortcutKeys0IsAlreadyInUse" xml:space="preserve">
+    <value>快捷键 ({0}) 已被占用</value>
+  </data>
+  <data name="HotkeyManager_FailedToRegisterTheShortcutKeys0" xml:space="preserve">
+    <value>快捷键 ({0}) 注册失败</value>
+  </data>
+  <data name="HotkeyManager_TheShortcutKeys0IsAlreadyInUsePleaseModifyItInSettingsPage" xml:space="preserve">
+    <value>快捷键 ({0}) 已被占用，请在设置页面中修改。</value>
+  </data>
+  <data name="HotkeyManager_FailedToRegisterTheShortcutKeys0PleaseRetryInSettingsPage" xml:space="preserve">
+    <value>快捷键 ({0}) 注册失败，请在设置页面中重试。</value>
+  </data>
+  <data name="HotkeySetting_FailedToRegisterTheShortcutKeys" xml:space="preserve">
+    <value>快捷键注册失败</value>
+  </data>
+  <data name="ScreenshotSetting_AutoConvertToSDRImage" xml:space="preserve">
+    <value>自动转换为 SDR 图片</value>
+  </data>
+  <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
+    <value>自动复制截图文件</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFile" xml:space="preserve">
+    <value>自动保存截图到本地</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
+    <value>截图完成后写入下方文件夹。「仅复制」快捷键不会落盘。</value>
+  </data>
+  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
+    <value>复制为 JPG</value>
+  </data>
+  <data name="ScreenshotPage_MultiSelect" xml:space="preserve">
+    <value>多选</value>
+  </data>
+  <data name="ScreenshotPage_Total0Files" xml:space="preserve">
+    <value>总计 {0} 个文件。</value>
+  </data>
+  <data name="ScreenshotSetting_Lossless" xml:space="preserve">
+    <value>无损</value>
+  </data>
+  <data name="ScreenCaptureInfoWindow_ProcessingImage" xml:space="preserve">
+    <value>正在处理图像</value>
+  </data>
+  <data name="ScreenshotPage_BatchConvert" xml:space="preserve">
+    <value>批量转换</value>
+  </data>
+  <data name="ScreenshotPage_Recopy" xml:space="preserve">
+    <value>重新复制</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Quality" xml:space="preserve">
+    <value>质量</value>
+  </data>
+  <data name="ImageBatchConvertWindow_StartConvert" xml:space="preserve">
+    <value>开始转换</value>
+  </data>
+  <data name="Common_Clear" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="ImageBatchConvertWindow_OutputFolder" xml:space="preserve">
+    <value>输出文件夹</value>
+  </data>
+  <data name="ImageBatchConvertWindow_OriginalFileFolder" xml:space="preserve">
+    <value>原文件所在文件夹</value>
+  </data>
+  <data name="ImageBatchConvertWindow_SelectOutputFormat" xml:space="preserve">
+    <value>选择输出格式</value>
+  </data>
+  <data name="ImageBatchConvertWindow_NoReadOrWritePermission" xml:space="preserve">
+    <value>没有读写权限</value>
+  </data>
+  <data name="ImageBatchConvertWindow_ConvertFailed" xml:space="preserve">
+    <value>转换失败</value>
+  </data>
+  <data name="ImageBatchConvertWindow_IfOutputFileExists" xml:space="preserve">
+    <value>如果输出文件已存在</value>
+  </data>
+  <data name="ImageBatchConvertWindow_SkipDefault" xml:space="preserve">
+    <value>跳过 (默认)</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Overwrite" xml:space="preserve">
+    <value>覆盖</value>
+  </data>
+  <data name="ImageBatchConvertWindow_Rename" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="Common_Success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="Common_Failed" xml:space="preserve">
+    <value>失败</value>
+  </data>
+  <data name="ImageBatchConvertWindow_ImageBatchConvert" xml:space="preserve">
+    <value>图像批量转换</value>
+  </data>
+  <data name="ScreenshotSetting_ClearSuccessfully" xml:space="preserve">
+    <value>清除成功</value>
+  </data>
+  <data name="ScreenshotSetting_ClearFailed" xml:space="preserve">
+    <value>清除失败</value>
+  </data>
+  <data name="Common_CopiedToClipboard" xml:space="preserve">
+    <value>已复制到剪贴板</value>
+  </data>
+  <data name="ScreenshotSetting_ColorManagement" xml:space="preserve">
+    <value>色彩管理</value>
+  </data>
+  <data name="Zshot_Nav_Gallery" xml:space="preserve">
+    <value>截图库</value>
+  </data>
+  <data name="Zshot_Nav_Appearance" xml:space="preserve">
+    <value>外观</value>
+  </data>
+  <data name="Zshot_Nav_Hotkey" xml:space="preserve">
+    <value>快捷键</value>
+  </data>
+  <data name="Zshot_Nav_Screenshot" xml:space="preserve">
+    <value>截图</value>
+  </data>
+  <data name="Zshot_Nav_Storage" xml:space="preserve">
+    <value>存储</value>
+  </data>
+  <data name="Zshot_Nav_Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Zshot_Nav_About" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="Zshot_SplashTagline" xml:space="preserve">
+    <value>新一代 Windows 原生 HDR 截图工具</value>
+  </data>
+  <data name="Zshot_WallpaperNotFound" xml:space="preserve">
+    <value>壁纸文件不存在，已清除配置并回退到无</value>
+  </data>
+  <data name="Zshot_Theme" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="Zshot_ThemeLight" xml:space="preserve">
+    <value>浅色</value>
+  </data>
+  <data name="Zshot_ThemeDark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="Zshot_Acrylic" xml:space="preserve">
+    <value>亚克力效果</value>
+  </data>
+  <data name="Zshot_AccentColor" xml:space="preserve">
+    <value>主题色</value>
+  </data>
+  <data name="Zshot_ApplyCurrentColor" xml:space="preserve">
+    <value>自定义颜色</value>
+  </data>
+  <data name="Zshot_Wallpaper" xml:space="preserve">
+    <value>壁纸</value>
+  </data>
+  <data name="Zshot_WallpaperModeNone" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="Zshot_WallpaperModeImage" xml:space="preserve">
+    <value>指定图片</value>
+  </data>
+  <data name="Zshot_WallpaperModeFolder" xml:space="preserve">
+    <value>文件夹随机</value>
+  </data>
+  <data name="Zshot_WallpaperModeVideo" xml:space="preserve">
+    <value>指定视频</value>
+  </data>
+  <data name="Zshot_WallpaperFolderVideoOnly" xml:space="preserve">
+    <value>视频优先</value>
+  </data>
+  <data name="Zshot_WallpaperFolderVideoOnlyDesc" xml:space="preserve">
+    <value>优先选择视频；视频无法初始化时回退到随机图片</value>
+  </data>
+  <data name="Zshot_WallpaperNowPlaying" xml:space="preserve">
+    <value>正在播放</value>
+  </data>
+  <data name="Zshot_WallpaperVideoFallbackToImage" xml:space="preserve">
+    <value>文件夹内无视频，已随机选取一张图片</value>
+  </data>
+  <data name="Zshot_WallpaperChooseImage" xml:space="preserve">
+    <value>选择图片</value>
+  </data>
+  <data name="Zshot_WallpaperChooseFolder" xml:space="preserve">
+    <value>选择文件夹</value>
+  </data>
+  <data name="Zshot_WallpaperChooseVideo" xml:space="preserve">
+    <value>选择视频</value>
+  </data>
+  <data name="Zshot_AccentFromWallpaper" xml:space="preserve">
+    <value>自动从壁纸取色</value>
+  </data>
+  <data name="Zshot_PathNone" xml:space="preserve">
+    <value>未选择</value>
+  </data>
+  <data name="Zshot_DisableCertificateValidation" xml:space="preserve">
+    <value>禁用证书校验</value>
+  </data>
+  <data name="Zshot_HotkeyScreenshot" xml:space="preserve">
+    <value>全屏截图</value>
+  </data>
+  <data name="Zshot_HotkeyRegion" xml:space="preserve">
+    <value>区域截图</value>
+  </data>
+  <data name="Zshot_HotkeyRegionCopy" xml:space="preserve">
+    <value>区域仅复制</value>
+  </data>
+  <data name="Zshot_HotkeyScreenshotDesc" xml:space="preserve">
+    <value>截取整块显示器（前台窗口 / 光标所在屏，可在「截图」设置切换）。</value>
+  </data>
+  <data name="Zshot_HotkeyRegionDesc" xml:space="preserve">
+    <value>框选区域或单击窗口。保存文件。</value>
+  </data>
+  <data name="Zshot_HotkeyRegionCopyDesc" xml:space="preserve">
+    <value>框选区域或单击窗口。只把位图复制到剪贴板，不保存文件。</value>
+  </data>
+  <data name="Zshot_SDRFormat" xml:space="preserve">
+    <value>SDR 格式</value>
+  </data>
+  <data name="Zshot_HDRFormat" xml:space="preserve">
+    <value>HDR 格式</value>
+  </data>
+  <data name="Zshot_Quality" xml:space="preserve">
+    <value>质量</value>
+  </data>
+  <data name="Zshot_ColorManagementDesc" xml:space="preserve">
+    <value>读取显示器 ICC profile 解析真实色域基色，写入文件的 cICP/ICC chunk。HDR 强制 BT2020；SDR 可开关（开 = 读 ICC 真实色域，关 = BT709）。启用前会检测显示器色彩配置，异常（如虚拟机、无 ICC 设备）则无法开启。</value>
+  </data>
+  <data name="Zshot_ColorManagementUnavailable" xml:space="preserve">
+    <value>当前显示器色彩配置异常（常见于虚拟机或无 ICC profile 的设备），无法启用色彩管理。</value>
+  </data>
+  <data name="Zshot_AutoConvertSDRDesc" xml:space="preserve">
+    <value>HDR 截图同时保存一份 SDR（Ultra HDR JPEG）。</value>
+  </data>
+  <data name="Zshot_DeleteHDRIfSDR" xml:space="preserve">
+    <value>SDR 内容删 HDR</value>
+  </data>
+  <data name="Zshot_DeleteHDRIfSDRDesc" xml:space="preserve">
+    <value>HDR 格式但内容为 SDR（maxCLL 不达标）时，自动转 SDR 并删除 HDR 文件，无视上方的自动转换开关。格式遵循 SDR 存储格式。</value>
+  </data>
+  <data name="Zshot_MonitorSource" xml:space="preserve">
+    <value>捕获显示器</value>
+  </data>
+  <data name="Zshot_MonitorForeground" xml:space="preserve">
+    <value>前台窗口</value>
+  </data>
+  <data name="Zshot_MonitorCursor" xml:space="preserve">
+    <value>光标位置</value>
+  </data>
+  <data name="Zshot_FilenameTemplate" xml:space="preserve">
+    <value>文件名模板</value>
+  </data>
+  <data name="Zshot_RegionFilenameTemplate" xml:space="preserve">
+    <value>区域文件名模板</value>
+  </data>
+  <data name="Zshot_ClickToInsert" xml:space="preserve">
+    <value>点击按钮在光标处添加模板，具体功能参见 </value>
+  </data>
+  <data name="Zshot_AutoStartInvalidCleared" xml:space="preserve">
+    <value>自启项指向的程序不存在，已自动清除</value>
+  </data>
+  <data name="Zshot_ClickToInsertSuffix" xml:space="preserve">
+    <value> 文件名模板</value>
+  </data>
+  <data name="Zshot_CheckUpdate" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="Zshot_UpdateAvailableTitle" xml:space="preserve">
+    <value>发现新版本！</value>
+  </data>
+  <data name="Zshot_UpdateNow" xml:space="preserve">
+    <value>立即更新</value>
+  </data>
+  <data name="Zshot_UpdateDelta" xml:space="preserve">
+    <value>差分更新</value>
+  </data>
+  <data name="Zshot_RemindLater" xml:space="preserve">
+    <value>稍后提醒</value>
+  </data>
+  <data name="Zshot_IgnoreThisVersion" xml:space="preserve">
+    <value>跳过此版本</value>
+  </data>
+  <data name="Zshot_LatestVersion" xml:space="preserve">
+    <value>已是最新版本</value>
+  </data>
+  <data name="Zshot_UpdateFailed" xml:space="preserve">
+    <value>更新失败</value>
+  </data>
+  <data name="Zshot_TitleMaxLength" xml:space="preserve">
+    <value>标题最大字符数（0=不截断）</value>
+  </data>
+  <data name="Zshot_ScreenshotFolder" xml:space="preserve">
+    <value>截图文件夹</value>
+  </data>
+  <data name="Zshot_LogFolder" xml:space="preserve">
+    <value>日志文件夹</value>
+  </data>
+  <data name="Zshot_LogFolderRestartTip" xml:space="preserve">
+    <value>重启后生效</value>
+  </data>
+  <data name="Zshot_LogLevel" xml:space="preserve">
+    <value>日志级别</value>
+  </data>
+  <data name="Zshot_LogLevelOff" xml:space="preserve">
+    <value>关</value>
+  </data>
+  <data name="Zshot_Change" xml:space="preserve">
+    <value>更改</value>
+  </data>
+  <data name="Zshot_StorageStats" xml:space="preserve">
+    <value>存储占用</value>
+  </data>
+  <data name="Zshot_ClearCache" xml:space="preserve">
+    <value>清理缓存</value>
+  </data>
+  <data name="Zshot_StatsScreenshots" xml:space="preserve">
+    <value>截图</value>
+  </data>
+  <data name="Zshot_StatsImageCache" xml:space="preserve">
+    <value>缩略图缓存</value>
+  </data>
+  <data name="Zshot_StatsWallpaper" xml:space="preserve">
+    <value>壁纸</value>
+  </data>
+  <data name="Zshot_StatsLog" xml:space="preserve">
+    <value>日志</value>
+  </data>
+  <data name="Zshot_SystemTray" xml:space="preserve">
+    <value>系统托盘</value>
+  </data>
+  <data name="Zshot_AutoStart" xml:space="preserve">
+    <value>开机自启</value>
+  </data>
+  <data name="Zshot_AutoStartMinimized" xml:space="preserve">
+    <value>启动时最小化到托盘</value>
+  </data>
+  <data name="Zshot_AboutLicense" xml:space="preserve">
+    <value>MIT 许可证</value>
+  </data>
+  <data name="Zshot_AboutDesc" xml:space="preserve">
+    <value>Zshot 直接从 DXGI 层获取显示器输出的原始 R16G16B16A16Float scRGB 帧缓冲，完整保留 HDR 亮度信息（可达数千 nit），编码为 16bit HDR AVIF、JPEG XL 或 PNGv3，色彩空间写入 BT2020 + PQ 传输函数元数据。同时提供 SDR 显示器自动降级、区域截图、多格式批量转换等通用截图工具应有的功能。</value>
+  </data>
+  <data name="Zshot_AboutTagline" xml:space="preserve">
+    <value>新一代 Windows 原生 HDR 截图工具</value>
+  </data>
+  <data name="Zshot_AboutThanksTitle" xml:space="preserve">
+    <value>致谢</value>
+  </data>
+  <data name="Zshot_AboutThanksStarward" xml:space="preserve">
+    <value>截图核心、编解码引擎、窗口框架均源自 Starward，由 @Scighost 开发</value>
+  </data>
+  <data name="Zshot_AboutThanksShareX" xml:space="preserve">
+    <value>区域截图覆盖层的窗口检测和交互设计参考</value>
+  </data>
+  <data name="Zshot_AboutProjectHome" xml:space="preserve">
+    <value>项目主页</value>
+  </data>
+  <data name="Zshot_OpenDataFolder" xml:space="preserve">
+    <value>打开数据目录</value>
+  </data>
+  <data name="Zshot_BackupDatabase" xml:space="preserve">
+    <value>备份数据库</value>
+  </data>
+  <data name="Zshot_LastBackup" xml:space="preserve">
+    <value>上次备份</value>
+  </data>
+  <data name="Zshot_BackupSuccess" xml:space="preserve">
+    <value>数据库已备份</value>
+  </data>
+  <data name="Zshot_BackupFailed" xml:space="preserve">
+    <value>数据库备份失败</value>
+  </data>
+  <data name="Zshot_StatsBackup" xml:space="preserve">
+    <value>备份</value>
+  </data>
+  <data name="Zshot_CheckPrerelease" xml:space="preserve">
+    <value>检查预发布版本</value>
+  </data>
+  <data name="Zshot_DataFolder" xml:space="preserve">
+    <value>数据文件夹</value>
+  </data>
+  <data name="Zshot_UpdateLinks" xml:space="preserve">
+    <value>相关链接</value>
+  </data>
+  <data name="Zshot_UpdateReleasePage" xml:space="preserve">
+    <value>发布页</value>
+  </data>
+  <data name="Zshot_UpdateFull" xml:space="preserve">
+    <value>全量更新</value>
+  </data>
+  <data name="Zshot_UpdateVerifying" xml:space="preserve">
+    <value>正在校验完整性…</value>
+  </data>
+  <data name="Zshot_UpdateArchitecture" xml:space="preserve">
+    <value>架构</value>
+  </data>
+  <data name="Zshot_UpdateChannel" xml:space="preserve">
+    <value>发布渠道</value>
+  </data>
+  <data name="Zshot_UpdateBuildTime" xml:space="preserve">
+    <value>发布时间</value>
+  </data>
+  <data name="Zshot_GithubApiNoProxy" xml:space="preserve">
+    <value>GitHub API 直连（不走代理）</value>
+  </data>
+  <data name="Zshot_DeltaUpdateMaxLayers" xml:space="preserve">
+    <value>差分更新最大层数</value>
+  </data>
+  <data name="Zshot_Advanced" xml:space="preserve">
+    <value>高级</value>
+  </data>
+  <data name="Zshot_RestartToTakeEffect" xml:space="preserve">
+    <value>重启后生效</value>
+  </data>
+  <data name="Zshot_WelcomeHello" xml:space="preserve">
+    <value>嗨，你好！</value>
+  </data>
+  <data name="Zshot_WelcomeIntro" xml:space="preserve">
+    <value>看来你是第一次来到 Zshot。这是一个简单的欢迎页，用来初始化一些配置。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiTitle" xml:space="preserve">
+    <value>DXGI 接口</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiSupported" xml:space="preserve">
+    <value>支持。可以使用所有截图功能。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported1" xml:space="preserve">
+    <value>当前环境不支持。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported2" xml:space="preserve">
+    <value>这意味着你无法使用本软件的所有截图功能，程序崩溃为可预见现象。</value>
+  </data>
+  <data name="Zshot_WelcomeDxgiNotSupported3" xml:space="preserve">
+    <value>理论上仍可正常使用部分其他功能，请您自行权衡。</value>
+  </data>
+  <data name="Zshot_WelcomeWallpaperTitle" xml:space="preserve">
+    <value>自定义壁纸</value>
+  </data>
+  <data name="Zshot_WelcomeWallpaperDesc" xml:space="preserve">
+    <value>强烈建议设置一张壁纸以获得最佳外观。可选择图片或视频文件；不设置则使用内置默认图片，即当前窗口背景所示。</value>
+  </data>
+  <data name="Zshot_WelcomePickWallpaper" xml:space="preserve">
+    <value>选择壁纸</value>
+  </data>
+  <data name="Zshot_WelcomeScreenshotFolderTitle" xml:space="preserve">
+    <value>截图存放位置</value>
+  </data>
+  <data name="Zshot_WelcomeScreenshotFolderDesc" xml:space="preserve">
+    <value>这决定了截图会存在哪里。如果不进行更改，默认会将所有截图存放在图片文件夹的 Zshot 目录。</value>
+  </data>
+  <data name="Zshot_WelcomePickFolder" xml:space="preserve">
+    <value>选择文件夹</value>
+  </data>
+  <data name="Zshot_WelcomeStart" xml:space="preserve">
+    <value>Zshot，启动！</value>
+  </data>
+  <data name="Zshot_InfoCopied" xml:space="preserve">
+    <value>已复制</value>
+  </data>
+  <data name="Zshot_DebugExtractTitle" xml:space="preserve">
+    <value>流式解压测试</value>
+  </data>
+  <data name="Zshot_DebugSection" xml:space="preserve">
+    <value>调试</value>
+  </data>
+  <data name="Zshot_DebugSelect" xml:space="preserve">
+    <value>选择</value>
+  </data>
+  <data name="Zshot_DebugExtract" xml:space="preserve">
+    <value>解压</value>
+  </data>
+  <data name="Zshot_DebugUrlEmpty" xml:space="preserve">
+    <value>URL 和路径都不能为空</value>
+  </data>
+  <data name="Zshot_DebugExtractDone" xml:space="preserve">
+    <value>完成！</value>
+  </data>
+  <data name="Zshot_DebugExtractFailed" xml:space="preserve">
+    <value>失败：</value>
+  </data>
+  <data name="Zshot_Update" xml:space="preserve">
+    <value>更新源</value>
+  </data>
+  <data name="Zshot_UpdateSource" xml:space="preserve">
+    <value>更新服务器</value>
+  </data>
+  <data name="Zshot_General" xml:space="preserve">
+    <value>通用</value>
+  </data>
+  <data name="Zshot_PriorityStart" xml:space="preserve">
+    <value>高优先级启动</value>
+  </data>
+  <data name="Zshot_TaskInvalid" xml:space="preserve">
+    <value>高优先级启动任务指向的程序不存在，请在设置中手动关闭</value>
+  </data>
+  <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
+    <value>← 如要调节此选项，请关闭高优先级启动</value>
+  </data>
+</root>

@@ -1,0 +1,101 @@
+global using Zshot.Language;
+using System;
+using System.Collections;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using Microsoft.Win32.TaskScheduler;
+using Serilog;
+
+namespace Zshot;
+
+#if DISABLE_XAML_GENERATED_MAIN
+
+/// <summary>
+/// Program class
+/// </summary>
+public static class Program
+{
+
+    // 未打包应用没注册 AppUserModelID，任务管理器用隐式 AUMID 解析应用图标常失败 → 空白图标。
+    // 显式设置后按此 ID 分组解析（配合 MainWindow 的 AppWindow.SetIcon）
+    [DllImport("shell32.dll")]
+    private static extern void SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string appID);
+
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler", " 3.0.0.2411")]
+    [global::System.STAThreadAttribute]
+    static int Main(string[] args)
+    {
+        SetCurrentProcessExplicitAppUserModelID("Zyl0812.Zshot");
+        // 提权子进程：--manage-task create/delete，以管理员权限调 TaskScheduler API 创建/删除任务后退出
+        if (args.Length > 0 && args[0] == "--manage-task")
+        {
+            try
+            {
+                using var ts = new TaskService();
+                if (args.Length > 1 && args[1] == "create")
+                {
+                    string launcherPath = args.Length > 2 ? args[2] : "";
+                    string taskArgs = args.Length > 3 ? args[3] : "";
+                    var td = ts.NewTask();
+                    td.Triggers.Add(new LogonTrigger());
+                    td.Actions.Add(new ExecAction(launcherPath, taskArgs));
+                    td.Settings.DisallowStartIfOnBatteries = false;
+                    td.Settings.StopIfGoingOnBatteries = false;
+                    try { ts.RootFolder.DeleteTask("Zshot", false); } catch { }
+                    ts.RootFolder.RegisterTaskDefinition("Zshot", td,
+                        TaskCreation.CreateOrUpdate,
+                        $"{Environment.UserDomainName}\\{Environment.UserName}",
+                        null,
+                        TaskLogonType.InteractiveToken);
+                    LogManageTask($"Task created: {launcherPath} {taskArgs}");
+                }
+                else
+                {
+                    ts.RootFolder.DeleteTask("Zshot", false);
+                    LogManageTask("Task deleted");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManageTask($"Task operation failed: {ex}");
+                return 1;
+            }
+            return 0;
+        }
+
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
+
+        global::WinRT.ComWrappersSupport.InitializeComWrappers();
+        global::Microsoft.UI.Xaml.Application.Start((p) =>
+        {
+            var context = new global::Microsoft.UI.Dispatching.DispatcherQueueSynchronizationContext(global::Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
+            global::System.Threading.SynchronizationContext.SetSynchronizationContext(context);
+            new App();
+        });
+        return 0;
+    }
+
+
+    private static void LogManageTask(string message)
+    {
+        try
+        {
+            string logFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Zshot", "log", "TaskScheduler.log");
+            Directory.CreateDirectory(Path.GetDirectoryName(logFile)!);
+            File.AppendAllText(logFile, $"[{DateTime.Now:HH:mm:ss.fff}] [manage-task] {message}\n");
+        }
+        catch { }
+    }
+
+
+    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        Log.Fatal(e.ExceptionObject as Exception, "Program Crash");
+    }
+}
+
+#endif

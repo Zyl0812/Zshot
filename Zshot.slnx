@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="arm64" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/Zshot/Zshot.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|arm64" Project="arm64" />
+    </Project>
+    <Project Path="src/Zshot.Core/Zshot.Core.csproj" />
+    <Project Path="src/Zshot.Language/Zshot.Language.csproj" />
+    <Project Path="src/Zshot.Launcher/Zshot.Launcher.vcxproj" Id="a1b2c3d4-e5f6-4789-9abc-def012345678" />
+    <Project Path="tests/Zshot.Core.Tests/Zshot.Core.Tests.csproj" />
+  </Folder>
+</Solution>

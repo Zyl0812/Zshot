@@ -1,0 +1,83 @@
+<sf:WindowEx x:Class="Zshot.Features.ViewHost.SystemTrayWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:hn="using:H.NotifyIcon"
+             xmlns:lang="using:Zshot.Language"
+             xmlns:local="using:Zshot.Features.ViewHost"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sf="using:Zshot.Frameworks"
+             Title="StarwardTrayMenu"
+             x:DefaultBindMode="OneWay"
+             Closed="WindowEx_Closed"
+             mc:Ignorable="d">
+
+    <Grid Name="RootGrid">
+        <hn:TaskbarIcon x:Name="trayIcon"
+                        LeftClickCommand="{x:Bind CaptureRegionCommand}"
+                        NoLeftClickDelay="True"
+                        RightClickCommand="{x:Bind ShowCommand}"
+                        ToolTipText="Zshot" />
+
+        <StackPanel Padding="8">
+
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind CaptureCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="&#xE722;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Zshot_HotkeyScreenshot}" />
+                </StackPanel>
+            </Button>
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind CaptureRegionCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="&#xE8A9;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Zshot_HotkeyRegion}" />
+                </StackPanel>
+            </Button>
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind CaptureRegionCopyCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon FontSize="16" Glyph="&#xE8C8;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Zshot_HotkeyRegionCopy}" />
+                </StackPanel>
+            </Button>
+            <MenuFlyoutSeparator />
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind ShowSettingsCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon HorizontalAlignment="Center"
+                              FontSize="16"
+                              Glyph="&#xE713;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Zshot_Nav_Settings}" />
+                </StackPanel>
+            </Button>
+            <Button Height="36"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    Command="{x:Bind ExitCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon HorizontalAlignment="Center"
+                              FontSize="16"
+                              Glyph="&#xE7E8;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Common_Exit}" />
+                </StackPanel>
+            </Button>
+
+        </StackPanel>
+    </Grid>
+
+</sf:WindowEx>

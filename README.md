@@ -1,15 +1,15 @@
 <div align="center">
 
-<img src="src/logo.png" width="120" alt="Starshot Logo">
+<img src="src/logo.png" width="120" alt="Zshot Logo">
 
-# Starshot
+# Zshot
 
 **Next-generation Windows-native HDR Screenshot Tool**
 
 Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL / PNGv3 Encoding · Color Management
 
-[![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../releases)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
+[![Release](https://img.shields.io/github/v/release/Zyl0812/Zshot?style=flat-square)](../../releases)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/Zyl0812/Zshot?tab=MIT-1-ov-file)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows)](../../releases)
 
 [Download](../../releases) · [Quick Start](#quick-start) · [Features](#features) · [Build from Source](#build-from-source)
@@ -20,11 +20,11 @@ Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL / PNGv3 Encoding
 
 ---
 
-## Why Starshot
+## Why Zshot
 
 Windows' built-in screenshot tool (Snipping Tool, Win+Shift+S) can only capture 8-bit SDR images even on HDR displays — the system compositor compresses 16-bit HDR frames on output, highlights are clipped, the color gamut is narrowed, resulting in screenshots that appear washed out, overexposed, or have incorrect color mapping. Common third-party screenshot tools are likewise limited by the traditional GDI/BitBlt capture pipeline and cannot perceive HDR data.
 
-Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from the DXGI layer, fully preserving HDR luminance information (up to thousands of nits). Screenshots are encoded as 16bit HDR AVIF, JPEG XL, or PNGv3 with BT.2020 color space and PQ transfer function metadata. It also provides SDR display auto-degradation, region screenshot, multi-format batch conversion, and everything else you'd expect from a general-purpose screenshot tool.
+Zshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from the DXGI layer, fully preserving HDR luminance information (up to thousands of nits). Screenshots are encoded as 16bit HDR AVIF, JPEG XL, or PNGv3 with BT.2020 color space and PQ transfer function metadata. It also provides SDR display auto-degradation, region screenshot, multi-format batch conversion, and everything else you'd expect from a general-purpose screenshot tool.
 
 **Key Features**
 
@@ -47,9 +47,9 @@ Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from th
 </td>
 <td align="center" width="50%">
 
-**Starshot (Ultra HDR JPEG)**
+**Zshot (Ultra HDR JPEG)**
 
-<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Starshot Ultra HDR JPEG preserving full highlight detail via gain map">
+<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Zshot Ultra HDR JPEG preserving full highlight detail via gain map">
 </td>
 </tr>
 </table>
@@ -60,7 +60,7 @@ Starshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from th
 > [!NOTE]
 > GitHub does not support AVIF rendering, so the comparison above uses Ultra HDR JPEG. The original AVIF image can be viewed [here](https://r2.cialo.site/endfield/3840x2160.dlaa.avif).
 
-On SDR displays, Starshot automatically falls back to the standard SDR screenshot path and works as a general-purpose screenshot tool. On HDR displays, it is one of the few desktop screenshot solutions that can fully preserve HDR data.
+On SDR displays, Zshot automatically falls back to the standard SDR screenshot path and works as a general-purpose screenshot tool. On HDR displays, it is one of the few desktop screenshot solutions that can fully preserve HDR data.
 
 ## System Requirements
 
@@ -70,7 +70,7 @@ On SDR displays, Starshot automatically falls back to the standard SDR screensho
 
 ## Download
 
-Download the archive from [Releases](../../releases), extract it, and run `Starshot.exe` from the root directory. No installation needed — just extract and run.
+Download the archive from [Releases](../../releases), extract it, and run `Zshot.exe` from the root directory. No installation needed — just extract and run.
 
 ## Screenshots
 
@@ -90,7 +90,7 @@ All shortcuts can be customized in Settings.
 
 ### HDR Screenshot Pipeline
 
-Most screenshot tools can only capture 8bit SDR even on HDR displays — the system compositor's 16bit floating-point scRGB output gets crushed into SDR with clipped highlights and narrowed gamut. Starshot captures the **raw HDR framebuffer**:
+Most screenshot tools can only capture 8bit SDR even on HDR displays — the system compositor's 16bit floating-point scRGB output gets crushed into SDR with clipped highlights and narrowed gamut. Zshot captures the **raw HDR framebuffer**:
 
 1. **HDR Capture**: When the display reports HDR, requests `R16G16B16A16Float` pixel format to obtain the full scRGB floating-point data (luminance up to thousands of nits).
 2. **HDR Save**: 16bit AVIF / JPEG XL / PNGv3 with BT.2020 color space + PQ transfer function. Highlights are not clipped, gamut is not narrowed.
@@ -99,7 +99,7 @@ Most screenshot tools can only capture 8bit SDR even on HDR displays — the sys
 
 #### SDR Content Handling
 
-On an HDR display, the desktop and SDR applications are also captured in the HDR format (R16G16B16A16Float), but the actual content luminance is at SDR levels. Starshot handles this as follows:
+On an HDR display, the desktop and SDR applications are also captured in the HDR format (R16G16B16A16Float), but the actual content luminance is at SDR levels. Zshot handles this as follows:
 
 - **Default**: Still saved in HDR format (16bit), **no 8bit tone mapping**, avoiding degradation and color shifts.
 - **Delete HDR for SDR Content** (optional): When enabled, content below the maxCLL threshold is automatically converted to SDR (using the user's configured SDR storage format) and the HDR file is deleted to save space.
@@ -134,7 +134,7 @@ All three modes share the same HDR detection, color management, filename templat
 
 ### Clipboard
 
-The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (deferred rendering + flush issues — content often never reaches other applications). Starshot uses Win32 native APIs (`OpenClipboard` / `SetClipboardData`) directly:
+The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (deferred rendering + flush issues — content often never reaches other applications). Zshot uses Win32 native APIs (`OpenClipboard` / `SetClipboardData`) directly:
 
 - **Full-screen**: CF_HDROP (file drop format) — paste into Explorer or chat apps to get the file directly.
 - **Region**: CF_DIB (BGRA bitmap) — the cropped SDR bitmap from the overlay is placed directly on the clipboard with no file read, no re-encode, no secondary tone mapping.
@@ -142,10 +142,10 @@ The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (defer
 
 ### Save
 
-- **Flat structure** (no subfolders). Defaults to `Pictures\Starshot`, customizable.
+- **Flat structure** (no subfolders). Defaults to `Pictures\Zshot`, customizable.
 - **SDR format** (PNG / AVIF / JPEG XL; default PNG) and **HDR format** (AVIF / JPEG XL / PNGv3; default AVIF) configured separately.
 - Quality levels: Medium / High / Lossless.
-- XMP metadata (CreatorTool = Starshot).
+- XMP metadata (CreatorTool = Zshot).
 - Serialized encoding (SemaphoreSlim) to avoid concurrent encoding conflicts.
 - **Storage Statistics**: Settings page shows disk usage for screenshots / thumbnail cache / wallpapers / logs / backups, with refresh and one-click cache cleanup (also cleans up orphaned wallpaper files).
 
@@ -245,7 +245,7 @@ Displays the logo + tagline on startup. Delays 700ms then fades out over 400ms. 
 
 ### Auto-start on Boot
 
-- Registry key `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, pointing to the launcher (root `Starshot.exe`).
+- Registry key `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, pointing to the launcher (root `Zshot.exe`).
 - Optional `--hide` flag to start minimized to tray (requires tray to be enabled).
 - The toggle reads the registry in real time (no cached database): Task Manager disabling only touches StartupApproved without removing the Run entry — the toggle still shows as on.
 - On startup, checks whether the exe pointed to by the auto-start entry exists; if not, automatically removes the startup entry and shows a toast.
@@ -264,7 +264,7 @@ Displays the logo + tagline on startup. Delays 700ms then fades out over 400ms. 
 - The region screenshot overlay displays HDR frames as SDR (WinUI CanvasControl uses an SDR swap chain); saved files are unaffected.
 - Custom wallpapers use `UniformToFill` to cover the window, but WinUI's crop is not centered — it is currently **top-left** aligned. For example, a narrow (portrait) wallpaper in a wide window will only show the upper portion (cropped from the top rather than centered).
 - When the region screenshot overlay first opens, the cursor remains the default system shape. **You need to move the mouse once** for the crosshair cursor to appear (WinUI `ProtectedCursor` does not take immediate effect on a stationary pointer already over the element — moving once triggers a pointer event, after which it works normally).
-- When hovering certain windows in region capture, the coordinate box may show negative values (e.g. `-11,-11`). This is the window extended frame bounds reported by Windows DWM (including off-screen shadow/border); Starshot reads it as-is — the off-screen part is invisible and does not affect the screenshot.
+- When hovering certain windows in region capture, the coordinate box may show negative values (e.g. `-11,-11`). This is the window extended frame bounds reported by Windows DWM (including off-screen shadow/border); Zshot reads it as-is — the off-screen part is invisible and does not affect the screenshot.
 - Video wallpaper may fail to initialize on startup due to MF media pipeline contention (intermittent, not fully resolved); during load a random image from the video's directory is shown as a placeholder, and kept if the video gets stuck — no black screen.
 
 ## Architecture
@@ -273,15 +273,15 @@ Displays the logo + tagline on startup. Delays 700ms then fades out over 400ms. 
 
 ```
 Root/
-  Starshot.exe            ← C++ launcher (reads version.ini to decide which app dir to launch)
-  StarshotDatabase.db     ← SQLite settings database
+  Zshot.exe            ← C++ launcher (reads version.ini to decide which app dir to launch)
+  ZshotDatabase.db     ← SQLite settings database
   version.ini             ← Version number (CI/CD release only; absent in local builds)
   app-{version}/          ← Main program directory (versioned for CI/CD release, app/ for local builds)
-    Starshot.exe          ← Main program (WinUI 3 / .NET 10)
+    Zshot.exe          ← Main program (WinUI 3 / .NET 10)
     *.dll                 ← Dependencies
     avifenc.exe etc.      ← Codec tools (from Starward.Codec NuGet)
   backup/                 ← Database backups
-%LOCALAPPDATA%/Starshot/  (default, configurable)
+%LOCALAPPDATA%/Zshot/  (default, configurable)
   log/                    ← Logs
   bg/                     ← Wallpapers
   thumb/                  ← Thumbnail cache
@@ -289,7 +289,7 @@ Root/
 
 ### Launcher
 
-Native C++ program (~400KB). Reads `version.ini` to decide whether to launch `app-{version}/Starshot.exe` (if no version.ini, falls back to `app/` for debug/local builds). When launched with `--clean` (or `--clean=<pid>`), iterates `app-*` directories and deletes non-current versions.
+Native C++ program (~400KB). Reads `version.ini` to decide whether to launch `app-{version}/Zshot.exe` (if no version.ini, falls back to `app/` for debug/local builds). When launched with `--clean` (or `--clean=<pid>`), iterates `app-*` directories and deletes non-current versions.
 
 ### Tray & Background Startup
 
@@ -340,36 +340,36 @@ Native C++ program (~400KB). Reads `version.ini` to decide whether to launch `ap
 ### Steps
 
 ```bash
-git clone https://github.com/loliri/Starshot
-cd Starshot
+git clone https://github.com/Zyl0812/Zshot
+cd Zshot
 
 # === Debug ===
 # Build the main program (outputs to build/app/)
-dotnet build src/Starshot/Starshot.csproj -c Debug -p:Platform=x64
+dotnet build src/Zshot/Zshot.csproj -c Debug -p:Platform=x64
 
-# Build the launcher (outputs to build/Starshot.exe; requires VS MSBuild)
-"C:\Program Files\Microsoft Visual Studio\<version>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# Build the launcher (outputs to build/Zshot.exe; requires VS MSBuild)
+"C:\Program Files\Microsoft Visual Studio\<version>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# Run: build/Starshot.exe (launcher) or build/app/Starshot.exe (main program)
+# Run: build/Zshot.exe (launcher) or build/app/Zshot.exe (main program)
 
 # === Release Publish ===
-# 1. Build the launcher first (outputs to build/Starshot.exe)
-"C:\Program Files\Microsoft Visual Studio\<version>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# 1. Build the launcher first (outputs to build/Zshot.exe)
+"C:\Program Files\Microsoft Visual Studio\<version>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# 2. Publish the main program (outputs to build/release/app/, auto-copies launcher to build/release/Starshot.exe + removes AI libs)
-dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
+# 2. Publish the main program (outputs to build/release/app/, auto-copies launcher to build/release/Zshot.exe + removes AI libs)
+dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=x64
 
 # Resulting directory structure:
 # build/release/
-#   Starshot.exe        ← Launcher (auto-copied)
+#   Zshot.exe        ← Launcher (auto-copied)
 #   app/
-#     Starshot.exe      ← Main program (self-contained + trim + R2R)
+#     Zshot.exe      ← Main program (self-contained + trim + R2R)
 #     *.dll / avifenc.exe etc.
 ```
 
 ## Internationalization (i18n)
 
-Translations are based on `.resx` resource files under `src/Starshot.Language/` (`Lang.resx` is the English default; `Lang.zh-CN.resx` etc. are per-locale). You also need to add an option to the language ComboBox in `GeneralSetting` + its `LanguageIndex` mapping.
+Translations are based on `.resx` resource files under `src/Zshot.Language/` (`Lang.resx` is the English default; `Lang.zh-CN.resx` etc. are per-locale). You also need to add an option to the language ComboBox in `GeneralSetting` + its `LanguageIndex` mapping.
 
 Translation contributions welcome: fork the repo → copy `Lang.resx` to `Lang.{your-locale}.resx` → translate → open a PR.
 
@@ -388,14 +388,14 @@ Contributions welcome:
 <details>
 <summary><b>Screenshot library (home page) images show incorrect / garbled colors</b></summary>
 
-This is typically a Windows system image codec issue (AVIF / HEIF / JPEG XL extensions), not a Starshot bug. Try searching for and updating the following in the Microsoft Store:
+This is typically a Windows system image codec issue (AVIF / HEIF / JPEG XL extensions), not a Zshot bug. Try searching for and updating the following in the Microsoft Store:
 
 - **AV1 Video Extension**
 - **HEIF Image Extensions**
 - **HEVC Video Extensions**
 - **Webp Image Extensions**
 
-Restart Starshot after updating. If the issue persists, please [submit an Issue](../../issues/new) with a screenshot attached.
+Restart Zshot after updating. If the issue persists, please [submit an Issue](../../issues/new) with a screenshot attached.
 
 </details>
 
@@ -423,12 +423,15 @@ If you're using an HDR display, make sure the Windows HDR toggle is enabled (Set
 <details>
 <summary><b>Can't paste from clipboard after taking a screenshot</b></summary>
 
-Starshot uses the Win32 native clipboard API for writing, which is theoretically more reliable than WinRT. If pasting still fails, the target application may not support the corresponding clipboard format (CF_HDROP for files / CF_DIB for bitmaps). Try pasting into Explorer (files) or Paint (bitmaps) to verify.
+Zshot uses the Win32 native clipboard API for writing, which is theoretically more reliable than WinRT. If pasting still fails, the target application may not support the corresponding clipboard format (CF_HDROP for files / CF_DIB for bitmaps). Try pasting into Explorer (files) or Paint (bitmaps) to verify.
 
 </details>
 
+Zshot is an independent product forked from [Starshot](https://github.com/loliri/Starshot) (MIT). It is not an official Starshot release.
+
 ## Acknowledgments
 
+- [Starshot](https://github.com/loliri/Starshot) — HDR capture / codec / overlay base, by [@loliri](https://github.com/loliri).
 - [Starward](https://github.com/Scighost/Starward) — Screenshot core, codec engine, and window framework all originate from Starward, developed by [@Scighost](https://github.com/Scighost).
 - [ShareX](https://github.com/ShareX/ShareX) — Reference for the region screenshot overlay's window detection and interaction design.
 

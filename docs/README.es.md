@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="../src/logo.png" width="120" alt="Logo de Starshot">
+<img src="../src/logo.png" width="120" alt="Logo de Zshot">
 
-# Starshot
+# Zshot
 
 **Herramienta de captura de pantalla HDR nativa de nueva generación para Windows**
 
@@ -10,8 +10,8 @@
 
 Captura 16bit de pipeline completo · Captura de región · Codificación AVIF / JPEG XL / PNGv3 · Gestión del color
 
-[![Release](https://img.shields.io/github/v/release/loliri/Starshot?style=flat-square)](../../../releases)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/loliri/Starshot?tab=MIT-1-ov-file)
+[![Release](https://img.shields.io/github/v/release/Zyl0812/Zshot?style=flat-square)](../../../releases)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/Zyl0812/Zshot?tab=MIT-1-ov-file)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows)](../../../releases)
 
 [Descargar](../../../releases) · [Inicio rápido](#inicio-rápido) · [Funcionalidades](#funcionalidades) · [Compilar desde el código fuente](#compilar-desde-el-código-fuente)
@@ -22,11 +22,11 @@ Captura 16bit de pipeline completo · Captura de región · Codificación AVIF /
 
 ---
 
-## Por qué Starshot
+## Por qué Zshot
 
 La herramienta de recortes integrada de Windows (Snipping Tool, Win+Shift+S) solo puede capturar imágenes SDR de 8 bits incluso en monitores HDR: el compositor del sistema comprime los fotogramas HDR de 16 bits, lo que provoca recorte de altas luces y reducción de la gama de colores, resultando en capturas apagadas, sobreexpuestas o con errores de mapeo de color. Las herramientas de captura de pantalla más comunes también están limitadas por el pipeline tradicional GDI/BitBlt y no pueden procesar datos HDR.
 
-Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB desde la capa DXGI, preservando completamente la información de luminancia HDR (hasta miles de nits). Las capturas se codifican como AVIF, JPEG XL o PNGv3 HDR de 16 bits con metadatos de espacio de color BT.2020 y función de transferencia PQ. También ofrece degradación automática para pantallas SDR, captura de región, conversión por lotes multiformato y todo lo que se espera de una herramienta de captura de propósito general.
+Zshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB desde la capa DXGI, preservando completamente la información de luminancia HDR (hasta miles de nits). Las capturas se codifican como AVIF, JPEG XL o PNGv3 HDR de 16 bits con metadatos de espacio de color BT.2020 y función de transferencia PQ. También ofrece degradación automática para pantallas SDR, captura de región, conversión por lotes multiformato y todo lo que se espera de una herramienta de captura de propósito general.
 
 **Características principales**
 
@@ -49,9 +49,9 @@ Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB des
 </td>
 <td align="center" width="50%">
 
-**Starshot (Ultra HDR JPEG)**
+**Zshot (Ultra HDR JPEG)**
 
-<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Captura Starshot Ultra HDR JPEG preservando el detalle completo de altas luces mediante gain map">
+<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Captura Zshot Ultra HDR JPEG preservando el detalle completo de altas luces mediante gain map">
 </td>
 </tr>
 </table>
@@ -62,7 +62,7 @@ Starshot captura directamente el framebuffer bruto `R16G16B16A16Float` scRGB des
 > [!NOTE]
 > Dado que GitHub no admite la renderización AVIF, la comparación anterior usa Ultra HDR JPEG. La imagen AVIF original puede verse [aquí](https://r2.cialo.site/endfield/3840x2160.dlaa.avif).
 
-En pantallas SDR, Starshot usa automáticamente la ruta de captura SDR estándar y funciona como una herramienta de captura de propósito general. En pantallas HDR, es una de las pocas soluciones de captura de escritorio capaces de preservar completamente los datos HDR.
+En pantallas SDR, Zshot usa automáticamente la ruta de captura SDR estándar y funciona como una herramienta de captura de propósito general. En pantallas HDR, es una de las pocas soluciones de captura de escritorio capaces de preservar completamente los datos HDR.
 
 ## Requisitos del sistema
 
@@ -72,7 +72,7 @@ En pantallas SDR, Starshot usa automáticamente la ruta de captura SDR estándar
 
 ## Descarga
 
-Descarga el archivo desde [Releases](../../../releases), extráelo y ejecuta `Starshot.exe` desde el directorio raíz. No necesita instalación: solo extraer y ejecutar.
+Descarga el archivo desde [Releases](../../../releases), extráelo y ejecuta `Zshot.exe` desde el directorio raíz. No necesita instalación: solo extraer y ejecutar.
 
 ## Capturas de pantalla
 
@@ -92,7 +92,7 @@ Todos los atajos se pueden personalizar en la configuración.
 
 ### Pipeline de captura HDR
 
-La mayoría de las herramientas de captura solo obtienen SDR de 8 bits incluso en pantallas HDR: el fotograma scRGB de punto flotante de 16 bits del compositor del sistema se comprime a SDR con altas luces recortadas y gama reducida. Starshot captura el **framebuffer HDR bruto**:
+La mayoría de las herramientas de captura solo obtienen SDR de 8 bits incluso en pantallas HDR: el fotograma scRGB de punto flotante de 16 bits del compositor del sistema se comprime a SDR con altas luces recortadas y gama reducida. Zshot captura el **framebuffer HDR bruto**:
 
 1. **Captura HDR**: cuando la pantalla informa modo HDR, solicita el formato de píxel `R16G16B16A16Float` para obtener los datos scRGB de punto flotante completos (luminancia de hasta miles de nits)
 2. **Guardado HDR**: AVIF / JPEG XL / PNGv3 de 16 bits, espacio de color BT.2020 + función de transferencia PQ. Las altas luces no se recortan, la gama no se reduce
@@ -101,7 +101,7 @@ La mayoría de las herramientas de captura solo obtienen SDR de 8 bits incluso e
 
 #### Manejo de contenido SDR
 
-En una pantalla HDR, el escritorio y las aplicaciones SDR también se capturan en formato HDR (R16G16B16A16Float), pero la luminancia real del contenido está a nivel SDR. Starshot lo maneja así:
+En una pantalla HDR, el escritorio y las aplicaciones SDR también se capturan en formato HDR (R16G16B16A16Float), pero la luminancia real del contenido está a nivel SDR. Zshot lo maneja así:
 
 - **Por defecto**: se guarda igualmente en formato HDR (16 bits), **sin mapeo tonal de 8 bits**, evitando degradación y cambios de color
 - **Opción Eliminar HDR para contenido SDR** (opcional): al activarla, el contenido por debajo del umbral maxCLL se convierte automáticamente a SDR (según el formato de guardado SDR configurado) y se elimina el archivo HDR para ahorrar espacio
@@ -136,7 +136,7 @@ Los tres modos comparten la misma detección HDR, gestión del color, plantillas
 
 ### Portapapeles
 
-El `Clipboard.SetContent` de WinRT en aplicaciones WinUI no empaquetadas no es fiable (renderizado diferido + problemas de Flush, el contenido a menudo no llega a otras aplicaciones). Starshot usa directamente las API nativas de Win32 (`OpenClipboard` / `SetClipboardData`):
+El `Clipboard.SetContent` de WinRT en aplicaciones WinUI no empaquetadas no es fiable (renderizado diferido + problemas de Flush, el contenido a menudo no llega a otras aplicaciones). Zshot usa directamente las API nativas de Win32 (`OpenClipboard` / `SetClipboardData`):
 
 - **Captura de pantalla completa**: CF_HDROP (formato de arrastrar y soltar archivo). Pega en el Explorador o en una aplicación de chat para obtener el archivo directamente.
 - **Captura de región**: CF_DIB (mapa de bits BGRA). El mapa de bits SDR recortado de la superposición se coloca directamente en el portapapeles, sin lectura de archivo, sin recodificación, sin segundo mapeo tonal.
@@ -144,10 +144,10 @@ El `Clipboard.SetContent` de WinRT en aplicaciones WinUI no empaquetadas no es f
 
 ### Guardado
 
-- **Estructura plana** (sin subcarpetas). Por defecto `Imágenes\Starshot`, personalizable.
+- **Estructura plana** (sin subcarpetas). Por defecto `Imágenes\Zshot`, personalizable.
 - **Formato SDR** (PNG / AVIF / JPEG XL; por defecto PNG) y **formato HDR** (AVIF / JPEG XL / PNGv3; por defecto AVIF) configurados por separado.
 - Niveles de calidad: Medio / Alto / Sin pérdidas.
-- Metadatos XMP (CreatorTool = Starshot).
+- Metadatos XMP (CreatorTool = Zshot).
 - Codificación serializada (SemaphoreSlim) para evitar conflictos de codificación concurrente.
 - **Estadísticas de almacenamiento**: la página de configuración muestra el espacio en disco usado por capturas / caché de miniaturas / fondos de pantalla / registros / copias de seguridad, con actualización y limpieza de caché en un clic (también limpia archivos huérfanos de fondos de pantalla).
 
@@ -247,7 +247,7 @@ Muestra el logo + eslogan al iniciar. Retraso de 700 ms y luego se desvanece en 
 
 ### Inicio automático
 
-- Clave de registro `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, apuntando al lanzador (`Starshot.exe` en la raíz)
+- Clave de registro `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, apuntando al lanzador (`Zshot.exe` en la raíz)
 - Opción `--hide` para iniciar minimizado en la bandeja (requiere que la bandeja esté activada)
 - El interruptor lee el registro en tiempo real (sin caché en base de datos): deshabilitar desde el Administrador de tareas solo modifica StartupApproved sin eliminar la entrada Run, el interruptor sigue mostrando Activado
 - Al iniciar, verifica si el exe apuntado por la entrada de inicio automático existe; si no, elimina automáticamente la entrada y muestra una notificación toast
@@ -266,7 +266,7 @@ Muestra el logo + eslogan al iniciar. Retraso de 700 ms y luego se desvanece en 
 - La superposición de captura de región muestra fotogramas HDR como SDR (CanvasControl de WinUI usa una cadena de intercambio SDR); los archivos guardados no se ven afectados
 - Los fondos de pantalla personalizados usan `UniformToFill` para cubrir la ventana, pero el recorte de WinUI no está centrado, actualmente está alineado **arriba a la izquierda**. Por ejemplo, un fondo estrecho (vertical) en una ventana ancha solo mostrará la parte superior (recortado desde arriba en lugar de centrado)
 - Al abrir la superposición de captura de región, el cursor mantiene la forma predeterminada del sistema. **Hay que mover el ratón una vez** para que aparezca el cursor en cruz (`ProtectedCursor` de WinUI no surte efecto inmediato sobre un puntero inmóvil que ya está sobre el elemento; al moverlo una vez se activa un evento pointer, tras lo cual funciona normalmente)
-- Al pasar el cursor sobre ciertas ventanas en la captura de región, el cuadro de coordenadas puede mostrar valores negativos (p. ej. `-11,-11`). Son los límites del marco extendido de la ventana que reporta Windows DWM (incluyendo sombra/borde fuera de pantalla); Starshot los lee tal cual — la parte fuera de pantalla es invisible y no afecta la captura
+- Al pasar el cursor sobre ciertas ventanas en la captura de región, el cuadro de coordenadas puede mostrar valores negativos (p. ej. `-11,-11`). Son los límites del marco extendido de la ventana que reporta Windows DWM (incluyendo sombra/borde fuera de pantalla); Zshot los lee tal cual — la parte fuera de pantalla es invisible y no afecta la captura
 - El fondo de pantalla de video puede no inicializarse al inicio debido a contención del pipeline de medios de MF (intermitente, no resuelto completamente); durante la carga se muestra como marcador de posición una imagen aleatoria del directorio del video, que se mantiene si el video se queda atascado — sin pantalla negra
 
 ## Arquitectura
@@ -275,15 +275,15 @@ Muestra el logo + eslogan al iniciar. Retraso de 700 ms y luego se desvanece en 
 
 ```
 Raíz/
-  Starshot.exe            ← Lanzador C++ (lee version.ini para decidir qué directorio app lanzar)
-  StarshotDatabase.db     ← Base de datos SQLite de configuración
+  Zshot.exe            ← Lanzador C++ (lee version.ini para decidir qué directorio app lanzar)
+  ZshotDatabase.db     ← Base de datos SQLite de configuración
   version.ini             ← Número de versión (solo releases CI/CD; ausente en compilaciones locales)
   app-{version}/          ← Directorio del programa principal (versionado para releases CI/CD, app/ para compilaciones locales)
-    Starshot.exe          ← Programa principal (WinUI 3 / .NET 10)
+    Zshot.exe          ← Programa principal (WinUI 3 / .NET 10)
     *.dll                 ← Dependencias
     avifenc.exe etc.      ← Herramientas de códec (de Starward.Codec NuGet)
   backup/                 ← Copias de seguridad de la base de datos
-%LOCALAPPDATA%/Starshot/  (por defecto, configurable)
+%LOCALAPPDATA%/Zshot/  (por defecto, configurable)
   log/                    ← Registros
   bg/                     ← Fondos de pantalla
   thumb/                  ← Caché de miniaturas
@@ -291,7 +291,7 @@ Raíz/
 
 ### Lanzador
 
-Programa nativo en C++ (~400 KB). Lee `version.ini` para decidir si lanzar `app-{version}/Starshot.exe` (si no hay version.ini, usa `app/` para compilaciones debug/local). Al ejecutarse con `--clean` (o `--clean=<pid>`), recorre los directorios `app-*` y elimina los que no corresponden a la versión actual.
+Programa nativo en C++ (~400 KB). Lee `version.ini` para decidir si lanzar `app-{version}/Zshot.exe` (si no hay version.ini, usa `app/` para compilaciones debug/local). Al ejecutarse con `--clean` (o `--clean=<pid>`), recorre los directorios `app-*` y elimina los que no corresponden a la versión actual.
 
 ### Bandeja e inicio en segundo plano
 
@@ -342,36 +342,36 @@ Guarda global `Interlocked.CompareExchange`. Los modos de pantalla completa, reg
 ### Pasos
 
 ```bash
-git clone https://github.com/loliri/Starshot
-cd Starshot
+git clone https://github.com/Zyl0812/Zshot
+cd Zshot
 
 # === Debug ===
 # Compilar el programa principal (salida en build/app/)
-dotnet build src/Starshot/Starshot.csproj -c Debug -p:Platform=x64
+dotnet build src/Zshot/Zshot.csproj -c Debug -p:Platform=x64
 
-# Compilar el lanzador (salida en build/Starshot.exe; requiere MSBuild de VS)
-"C:\Program Files\Microsoft Visual Studio\<versión>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# Compilar el lanzador (salida en build/Zshot.exe; requiere MSBuild de VS)
+"C:\Program Files\Microsoft Visual Studio\<versión>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# Ejecutar: build/Starshot.exe (lanzador) o build/app/Starshot.exe (programa principal)
+# Ejecutar: build/Zshot.exe (lanzador) o build/app/Zshot.exe (programa principal)
 
 # === Publicación Release ===
-# 1. Primero compilar el lanzador (salida en build/Starshot.exe)
-"C:\Program Files\Microsoft Visual Studio\<versión>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# 1. Primero compilar el lanzador (salida en build/Zshot.exe)
+"C:\Program Files\Microsoft Visual Studio\<versión>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
 
-# 2. Publicar el programa principal (salida en build/release/app/, copia automática del lanzador a build/release/Starshot.exe + elimina librerías IA)
-dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=x64
+# 2. Publicar el programa principal (salida en build/release/app/, copia automática del lanzador a build/release/Zshot.exe + elimina librerías IA)
+dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=x64
 
 # Estructura resultante:
 # build/release/
-#   Starshot.exe        ← Lanzador (copiado automáticamente)
+#   Zshot.exe        ← Lanzador (copiado automáticamente)
 #   app/
-#     Starshot.exe      ← Programa principal (autocontenido + trim + R2R)
+#     Zshot.exe      ← Programa principal (autocontenido + trim + R2R)
 #     *.dll / avifenc.exe etc.
 ```
 
 ## Internacionalización (i18n)
 
-Las traducciones se basan en los archivos `.resx` de `src/Starshot.Language/` (`Lang.resx` es el inglés por defecto; `Lang.zh-CN.resx` etc. por idioma). También hay que añadir una opción al ComboBox de idioma en `GeneralSetting` + su mapeo `LanguageIndex`.
+Las traducciones se basan en los archivos `.resx` de `src/Zshot.Language/` (`Lang.resx` es el inglés por defecto; `Lang.zh-CN.resx` etc. por idioma). También hay que añadir una opción al ComboBox de idioma en `GeneralSetting` + su mapeo `LanguageIndex`.
 
 Se aceptan contribuciones de traducción: haz fork del repositorio → copia `Lang.resx` a `Lang.{tu-locale}.resx` → traduce → abre un PR.
 
@@ -390,14 +390,14 @@ Contribuciones bienvenidas:
 <details>
 <summary><b>Las imágenes en la biblioteca de capturas (página de inicio) muestran colores incorrectos / distorsionados</b></summary>
 
-Esto suele ser un problema de los códecs de imagen del sistema Windows (extensiones AVIF / HEIF / JPEG XL), no un bug de Starshot. Intenta buscar y actualizar los siguientes componentes en Microsoft Store:
+Esto suele ser un problema de los códecs de imagen del sistema Windows (extensiones AVIF / HEIF / JPEG XL), no un bug de Zshot. Intenta buscar y actualizar los siguientes componentes en Microsoft Store:
 
 - **AV1 Video Extension**
 - **HEIF Image Extensions**
 - **HEVC Video Extensions**
 - **Webp Image Extensions**
 
-Reinicia Starshot después de actualizar. Si el problema persiste, [abre un Issue](../../../issues/new) adjuntando una captura de pantalla.
+Reinicia Zshot después de actualizar. Si el problema persiste, [abre un Issue](../../../issues/new) adjuntando una captura de pantalla.
 
 </details>
 
@@ -425,7 +425,7 @@ Si estás usando una pantalla HDR, asegúrate de que el interruptor HDR de Windo
 <details>
 <summary><b>No puedo pegar desde el portapapeles después de hacer una captura</b></summary>
 
-Starshot usa la API nativa de Win32 para escribir en el portapapeles, lo que en teoría es más fiable que WinRT. Si aún así falla el pegado, puede que la aplicación destino no admita el formato de portapapeles correspondiente (CF_HDROP para archivos / CF_DIB para mapas de bits). Prueba a pegar en el Explorador (archivos) o Paint (mapas de bits) para verificar.
+Zshot usa la API nativa de Win32 para escribir en el portapapeles, lo que en teoría es más fiable que WinRT. Si aún así falla el pegado, puede que la aplicación destino no admita el formato de portapapeles correspondiente (CF_HDROP para archivos / CF_DIB para mapas de bits). Prueba a pegar en el Explorador (archivos) o Paint (mapas de bits) para verificar.
 
 </details>
 
