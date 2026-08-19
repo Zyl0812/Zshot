@@ -401,6 +401,56 @@ public static partial class AppConfig
     }
 
 
+    /// <summary>0 = PP-OCRv6 Small / Balanced，1 = Medium / High</summary>
+    public static int OcrAccuracyMode
+    {
+        get => GetValue(0);
+        set => SetValue(value);
+    }
+
+
+    public static string TranslationBaseUrl
+    {
+        get => GetValue("") ?? "";
+        set => SetValue(value);
+    }
+
+
+    public static string TranslationModel
+    {
+        get => GetValue("gpt-4o-mini") ?? "gpt-4o-mini";
+        set => SetValue(value);
+    }
+
+
+    public static string TranslationTargetLanguage
+    {
+        get => GetValue("zh-CN") ?? "zh-CN";
+        set => SetValue(value);
+    }
+
+
+    public static string TranslationPrompt
+    {
+        get => GetValue("") ?? "";
+        set => SetValue(value);
+    }
+
+
+    public static int TranslationTimeoutSeconds
+    {
+        get => GetValue(30);
+        set => SetValue(value);
+    }
+
+
+    public static int LongCaptureMaxHeight
+    {
+        get => GetValue(20000);
+        set => SetValue(value);
+    }
+
+
     /// <summary>
     /// 截图链路色彩管理（HDR 模式始终启用）
     /// </summary>

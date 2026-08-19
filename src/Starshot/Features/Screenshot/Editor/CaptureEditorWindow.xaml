@@ -39,6 +39,9 @@
                 <Button Command="{x:Bind UndoCommand}" Content="撤销" />
                 <Button Command="{x:Bind RedoCommand}" Content="重做" />
                 <Button Command="{x:Bind ClearCommand}" Content="清空" />
+                <Button Command="{x:Bind RunOcrCommand}" Content="OCR" />
+                <Button Command="{x:Bind RunTranslateCommand}" Content="翻译" />
+                <Button Command="{x:Bind RequestLongCaptureCommand}" Content="长截图" />
                 <Button Command="{x:Bind CompleteCommand}" Content="完成" Style="{ThemeResource AccentButtonStyle}" />
                 <Button Command="{x:Bind CancelCommand}" Content="取消" />
             </StackPanel>

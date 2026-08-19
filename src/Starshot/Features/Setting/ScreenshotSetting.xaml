@@ -127,6 +127,28 @@
                           OnContent="{x:Bind lang:Lang.ScreenshotSetting_AutoCopyScreenshotFile}" />
 
 
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="20" Text="OCR" />
+                <cwc:Segmented SelectedIndex="{x:Bind OcrAccuracyMode, Mode=TwoWay}">
+                    <cwc:SegmentedItem Content="Small / 均衡" />
+                    <cwc:SegmentedItem Content="Medium / 高精度" />
+                </cwc:Segmented>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="20" Text="AI 翻译" />
+                <TextBox Header="Base URL" Text="{x:Bind TranslationBaseUrl, Mode=TwoWay}" />
+                <PasswordBox x:Name="ApiKeyBox" Header="API Key" PasswordChanged="ApiKeyBox_PasswordChanged" />
+                <TextBox Header="模型" Text="{x:Bind TranslationModel, Mode=TwoWay}" />
+                <TextBox Header="目标语言" Text="{x:Bind TranslationTargetLanguage, Mode=TwoWay}" />
+                <TextBox Header="Prompt" Text="{x:Bind TranslationPrompt, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="20" Text="长截图最大高度" />
+                <NumberBox Value="{x:Bind LongCaptureMaxHeight, Mode=TwoWay}" Minimum="1000" Maximum="100000" SpinButtonPlacementMode="Inline" />
+            </StackPanel>
+
             <!--  捕获显示器  -->
             <StackPanel Spacing="12">
                 <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Starshot_MonitorSource}" />

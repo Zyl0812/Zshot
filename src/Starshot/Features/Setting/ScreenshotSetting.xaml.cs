@@ -178,9 +178,92 @@ public sealed partial class ScreenshotSetting : PageBase
     } = AppConfig.ScreenshotCaptureMonitorSource;
 
 
+    public int OcrAccuracyMode
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.OcrAccuracyMode = value;
+            }
+        }
+    } = AppConfig.OcrAccuracyMode;
+
+
+    public string TranslationBaseUrl
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.TranslationBaseUrl = value;
+            }
+        }
+    } = AppConfig.TranslationBaseUrl;
+
+
+    public string TranslationModel
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.TranslationModel = value;
+            }
+        }
+    } = AppConfig.TranslationModel;
+
+
+    public string TranslationTargetLanguage
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.TranslationTargetLanguage = value;
+            }
+        }
+    } = AppConfig.TranslationTargetLanguage;
+
+
+    public string TranslationPrompt
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.TranslationPrompt = value;
+            }
+        }
+    } = AppConfig.TranslationPrompt;
+
+
+    public double LongCaptureMaxHeight
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.LongCaptureMaxHeight = (int)value;
+            }
+        }
+    } = AppConfig.LongCaptureMaxHeight;
+
+
     public ScreenshotSetting()
     {
         InitializeComponent();
+        string? key = SecretStorageService.Load("apiKey");
+        if (!string.IsNullOrEmpty(key))
+        {
+            ApiKeyBox.Password = key;
+        }
+    }
+
+
+    private void ApiKeyBox_PasswordChanged(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        SecretStorageService.Save("apiKey", ApiKeyBox.Password);
     }
 
 

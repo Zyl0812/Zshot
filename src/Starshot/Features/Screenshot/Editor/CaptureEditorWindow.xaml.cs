@@ -8,10 +8,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Starshot.Core.Editor;
+using Starshot.Core.Ocr;
+using Starshot.Core.Translation;
+using Starshot.Features.Screenshot.Ocr;
 using Starshot.Frameworks;
 using Starshot.Helpers;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Graphics;
@@ -36,8 +40,11 @@ public sealed partial class CaptureEditorWindow : WindowEx
     private double _moveDx;
     private double _moveDy;
     private bool _forceClose;
+    private string _lastOcrText = "";
+    private static readonly HttpClient TranslationHttp = new() { Timeout = TimeSpan.FromSeconds(60) };
 
     public CanvasRenderTarget? Flattened { get; private set; }
+    public bool RequestedLongCapture { get; private set; }
 
     public CaptureEditorWindow()
     {
@@ -145,6 +152,92 @@ public sealed partial class CaptureEditorWindow : WindowEx
         _history.Execute(_document, new ClearElementsCommand());
         _selected = null;
         DrawCanvas.Invalidate();
+    }
+
+    [RelayCommand]
+    private void RequestLongCapture()
+    {
+        RequestedLongCapture = true;
+        Finish(false);
+    }
+
+    [RelayCommand]
+    private async Task RunOcr()
+    {
+        if (_background is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var session = new OcrSession(new PaddleOcrRecognizer(new OcrModelManager()));
+            var accuracy = AppConfig.OcrAccuracyMode == 1 ? OcrAccuracy.High : OcrAccuracy.Balanced;
+            var result = await session.RecognizeAsync(_background, accuracy);
+            _lastOcrText = result.PlainText;
+            await ShowTextDialog("OCR", string.IsNullOrWhiteSpace(_lastOcrText) ? "未识别到文字" : _lastOcrText);
+        }
+        catch (Exception ex)
+        {
+            await ShowTextDialog("OCR 失败", ex.Message);
+        }
+    }
+
+    [RelayCommand]
+    private async Task RunTranslate()
+    {
+        if (string.IsNullOrWhiteSpace(_lastOcrText))
+        {
+            await RunOcr();
+        }
+
+        if (string.IsNullOrWhiteSpace(_lastOcrText))
+        {
+            return;
+        }
+
+        try
+        {
+            var provider = new CustomApiTranslationProvider(TranslationHttp, new CustomApiTranslationSettings
+            {
+                BaseUrl = AppConfig.TranslationBaseUrl,
+                ApiKey = SecretStorageService.Load("apiKey") ?? "",
+                Model = AppConfig.TranslationModel,
+                TargetLanguage = AppConfig.TranslationTargetLanguage,
+                SystemPrompt = AppConfig.TranslationPrompt,
+                TimeoutSeconds = AppConfig.TranslationTimeoutSeconds,
+            });
+            using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(Math.Max(5, AppConfig.TranslationTimeoutSeconds)));
+            var result = await provider.TranslateAsync(new TranslationRequest
+            {
+                Text = _lastOcrText,
+                TargetLanguage = AppConfig.TranslationTargetLanguage,
+                SystemPrompt = AppConfig.TranslationPrompt,
+                Model = AppConfig.TranslationModel,
+            }, cts.Token);
+            await ShowTextDialog("翻译", result.TranslatedText);
+        }
+        catch (Exception ex)
+        {
+            await ShowTextDialog("翻译失败", ex.Message);
+        }
+    }
+
+    private async Task ShowTextDialog(string title, string text)
+    {
+        var box = new TextBox { Text = text, AcceptsReturn = true, IsReadOnly = true, MinWidth = 360, MinHeight = 160, TextWrapping = TextWrapping.Wrap };
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = box,
+            PrimaryButtonText = "复制",
+            CloseButtonText = "关闭",
+            XamlRoot = Content.XamlRoot,
+        };
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        {
+            ClipboardHelper.SetText(text);
+        }
     }
 
     [RelayCommand]
