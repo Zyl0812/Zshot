@@ -153,9 +153,10 @@ public sealed partial class SystemTrayWindow : WindowEx
 
 
     [RelayCommand]
-    public void ShowMainWindow()
+    public void ShowSettings()
     {
-        App.Current.EnsureMainWindow();
+        Hide();
+        App.Current.EnsureSettingsWindow();
     }
 
 

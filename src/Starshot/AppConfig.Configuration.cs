@@ -1,5 +1,4 @@
 using Starshot.Features.Database;
-using Starshot.Features.ViewHost;
 using Starshot.Helpers;
 using System;
 using System.Globalization;
@@ -51,48 +50,8 @@ public static partial class AppConfig
         LogFile = Path.Combine(logFolder, "log", BuildLogFileName());
         Directory.CreateDirectory(CacheFolder);
 
-        // 首次启动（DB 不存在）弹欢迎页；用户关掉不完成则退出
-        string dbPath = Path.Combine(UserDataFolder, "StarshotDatabase.db");
-        WelcomeWindow? welcome = null;
-        if (!File.Exists(dbPath))
-        {
-            welcome = new Features.ViewHost.WelcomeWindow();
-            if (!await welcome.WaitAsync())
-            {
-                Environment.Exit(0);
-            }
-        }
-
+        // 首次启动不再弹欢迎页；托盘优先，直接建库。
         DatabaseService.SetDatabase(UserDataFolder);
-
-        // 欢迎页选的配置在 SetDatabase 之后才写 DB（之前 DB 没创建，直接写会丢）
-        if (welcome is not null)
-        {
-            if (welcome.WallpaperIsVideo && !string.IsNullOrWhiteSpace(welcome.WallpaperVideoPath))
-            {
-                AppConfig.WallpaperVideoFile = welcome.WallpaperVideoPath;
-                AppConfig.WallpaperMode = 2;
-            }
-            else if (!string.IsNullOrWhiteSpace(welcome.WallpaperFileName))
-            {
-                AppConfig.WallpaperFile = welcome.WallpaperFileName;
-                AppConfig.WallpaperMode = 1;
-            }
-            else
-            {
-                // 没选壁纸 → 默认用内置 pic.jpg（拷 Assets → cache/bg）
-                string bgPath = Path.Combine(CacheFolder, "bg", "pic.jpg");
-                Directory.CreateDirectory(Path.GetDirectoryName(bgPath)!);
-                string assetPath = Path.Combine(AppContext.BaseDirectory, "Assets", "pic.jpg");
-                if (File.Exists(assetPath)) File.Copy(assetPath, bgPath, overwrite: true);
-                AppConfig.WallpaperFile = "pic.jpg";
-                AppConfig.WallpaperMode = 1;
-            }
-            if (!string.IsNullOrWhiteSpace(welcome.ScreenshotFolderPath))
-            {
-                AppConfig.ScreenshotFolder = welcome.ScreenshotFolderPath;
-            }
-        }
 
         // 应用强调色与语言
         AccentColorHelper.ChangeAppAccentColor(AccentColor);

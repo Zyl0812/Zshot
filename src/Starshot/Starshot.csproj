@@ -87,6 +87,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Starshot.Language\Starshot.Language.csproj" />
+		<ProjectReference Include="..\Starshot.Core\Starshot.Core.csproj" />
 	</ItemGroup>
 
 	<!-- 若先编译了启动器会自动拷到 `build/release/` -->

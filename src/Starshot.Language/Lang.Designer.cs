@@ -898,6 +898,24 @@
         }
         
         /// <summary>
+        ///   查找类似 Auto Save Screenshot 的本地化字符串。
+        /// </summary>
+        public static string ScreenshotSetting_AutoSaveScreenshotFile {
+            get {
+                return ResourceManager.GetString("ScreenshotSetting_AutoSaveScreenshotFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Save the finished screenshot to the folder below. 的本地化字符串。
+        /// </summary>
+        public static string ScreenshotSetting_AutoSaveScreenshotFileDesc {
+            get {
+                return ResourceManager.GetString("ScreenshotSetting_AutoSaveScreenshotFileDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Clear Failed 的本地化字符串。
         /// </summary>
         public static string ScreenshotSetting_ClearFailed {

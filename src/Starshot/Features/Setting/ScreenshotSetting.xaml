@@ -78,6 +78,49 @@
             </StackPanel>
 
 
+            <!--  自动保存  -->
+            <StackPanel Spacing="8">
+                <ToggleSwitch IsOn="{x:Bind AutoSaveScreenshotToFile, Mode=TwoWay}"
+                              OffContent="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFile}"
+                              OnContent="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFile}" />
+                <TextBlock FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFileDesc}"
+                           TextWrapping="Wrap" />
+                <TextBlock FontSize="16" Text="{x:Bind lang:Lang.Starshot_ScreenshotFolder}" />
+                <Grid ColumnSpacing="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Height="40"
+                            Padding="16,0,16,0"
+                            BorderThickness="0"
+                            Command="{x:Bind ChangeScreenshotFolderCommand}"
+                            CornerRadius="8,20,20,8"
+                            Style="{ThemeResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE8DE;" />
+                            <TextBlock Text="{x:Bind lang:Lang.Starshot_Change}" />
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="1"
+                            Height="40"
+                            Margin="16,0,0,0"
+                            Padding="20,0,20,1"
+                            HorizontalContentAlignment="Left"
+                            BorderThickness="0"
+                            Command="{x:Bind OpenScreenshotFolderCommand}"
+                            CornerRadius="20">
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Bind ScreenshotFolderPath}"
+                                   TextTrimming="CharacterEllipsis" />
+                    </Button>
+                </Grid>
+            </StackPanel>
+
             <!--  自动复制  -->
             <ToggleSwitch IsOn="{x:Bind AutoCopyScreenshotToClipboard, Mode=TwoWay}"
                           OffContent="{x:Bind lang:Lang.ScreenshotSetting_AutoCopyScreenshotFile}"

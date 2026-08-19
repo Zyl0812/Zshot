@@ -1,9 +1,14 @@
+using System;
+using System.IO;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Starshot.Features.Screenshot;
 using Starshot.Frameworks;
 using Starshot.Helpers;
 using Starshot.Language;
+using Windows.System;
 
 namespace Starshot.Features.Setting;
 
@@ -121,6 +126,43 @@ public sealed partial class ScreenshotSetting : PageBase
             }
         }
     } = AppConfig.AutoCopyScreenshotToClipboard;
+
+
+    public bool AutoSaveScreenshotToFile
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.AutoSaveScreenshotToFile = value;
+            }
+        }
+    } = AppConfig.AutoSaveScreenshotToFile;
+
+
+    public string ScreenshotFolderPath { get; set => SetProperty(ref field, value); } = AppConfig.ScreenshotFolder ?? "";
+
+
+    [RelayCommand]
+    private async Task ChangeScreenshotFolder()
+    {
+        string? folder = await FileDialogHelper.PickFolderAsync(this.XamlRoot);
+        if (Directory.Exists(folder))
+        {
+            ScreenshotFolderPath = folder;
+            AppConfig.ScreenshotFolder = folder;
+        }
+    }
+
+
+    [RelayCommand]
+    private async Task OpenScreenshotFolder()
+    {
+        if (Directory.Exists(ScreenshotFolderPath))
+        {
+            await Launcher.LaunchFolderPathAsync(ScreenshotFolderPath);
+        }
+    }
 
 
     public int CaptureMonitorSource

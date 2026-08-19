@@ -14,10 +14,10 @@
 
     <Grid Name="RootGrid">
         <hn:TaskbarIcon x:Name="trayIcon"
-                        LeftClickCommand="{x:Bind ShowMainWindowCommand}"
+                        LeftClickCommand="{x:Bind CaptureRegionCommand}"
                         NoLeftClickDelay="True"
                         RightClickCommand="{x:Bind ShowCommand}"
-                        ToolTipText="Starshot" />
+                        ToolTipText="Zshot" />
 
         <StackPanel Padding="8">
 
@@ -55,13 +55,13 @@
             <Button Height="36"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Left"
-                    Command="{x:Bind ShowMainWindowCommand}"
+                    Command="{x:Bind ShowSettingsCommand}"
                     Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <FontIcon HorizontalAlignment="Center"
                               FontSize="16"
-                              Glyph="&#xE80F;" />
-                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.MainPage_Launcher}" />
+                              Glyph="&#xE713;" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Starshot_Nav_Settings}" />
                 </StackPanel>
             </Button>
             <Button Height="36"

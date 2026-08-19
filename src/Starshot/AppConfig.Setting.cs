@@ -318,7 +318,7 @@ public static partial class AppConfig
     /// </summary>
     public static string? ScreenshotFolder
     {
-        get => GetValue(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Starshot"));
+        get => GetValue(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Zshot"));
         set => SetValue(value);
     }
 
@@ -385,6 +385,16 @@ public static partial class AppConfig
 
 
     public static bool AutoCopyScreenshotToClipboard
+    {
+        get => GetValue(true);
+        set => SetValue(value);
+    }
+
+
+    /// <summary>
+    /// 截图完成后是否自动保存到本地。默认开启。「仅复制」快捷键无视此开关。
+    /// </summary>
+    public static bool AutoSaveScreenshotToFile
     {
         get => GetValue(true);
         set => SetValue(value);

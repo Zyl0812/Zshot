@@ -5,6 +5,7 @@ using Microsoft.Graphics.Display;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Starward.Codec.ICC;
+using Starshot.Core;
 using Starshot.Features.Codec;
 using Starshot.Helpers;
 using System;
@@ -356,6 +357,19 @@ internal class ScreenCaptureService
         float maxCLL, float sdrWhiteLevel, Microsoft.UI.DisplayId displayId, bool isRegion = false, bool copyToClipboard = true)
     {
         bool hdr = bitmap.Format is DirectXPixelFormat.R16G16B16A16Float;
+        bool writeFile = ScreenshotSavePolicy.ShouldWriteFile(AppConfig.AutoSaveScreenshotToFile, copyOnlyHotkey: false);
+        var clipboardKind = copyToClipboard
+            ? ScreenshotSavePolicy.GetFullscreenClipboardKind(AppConfig.AutoSaveScreenshotToFile, AppConfig.AutoCopyScreenshotToClipboard, copyOnlyHotkey: false)
+            : ClipboardExportKind.None;
+
+        if (!writeFile)
+        {
+            if (clipboardKind is ClipboardExportKind.SdrBitmap)
+            {
+                await CopySdrBitmapToClipboardAsync(bitmap, sdrWhiteLevel);
+            }
+            return;
+        }
 
         // 提前判定内容是否真 HDR + 各分支标志（maxCLL 入口已有，无需等编码后再判）
         bool contentIsHDR = hdr && maxCLL > sdrWhiteLevel + 5;
@@ -462,14 +476,32 @@ internal class ScreenCaptureService
 
         string finalFile = filePath;
 
-        if (copyToClipboard && AppConfig.AutoCopyScreenshotToClipboard)
+        if (clipboardKind is ClipboardExportKind.SavedFile)
         {
             // 全屏截图：CF_HDROP 放文件。autoConvertSDR 放 UHDR jpg，否则主文件
             string clipFile = autoConvertSDR ? sdrPath! : finalFile;
             ClipboardHelper.SetFiles(clipFile);
         }
+        else if (clipboardKind is ClipboardExportKind.SdrBitmap)
+        {
+            await CopySdrBitmapToClipboardAsync(bitmap, sdrWhiteLevel);
+        }
 
         _infoWindow?.CaptureSuccess(displayId, bitmap, finalFile, maxCLL);
+    }
+
+
+    private static async Task CopySdrBitmapToClipboardAsync(CanvasBitmap bitmap, float sdrWhiteLevel)
+    {
+        bool hdr = bitmap.Format is DirectXPixelFormat.R16G16B16A16Float or DirectXPixelFormat.R32G32B32A32Float;
+        if (hdr)
+        {
+            using CanvasRenderTarget sdr = TonemapToSdr(bitmap, sdrWhiteLevel);
+            await CopyCaptureToClipboardAsync(sdr, force: true);
+            return;
+        }
+
+        await CopyCaptureToClipboardAsync(bitmap, force: true);
     }
 
 

@@ -343,6 +343,12 @@
   <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
     <value>スクショファイルの自動コピー</value>
   </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFile" xml:space="preserve">
+    <value>スクリーンショットを自動保存</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
+    <value>完了後に下のフォルダーへ保存します。コピー専用ホットキーはファイルを書きません。</value>
+  </data>
   <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
     <value>JPG としてコピー</value>
   </data>

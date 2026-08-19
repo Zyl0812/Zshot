@@ -343,6 +343,12 @@
   <data name="ScreenshotSetting_AutoCopyScreenshotFile" xml:space="preserve">
     <value>Auto Copy Screenshot File</value>
   </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFile" xml:space="preserve">
+    <value>Auto Save Screenshot</value>
+  </data>
+  <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
+    <value>Save the finished screenshot to the folder below. The copy-only hotkey never writes a file.</value>
+  </data>
   <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
     <value>Copy as JPG</value>
   </data>

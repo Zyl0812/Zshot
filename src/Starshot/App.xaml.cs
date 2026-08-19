@@ -60,14 +60,7 @@ public partial class App : Application
         AppConfig.CheckAutoStartValidity();
         AppConfig.CheckTaskValidity();
 
-        bool startHidden = Environment.GetCommandLineArgs().Contains("--hide", StringComparer.OrdinalIgnoreCase)
-                           && AppConfig.EnableSystemTrayIcon;
-
-        if (!startHidden)
-        {
-            m_MainWindow = new MainWindow();
-            m_MainWindow.Activate();
-        }
+        // PixPin 式：启动只挂托盘，不创建主窗口。
         EnsureSystemTray();
     }
 
@@ -75,14 +68,16 @@ public partial class App : Application
 
     private AppInstance instance;
 
-    private MainWindow m_MainWindow;
+    private MainWindow? m_MainWindow = null;
 
     /// <summary>
-    /// 主窗口引用（供设置页等调用 ApplyTheme）
+    /// 主窗口引用（供设置页等调用 ApplyTheme）。托盘优先后默认为 null。
     /// </summary>
     public MainWindow? MainWindow => m_MainWindow;
 
     private SystemTrayWindow? m_SystemTrayWindow;
+
+    private SettingsWindow? m_SettingsWindow;
 
 
 
@@ -96,18 +91,28 @@ public partial class App : Application
 
 
 
+    public void EnsureSettingsWindow()
+    {
+        m_SettingsWindow ??= new SettingsWindow();
+        m_SettingsWindow.Activate();
+        m_SettingsWindow.Show();
+    }
+
+
+
     public void EnsureMainWindow()
     {
-        m_MainWindow ??= new MainWindow();
-        m_MainWindow.Activate();
-        m_MainWindow.Show();
+        EnsureSettingsWindow();
     }
 
 
 
     private void AppInstance_Activated(object? sender, AppActivationArguments e)
     {
-        _uiDispatcherQueue.TryEnqueue(EnsureMainWindow);
+        _uiDispatcherQueue.TryEnqueue(() =>
+        {
+            Features.Screenshot.ScreenCaptureService.CaptureRegion();
+        });
     }
 
 
@@ -118,7 +123,12 @@ public partial class App : Application
         {
             m_MainWindow.ForceExit = true;
         }
+        if (m_SettingsWindow is not null)
+        {
+            m_SettingsWindow.ForceExit = true;
+        }
         m_SystemTrayWindow?.Close();
+        m_SettingsWindow?.Close();
         m_MainWindow?.Close();
         Application.Current.Exit();
     }
