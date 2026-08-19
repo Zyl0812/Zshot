@@ -57,4 +57,45 @@ public class ScreenshotSavePolicyTests
             ClipboardExportKind.SdrBitmap,
             ScreenshotSavePolicy.GetFullscreenClipboardKind(autoSaveEnabled: true, autoCopyEnabled: false, copyOnlyHotkey: true));
     }
+
+    [Fact]
+    public void Overlay_complete_follows_auto_save_and_auto_copy()
+    {
+        var decision = ScreenshotSavePolicy.ResolveOverlayExport(OverlayExportAction.Complete, autoSave: true, autoCopy: true);
+        Assert.True(decision.WriteFile);
+        Assert.True(decision.CopyToClipboard);
+        Assert.True(decision.CanEndSession);
+    }
+
+    [Fact]
+    public void Overlay_complete_with_both_off_does_not_end_session()
+    {
+        var decision = ScreenshotSavePolicy.ResolveOverlayExport(OverlayExportAction.Complete, autoSave: false, autoCopy: false);
+        Assert.False(decision.WriteFile);
+        Assert.False(decision.CopyToClipboard);
+        Assert.False(decision.CanEndSession);
+    }
+
+    [Fact]
+    public void Overlay_copy_only_never_writes_file()
+    {
+        var decision = ScreenshotSavePolicy.ResolveOverlayExport(OverlayExportAction.CopyOnly, autoSave: true, autoCopy: false);
+        Assert.False(decision.WriteFile);
+        Assert.True(decision.CopyToClipboard);
+        Assert.True(decision.CanEndSession);
+    }
+
+    [Fact]
+    public void Overlay_save_always_writes_file_and_follows_auto_copy()
+    {
+        var on = ScreenshotSavePolicy.ResolveOverlayExport(OverlayExportAction.Save, autoSave: false, autoCopy: true);
+        Assert.True(on.WriteFile);
+        Assert.True(on.CopyToClipboard);
+        Assert.True(on.CanEndSession);
+
+        var off = ScreenshotSavePolicy.ResolveOverlayExport(OverlayExportAction.Save, autoSave: false, autoCopy: false);
+        Assert.True(off.WriteFile);
+        Assert.False(off.CopyToClipboard);
+        Assert.True(off.CanEndSession);
+    }
 }

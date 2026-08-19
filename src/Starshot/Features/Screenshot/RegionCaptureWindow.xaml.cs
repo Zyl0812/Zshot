@@ -6,20 +6,34 @@ using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Starshot.Features.Codec;
+using Starshot.Core;
+using Starshot.Core.Editor;
+using Starshot.Core.Ocr;
+using Starshot.Core.Overlay;
+using Starshot.Core.Translation;
+using Starshot.Features.Screenshot.Editor;
+using Starshot.Features.Screenshot.LongCapture;
+using Starshot.Features.Screenshot.Ocr;
 using Starshot.Frameworks;
 using Starshot.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Vanara.PInvoke;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Graphics.DirectX;
+using Windows.System;
 using Windows.UI;
+using Windows.UI.Core;
 
 namespace Starshot.Features.Screenshot;
 
@@ -28,6 +42,11 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private const int MinimumRectangleSize = 5;
     private const int MagnifierPixelCount = 15;
     private const int MagnifierPixelSize = 10;
+    private const double HandleSize = 8;
+    private const uint WdaExcludeFromCapture = 0x11;
+    private const uint WdaNone = 0;
+    private const int WmNcHitTest = 0x0084;
+    private const int HtTransparent = -1;
 
     public Rect SelectionRect { get; private set; }
     public bool IsConfirmed { get; private set; }
@@ -71,8 +90,21 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private bool _pendingMoveIn;
     private int _moveInTick;
 
-    // 单例：选区完成信号（替代 Closed），ScreenCaptureService await 它；窗口不 Close 只 Hide
-    public TaskCompletionSource<bool> Completion { get; private set; }
+    // 单例：整段 Overlay 会话结束才完成；窗口不 Close，只移出屏幕
+    public TaskCompletionSource<RegionOverlayResult> Completion { get; private set; }
+
+    private OverlayPhase _phase;
+    private bool _copyOnlySession;
+    private OverlayAnnotationController _editor = new();
+    private SelectionHitKind _activeHit;
+    private EditorRect _selectionAtPress;
+    private EditorPoint _pointerAtPress;
+    private bool _manipulatingSelection;
+    private EditorPoint _textPoint;
+    private string _lastOcrText = "";
+    private static readonly HttpClient TranslationHttp = new() { Timeout = Timeout.InfiniteTimeSpan };
+    private CancellationTokenSource? _longCts;
+    private TaskCompletionSource<bool>? _longDecision;
 
 
     public RegionCaptureWindow()
@@ -126,7 +158,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
     /// 关窗时移到屏外保持 IsWindowVisible（合成管线不停摆），下次截图先把新帧 Present 上屏
     /// 再移回屏内，从根上避免 Show 瞬间 DWM 先合成保留的旧会话帧（启动闪上次截图界面）。
     /// </summary>
-    public void SetCapture(CanvasBitmap canvas, float sdrWhiteLevel, int physW, int physH)
+    public void SetCapture(CanvasBitmap canvas, float sdrWhiteLevel, int physW, int physH, bool copyOnly = false)
     {
         // swapChain 常驻（关窗只移屏外不销毁）；分辨率变了尺寸过期则重建
         float needW = physW / _scale, needH = physH / _scale;
@@ -164,7 +196,16 @@ public sealed partial class RegionCaptureWindow : WindowEx
         _sizeLocked = false;  // 首帧重新锁尺寸 + 触发 DetectWindows
         _isClosed = false;
         _cleanedUp = false;
-        Completion = new TaskCompletionSource<bool>();
+        _phase = OverlayPhase.Selecting;
+        _copyOnlySession = copyOnly;
+        _editor = new OverlayAnnotationController();
+        _activeHit = SelectionHitKind.None;
+        _manipulatingSelection = false;
+        _lastOcrText = "";
+        CancelLongCaptureInternal(restorePhase: false);
+        SetExcludeFromCapture(false);
+        HideChrome();
+        Completion = new TaskCompletionSource<RegionOverlayResult>();
         _prevForeground = (nint)User32.GetForegroundWindow();
 
         _renderTimer.Start();
@@ -206,6 +247,9 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
 
     // 直接 P/Invoke DwmGetWindowAttribute，避免 Vanara 泛型重载在 DWMWA_CLOAKED 上 marshal 不可靠
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowDisplayAffinity(IntPtr hwnd, uint dwAffinity);
+
     [DllImport("dwmapi.dll", EntryPoint = "DwmGetWindowAttribute")]
     private static extern int DwmGetCloaked(IntPtr hwnd, int attr, out int pvAttribute, int cbAttribute);
 
@@ -340,71 +384,88 @@ public sealed partial class RegionCaptureWindow : WindowEx
             float physW = (float)_displayBitmap.SizeInPixels.Width;
             float physH = (float)_displayBitmap.SizeInPixels.Height;
 
-        // 1. 画冻结帧（铺满，尺寸锁定，不动）
-        ds.DrawImage(_displayBitmap,
-            new Rect(0, 0, _lockedW, _lockedH),
-            new Rect(0, 0, physW, physH),
-            1f, CanvasImageInterpolation.Linear);
+        if (_phase == OverlayPhase.LongCapturing)
+        {
+            FillDimOutside(ds, SelectionRect);
+        }
+        else
+        {
+            ds.DrawImage(_displayBitmap,
+                new Rect(0, 0, _lockedW, _lockedH),
+                new Rect(0, 0, physW, physH),
+                1f, CanvasImageInterpolation.Linear);
+            ds.FillRectangle(new Rect(0, 0, _lockedW, _lockedH), Color.FromArgb(51, 0, 0, 0));
+        }
 
-        // 1b. 整帧压黑 alpha 51（BackgroundDimStrength=20 → 255*0.2）
-        ds.FillRectangle(new Rect(0, 0, _lockedW, _lockedH), Color.FromArgb(51, 0, 0, 0));
-
-        // 2. 选区或悬停边框（纯绘图，不碰冻结帧）
         Rect rect = default;
         bool hasRect = false;
+        bool fromDrag = _selectionFromDrag;
 
-        if (_isMouseDown && SelectionRect.Width > MinimumRectangleSize && SelectionRect.Height > MinimumRectangleSize)
+        if (_phase is OverlayPhase.SelectionActive or OverlayPhase.LongCapturing)
+        {
+            rect = SelectionRect;
+            hasRect = rect.Width > 2 && rect.Height > 2;
+        }
+        else if (_isMouseDown && SelectionRect.Width > MinimumRectangleSize && SelectionRect.Height > MinimumRectangleSize)
         {
             rect = SelectionRect;
             hasRect = true;
+            fromDrag = true;
         }
         else if (_hasHover && _hoverRect.Width > 2 && _hoverRect.Height > 2)
         {
             rect = _hoverRect;
             hasRect = true;
+            fromDrag = false;
         }
 
         if (hasRect)
         {
-            // 选区/hover 位置挖洞：重画干净原图抵消压黑（backgroundHighlight）
-            // hover rect 可能含标题栏/阴影（位置负，超画布），只挖与画布的交集，避免 sourceRect 越出 bitmap 边界被拉伸
-            double cx = Math.Max(rect.X, 0);
-            double cy = Math.Max(rect.Y, 0);
-            double cw = Math.Max(0, Math.Min(rect.X + rect.Width, _lockedW) - cx);
-            double ch = Math.Max(0, Math.Min(rect.Y + rect.Height, _lockedH) - cy);
-            var clip = new Rect(cx, cy, cw, ch);
-            if (clip.Width > 0 && clip.Height > 0)
+            if (_phase != OverlayPhase.LongCapturing)
             {
-                ds.DrawImage(_displayBitmap,
-                    clip,
-                    new Rect(clip.X / _lockedW * physW, clip.Y / _lockedH * physH,
-                             clip.Width / _lockedW * physW, clip.Height / _lockedH * physH),
-                    1f, CanvasImageInterpolation.Linear);
+                HighlightRect(ds, rect, physW, physH);
             }
 
             ds.DrawRectangle(rect, Colors.Black, 1);
             using var anim = new CanvasStrokeStyle { CustomDashStyle = new float[] { 5, 5 }, DashOffset = _dashOffset };
             ds.DrawRectangle(rect, Colors.White, 1, anim);
 
-            // 与 GetPhysicalSourceRect 一致：拖拽中 +1，悬停窗口不 +1
-            var phys = ComputePhysicalRect(rect, _isMouseDown);
+            if (_phase == OverlayPhase.SelectionActive)
+            {
+                DrawHandles(ds, rect);
+                using (ds.CreateLayer(1, rect))
+                {
+                    foreach (var element in _editor.Document.Elements)
+                    {
+                        EditorRenderer.Draw(ds, element);
+                    }
+
+                    if (_editor.Draft is not null)
+                    {
+                        EditorRenderer.Draw(ds, _editor.Draft);
+                    }
+                }
+            }
+
+            var phys = ComputePhysicalRect(rect, fromDrag);
             DrawInfoBox(ds, $"X: {(int)phys.X}, Y: {(int)phys.Y}, W: {(int)phys.Width}, H: {(int)phys.Height}",
                 new Vector2((float)rect.X + 3, (float)rect.Y + 3));
         }
 
-        // 3+4. 放大镜与鼠标坐标框都钳制到光标所在显示器（不跨屏）
-        float mx = (float)_currentMousePos.X, my = (float)_currentMousePos.Y;
-        GetActiveMonitorDip(mx, my, out float ml, out float mt, out float mr, out float mb);
-        DrawMagnifier(ds, mx, my, ml, mt, mr, mb);
+        if (_phase == OverlayPhase.Selecting)
+        {
+            float mx = (float)_currentMousePos.X, my = (float)_currentMousePos.Y;
+            GetActiveMonitorDip(mx, my, out float ml, out float mt, out float mr, out float mb);
+            DrawMagnifier(ds, mx, my, ml, mt, mr, mb);
 
-        // 鼠标坐标框：同样钳制到当前显示器
-        const float cbW = 160, cbH = 22, cbOff = 12;
-        float cbX = mx + cbOff, cbY = my + cbOff;
-        if (cbX + cbW > mr) cbX = mx - cbOff - cbW;
-        if (cbY + cbH > mb) cbY = my - cbOff - cbH;
-        if (cbX < ml) cbX = ml;
-        if (cbY < mt) cbY = mt;
+            const float cbW = 160, cbH = 22, cbOff = 12;
+            float cbX = mx + cbOff, cbY = my + cbOff;
+            if (cbX + cbW > mr) cbX = mx - cbOff - cbW;
+            if (cbY + cbH > mb) cbY = my - cbOff - cbH;
+            if (cbX < ml) cbX = ml;
+            if (cbY < mt) cbY = mt;
             DrawInfoBox(ds, $"X: {(int)(mx * _scale)} Y: {(int)(my * _scale)}", new Vector2(cbX, cbY));
+        }
         }
         _swapChain.Present();
 
@@ -515,21 +576,47 @@ public sealed partial class RegionCaptureWindow : WindowEx
     {
         var pt = e.GetCurrentPoint(Canvas);
         _currentMousePos = pt.Position;
-        if (pt.Properties.IsLeftButtonPressed)
+        if (!pt.Properties.IsLeftButtonPressed)
         {
-            _positionOnClick = pt.Position;
-            _isMouseDown = true;
-            _selectionFromDrag = true;
-            _pressedOnHover = _hasHover;  // 记下：是否在悬停窗口上按下（单击截图用）
-            SelectionRect = new Rect(pt.Position.X, pt.Position.Y, 0, 0);
-            e.Handled = true;
+            return;
         }
+
+        if (_phase == OverlayPhase.LongCapturing)
+        {
+            return;
+        }
+
+        if (_phase == OverlayPhase.SelectionActive)
+        {
+            HandleEditingPressed(pt.Position, e);
+            return;
+        }
+
+        _positionOnClick = pt.Position;
+        _isMouseDown = true;
+        _selectionFromDrag = true;
+        _pressedOnHover = _hasHover;
+        SelectionRect = new Rect(pt.Position.X, pt.Position.Y, 0, 0);
+        e.Handled = true;
     }
 
     private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
         var pos = e.GetCurrentPoint(Canvas).Position;
         _currentMousePos = pos;
+
+        if (_phase == OverlayPhase.SelectionActive)
+        {
+            HandleEditingMoved(pos);
+            e.Handled = true;
+            return;
+        }
+
+        if (_phase == OverlayPhase.LongCapturing)
+        {
+            e.Handled = true;
+            return;
+        }
 
         if (_isMouseDown)
         {
@@ -552,15 +639,25 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
         if (pt.Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
         {
-            if (_isMouseDown)
+            HandleRightRelease();
+            e.Handled = true;
+            return;
+        }
+
+        if (_phase == OverlayPhase.SelectionActive)
+        {
+            if (_manipulatingSelection)
             {
-                _isMouseDown = false;
-                SelectionRect = default;
+                _manipulatingSelection = false;
+                _activeHit = SelectionHitKind.None;
+                Canvas.ReleasePointerCapture(e.Pointer);
+                LayoutChrome();
             }
             else
             {
-                CloseWindow();
+                _editor.PointerReleased();
             }
+
             e.Handled = true;
             return;
         }
@@ -570,19 +667,32 @@ public sealed partial class RegionCaptureWindow : WindowEx
             _isMouseDown = false;
             if (SelectionRect.Width > MinimumRectangleSize && SelectionRect.Height > MinimumRectangleSize)
             {
-                // 拖拽选区
-                IsConfirmed = true;
-                CloseWindow();
+                EnterSelectionActive(fromDrag: true);
             }
             else if (_pressedOnHover && _hoverRect.Width > 2 && _hoverRect.Height > 2)
             {
-                // 单击（未拖动）落在悬停窗口上 → 直接截该窗口（QuickCrop）
                 SelectionRect = _hoverRect;
-                _selectionFromDrag = false;
-                IsConfirmed = true;
-                CloseWindow();
+                EnterSelectionActive(fromDrag: false);
             }
             e.Handled = true;
+        }
+    }
+
+    private void Canvas_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        if (_phase != OverlayPhase.SelectionActive)
+        {
+            return;
+        }
+
+        if (_manipulatingSelection)
+        {
+            _manipulatingSelection = false;
+            _activeHit = SelectionHitKind.None;
+        }
+        else
+        {
+            _editor.PointerReleased();
         }
     }
 
@@ -602,31 +712,33 @@ public sealed partial class RegionCaptureWindow : WindowEx
         }
     }
 
-    private void CloseWindow()
+    private void CloseWindow() => EndSession(new RegionOverlayResult { End = RegionOverlayEnd.Cancelled });
+
+    private void EndSession(RegionOverlayResult result)
     {
         try { _renderTimer?.Stop(); } catch { }
-        if (IsConfirmed)
+        CancelLongCaptureInternal(restorePhase: false);
+        SetExcludeFromCapture(false);
+        HideChrome();
+        IsConfirmed = result.Confirmed;
+        if (result.Confirmed && result.FlattenedSdr is null)
         {
-            // _displayBitmap 是冻结帧的 SDR 版（覆盖层已 tonemap），隐藏前（它还活着）裁出选区给剪贴板
-            try { SdrCrop = CropDisplayToBgra(); } catch { }
+            try { result = new RegionOverlayResult { End = result.End, FlattenedSdr = FlattenSelection() }; } catch { }
         }
+
+        SdrCrop = result.FlattenedSdr;
         _isClosed = true;
-        // 不 Hide：移到屏外保持 IsWindowVisible，合成管线不停摆，
-        // 否则下次 Show 瞬间 DWM 先合成保留的旧会话帧（启动闪上次截图的完整界面）
         User32.SetWindowPos(WindowHandle, IntPtr.Zero, -32000, -32000, 0, 0,
             User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOACTIVATE);
-        // 交还焦点（屏外窗口不 Hide 仍持有键盘焦点，不还的话用户打字被吞）
         if (_prevForeground != 0 && _prevForeground != (nint)WindowHandle)
         {
             try { User32.SetForegroundWindow(new HWND(_prevForeground)); } catch { }
         }
         if (_ownsDisplayBitmap) { try { _displayBitmap?.Dispose(); } catch { } }
-        // _displayBitmap 引用清掉（自有的已 dispose）；_canvasOriginal 不清：
-        // service 在 Completion 后还要 GetPhysicalSourceRect 读它（底层是 service 的 composite，由 service dispose）；
-        // swapChain 常驻不销毁（屏外窗口还靠它承接下次会话的 Present）
         _displayBitmap = null;
         _ownsDisplayBitmap = false;
-        Completion?.TrySetResult(IsConfirmed);
+        _phase = OverlayPhase.Selecting;
+        Completion?.TrySetResult(result);
     }
 
 
@@ -676,38 +788,582 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Escape)
+        bool ctrl = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
+        if (_phase == OverlayPhase.SelectionActive)
         {
-            CloseWindow();
+            if (ctrl && e.Key == VirtualKey.Z)
+            {
+                _editor.Undo();
+                e.Handled = true;
+                return;
+            }
+
+            if (ctrl && (e.Key == VirtualKey.Y || e.Key == VirtualKey.R))
+            {
+                _editor.Redo();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == VirtualKey.Delete && _editor.DeleteSelected())
+            {
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == VirtualKey.Enter)
+            {
+                RequestExport(OverlayExportAction.Complete);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == VirtualKey.Escape)
+            {
+                HandleEditingEscape();
+                e.Handled = true;
+                return;
+            }
+        }
+
+        if (e.Key == VirtualKey.Escape)
+        {
+            if (_phase == OverlayPhase.LongCapturing)
+            {
+                LongCaptureCancel_Click(this, e);
+            }
+            else
+            {
+                CloseWindow();
+            }
+
             e.Handled = true;
         }
-        else if (e.Key == Windows.System.VirtualKey.Enter && _hasHover && !_isMouseDown)
+        else if (e.Key == VirtualKey.Enter && _phase == OverlayPhase.Selecting && _hasHover && !_isMouseDown)
         {
             SelectionRect = _hoverRect;
-            _selectionFromDrag = false;
-            IsConfirmed = true;
-            CloseWindow();
+            EnterSelectionActive(fromDrag: false);
             e.Handled = true;
         }
     }
 
     protected override nint WindowSubclassProc(HWND hWnd, uint uMsg, nint wParam, nint lParam, nuint uIdSubclass, nint dwRefData)
     {
+        if (uMsg == WmNcHitTest && _phase == OverlayPhase.LongCapturing)
+        {
+            int sx = unchecked((short)(lParam.ToInt64() & 0xFFFF));
+            int sy = unchecked((short)((lParam.ToInt64() >> 16) & 0xFFFF));
+            double x = (sx - _vx) / _scale;
+            double y = (sy - _vy) / _scale;
+            if (SelectionRect.Contains(new Point(x, y)))
+            {
+                return HtTransparent;
+            }
+        }
+
         if (uMsg == (uint)User32.WindowMessage.WM_RBUTTONUP)
         {
-            if (_isMouseDown)
-            {
-                _isMouseDown = false;
-                SelectionRect = default;
-            }
-            else
-            {
-                CloseWindow();
-            }
+            HandleRightRelease();
             return 0;
         }
         return base.WindowSubclassProc(hWnd, uMsg, wParam, lParam, uIdSubclass, dwRefData);
     }
+
+    private void EnterSelectionActive(bool fromDrag)
+    {
+        _selectionFromDrag = fromDrag;
+        _phase = OverlayPhase.SelectionActive;
+        IsConfirmed = true;
+        _isMouseDown = false;
+        PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Arrow);
+        ToolbarBorder.Visibility = Visibility.Visible;
+        LongCaptureBar.Visibility = Visibility.Collapsed;
+        LayoutChrome();
+        RootGrid.Focus(FocusState.Programmatic);
+    }
+
+    private void HandleEditingPressed(Point pos, PointerRoutedEventArgs e)
+    {
+        var point = new EditorPoint(pos.X, pos.Y);
+        var bounds = CanvasBounds();
+        var hit = SelectionInteraction.HitTest(ToEditorRect(SelectionRect), point, HandleSize);
+        bool canResize = hit is not SelectionHitKind.None and not SelectionHitKind.Inside;
+        bool canMove = hit == SelectionHitKind.Inside && _editor.Tool == "select" &&
+                       !_editor.Document.Elements.Exists(el => el.HitTest(point));
+
+        if (canResize || canMove)
+        {
+            _manipulatingSelection = true;
+            _activeHit = canMove ? SelectionHitKind.Inside : hit;
+            _selectionAtPress = ToEditorRect(SelectionRect);
+            _pointerAtPress = point;
+            Canvas.CapturePointer(e.Pointer);
+            e.Handled = true;
+            return;
+        }
+
+        if (!SelectionRect.Contains(pos))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        var kind = _editor.PointerPressed(point);
+        if (kind == OverlayAnnotationController.PressKind.RequestText)
+        {
+            BeginTextInput(point);
+        }
+        else if (kind == OverlayAnnotationController.PressKind.Capture)
+        {
+            Canvas.CapturePointer(e.Pointer);
+        }
+
+        e.Handled = true;
+    }
+
+    private void HandleEditingMoved(Point pos)
+    {
+        var point = new EditorPoint(pos.X, pos.Y);
+        if (_manipulatingSelection)
+        {
+            var bounds = CanvasBounds();
+            SelectionRect = _activeHit == SelectionHitKind.Inside
+                ? ToRect(SelectionInteraction.Move(_selectionAtPress, point.X - _pointerAtPress.X, point.Y - _pointerAtPress.Y, bounds))
+                : ToRect(SelectionInteraction.Resize(_selectionAtPress, _activeHit, point, bounds, MinimumRectangleSize));
+
+            LayoutChrome();
+            return;
+        }
+
+        if (_editor.IsDragging)
+        {
+            _editor.PointerMoved(point);
+            return;
+        }
+
+        UpdateEditingCursor(point);
+    }
+
+    private void UpdateEditingCursor(EditorPoint point)
+    {
+        var hit = SelectionInteraction.HitTest(ToEditorRect(SelectionRect), point, HandleSize);
+        InputSystemCursorShape shape = hit switch
+        {
+            SelectionHitKind.North or SelectionHitKind.South => InputSystemCursorShape.SizeNorthSouth,
+            SelectionHitKind.East or SelectionHitKind.West => InputSystemCursorShape.SizeWestEast,
+            SelectionHitKind.NorthWest or SelectionHitKind.SouthEast => InputSystemCursorShape.SizeNorthwestSoutheast,
+            SelectionHitKind.NorthEast or SelectionHitKind.SouthWest => InputSystemCursorShape.SizeNortheastSouthwest,
+            SelectionHitKind.Inside when _editor.Tool == "select" => InputSystemCursorShape.SizeAll,
+            _ => _editor.Tool == "select" ? InputSystemCursorShape.Arrow : InputSystemCursorShape.Cross,
+        };
+        PointerCursor.SetCursorShape(Canvas, shape);
+    }
+
+    private void HandleRightRelease()
+    {
+        if (_isMouseDown)
+        {
+            _isMouseDown = false;
+            SelectionRect = default;
+            return;
+        }
+
+        if (_phase == OverlayPhase.LongCapturing)
+        {
+            LongCaptureCancel_Click(this, new RoutedEventArgs());
+            return;
+        }
+
+        CloseWindow();
+    }
+
+    private void HandleEditingEscape()
+    {
+        if (TextInputBorder.Visibility == Visibility.Visible)
+        {
+            TextInputBorder.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        if (_editor.Selected is not null)
+        {
+            _editor.ClearSelection();
+            return;
+        }
+
+        if (_editor.Draft is not null)
+        {
+            _editor.CancelDraft();
+            return;
+        }
+
+        CloseWindow();
+    }
+
+    private void Tool_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string tool })
+        {
+            _editor.Tool = tool;
+            _editor.ClearSelection();
+        }
+    }
+
+    private void Undo_Click(object sender, RoutedEventArgs e) => _editor.Undo();
+
+    private void Redo_Click(object sender, RoutedEventArgs e) => _editor.Redo();
+
+    private void Clear_Click(object sender, RoutedEventArgs e) => _editor.Clear();
+
+    private void Copy_Click(object sender, RoutedEventArgs e) => RequestExport(OverlayExportAction.CopyOnly);
+
+    private void Save_Click(object sender, RoutedEventArgs e) => RequestExport(OverlayExportAction.Save);
+
+    private void Complete_Click(object sender, RoutedEventArgs e) => RequestExport(OverlayExportAction.Complete);
+
+    private void Cancel_Click(object sender, RoutedEventArgs e) => CloseWindow();
+
+    private async void Ocr_Click(object sender, RoutedEventArgs e) => await RunOcrAsync();
+
+    private async Task RunOcrAsync()
+    {
+        using var crop = FlattenSelection();
+        if (crop is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var session = new OcrSession(new PaddleOcrRecognizer(new OcrModelManager()));
+            var accuracy = AppConfig.OcrAccuracyMode == 1 ? OcrAccuracy.High : OcrAccuracy.Balanced;
+            var result = await session.RecognizeAsync(crop, accuracy);
+            _lastOcrText = result.PlainText;
+            ShowResult("OCR", string.IsNullOrWhiteSpace(_lastOcrText) ? "未识别到文字" : _lastOcrText);
+        }
+        catch (Exception ex)
+        {
+            ShowResult("OCR 失败", ex.Message);
+        }
+    }
+
+    private async void Translate_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_lastOcrText))
+        {
+            await RunOcrAsync();
+        }
+
+        if (string.IsNullOrWhiteSpace(_lastOcrText))
+        {
+            return;
+        }
+
+        try
+        {
+            var provider = new CustomApiTranslationProvider(TranslationHttp, new CustomApiTranslationSettings
+            {
+                BaseUrl = AppConfig.TranslationBaseUrl,
+                ApiKey = SecretStorageService.Load("apiKey") ?? "",
+                Model = AppConfig.TranslationModel,
+                TargetLanguage = AppConfig.TranslationTargetLanguage,
+                SystemPrompt = AppConfig.TranslationPrompt,
+                TimeoutSeconds = AppConfig.TranslationTimeoutSeconds,
+            });
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Max(5, AppConfig.TranslationTimeoutSeconds)));
+            var result = await provider.TranslateAsync(new TranslationRequest
+            {
+                Text = _lastOcrText,
+                TargetLanguage = AppConfig.TranslationTargetLanguage,
+                SystemPrompt = AppConfig.TranslationPrompt,
+                Model = AppConfig.TranslationModel,
+            }, cts.Token);
+            ShowResult("翻译", result.TranslatedText);
+        }
+        catch (Exception ex)
+        {
+            ShowResult("翻译失败", ex.Message);
+        }
+    }
+
+    private async void LongCapture_Click(object sender, RoutedEventArgs e)
+    {
+        if (_phase != OverlayPhase.SelectionActive)
+        {
+            return;
+        }
+
+        _phase = OverlayPhase.LongCapturing;
+        ToolbarBorder.Visibility = Visibility.Collapsed;
+        ResultPanel.Visibility = Visibility.Collapsed;
+        LongCaptureBar.Visibility = Visibility.Visible;
+        LongCaptureStatus.Text = "请滚动页面以继续截图";
+        LayoutChrome();
+        SetExcludeFromCapture(true);
+
+        _longCts = new CancellationTokenSource();
+        _longDecision = new TaskCompletionSource<bool>();
+        var region = GetPhysicalSourceRect();
+        try
+        {
+            var runner = new LongCaptureRunner();
+            var image = await runner.RunAsync(
+                region,
+                AppConfig.LongCaptureMaxHeight,
+                status => LongCaptureStatus.Text = status,
+                _longDecision.Task,
+                _longCts.Token);
+            if (image is null)
+            {
+                RestoreAfterLongCapture();
+                return;
+            }
+
+            EndSession(new RegionOverlayResult { End = RegionOverlayEnd.LongCapture, FlattenedSdr = image });
+        }
+        catch (Exception)
+        {
+            RestoreAfterLongCapture();
+        }
+    }
+
+    private void LongCaptureFinish_Click(object sender, RoutedEventArgs e)
+        => _longDecision?.TrySetResult(true);
+
+    private void LongCaptureCancel_Click(object sender, RoutedEventArgs e)
+    {
+        _longDecision?.TrySetResult(false);
+        _longCts?.Cancel();
+    }
+
+    private void RestoreAfterLongCapture()
+    {
+        CancelLongCaptureInternal(restorePhase: true);
+        SetExcludeFromCapture(false);
+        ToolbarBorder.Visibility = Visibility.Visible;
+        LongCaptureBar.Visibility = Visibility.Collapsed;
+        LayoutChrome();
+    }
+
+    private void CancelLongCaptureInternal(bool restorePhase)
+    {
+        _longCts?.Cancel();
+        _longDecision?.TrySetResult(false);
+        _longCts = null;
+        _longDecision = null;
+        if (restorePhase)
+        {
+            _phase = OverlayPhase.SelectionActive;
+        }
+    }
+
+    private void RequestExport(OverlayExportAction action)
+    {
+        if (_copyOnlySession && action == OverlayExportAction.Complete)
+        {
+            action = OverlayExportAction.CopyOnly;
+        }
+
+        var decision = ScreenshotSavePolicy.ResolveOverlayExport(
+            action,
+            AppConfig.AutoSaveScreenshotToFile,
+            AppConfig.AutoCopyScreenshotToClipboard);
+        if (!decision.CanEndSession)
+        {
+            HintText.Text = "请先保存或复制";
+            HintText.Visibility = Visibility.Visible;
+            return;
+        }
+
+        HintText.Visibility = Visibility.Collapsed;
+        var end = action switch
+        {
+            OverlayExportAction.CopyOnly => RegionOverlayEnd.CopyOnly,
+            OverlayExportAction.Save => RegionOverlayEnd.Save,
+            _ => RegionOverlayEnd.Complete,
+        };
+        EndSession(new RegionOverlayResult { End = end, FlattenedSdr = FlattenSelection() });
+    }
+
+    private void BeginTextInput(EditorPoint point)
+    {
+        _textPoint = point;
+        TextInputBox.Text = "";
+        TextInputBorder.Visibility = Visibility.Visible;
+        Microsoft.UI.Xaml.Controls.Canvas.SetLeft(TextInputBorder, point.X);
+        Microsoft.UI.Xaml.Controls.Canvas.SetTop(TextInputBorder, point.Y);
+        TextInputBox.Focus(FocusState.Programmatic);
+    }
+
+    private void TextInputBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter)
+        {
+            _editor.AddText(_textPoint, TextInputBox.Text);
+            TextInputBorder.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+        }
+        else if (e.Key == VirtualKey.Escape)
+        {
+            TextInputBorder.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+        }
+    }
+
+    private void ShowResult(string title, string text)
+    {
+        ResultTitle.Text = title;
+        ResultText.Text = text;
+        ResultPanel.Visibility = Visibility.Visible;
+        LayoutChrome();
+    }
+
+    private void ResultCopy_Click(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace(ResultText.Text))
+        {
+            ClipboardHelper.SetText(ResultText.Text);
+        }
+    }
+
+    private void LayoutChrome()
+    {
+        if (_phase is not OverlayPhase.SelectionActive and not OverlayPhase.LongCapturing)
+        {
+            return;
+        }
+
+        FrameworkElement bar = _phase == OverlayPhase.LongCapturing ? LongCaptureBar : ToolbarBorder;
+        bar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        GetActiveMonitorDip((float)(SelectionRect.X + SelectionRect.Width / 2), (float)(SelectionRect.Y + SelectionRect.Height / 2),
+            out float ml, out float mt, out float mr, out float mb);
+        var pos = ToolbarAnchor.Place(
+            ToEditorRect(SelectionRect),
+            bar.DesiredSize.Width,
+            bar.DesiredSize.Height,
+            new EditorRect(ml, mt, mr - ml, mb - mt),
+            8);
+        Microsoft.UI.Xaml.Controls.Canvas.SetLeft(bar, pos.X);
+        Microsoft.UI.Xaml.Controls.Canvas.SetTop(bar, pos.Y);
+        if (ResultPanel.Visibility == Visibility.Visible)
+        {
+            Microsoft.UI.Xaml.Controls.Canvas.SetLeft(ResultPanel, pos.X);
+            Microsoft.UI.Xaml.Controls.Canvas.SetTop(ResultPanel, pos.Y + bar.DesiredSize.Height + 6);
+        }
+    }
+
+    private void HideChrome()
+    {
+        ToolbarBorder.Visibility = Visibility.Collapsed;
+        LongCaptureBar.Visibility = Visibility.Collapsed;
+        TextInputBorder.Visibility = Visibility.Collapsed;
+        ResultPanel.Visibility = Visibility.Collapsed;
+        HintText.Visibility = Visibility.Collapsed;
+    }
+
+    private void HighlightRect(CanvasDrawingSession ds, Rect rect, float physW, float physH)
+    {
+        double cx = Math.Max(rect.X, 0);
+        double cy = Math.Max(rect.Y, 0);
+        double cw = Math.Max(0, Math.Min(rect.X + rect.Width, _lockedW) - cx);
+        double ch = Math.Max(0, Math.Min(rect.Y + rect.Height, _lockedH) - cy);
+        var clip = new Rect(cx, cy, cw, ch);
+        if (clip.Width > 0 && clip.Height > 0 && _displayBitmap is not null)
+        {
+            ds.DrawImage(_displayBitmap,
+                clip,
+                new Rect(clip.X / _lockedW * physW, clip.Y / _lockedH * physH,
+                         clip.Width / _lockedW * physW, clip.Height / _lockedH * physH),
+                1f, CanvasImageInterpolation.Linear);
+        }
+    }
+
+    private void FillDimOutside(CanvasDrawingSession ds, Rect hole)
+    {
+        var dim = Color.FromArgb(51, 0, 0, 0);
+        ds.FillRectangle(new Rect(0, 0, _lockedW, Math.Max(0, hole.Y)), dim);
+        ds.FillRectangle(new Rect(0, hole.Y + hole.Height, _lockedW, Math.Max(0, _lockedH - hole.Y - hole.Height)), dim);
+        ds.FillRectangle(new Rect(0, hole.Y, Math.Max(0, hole.X), hole.Height), dim);
+        ds.FillRectangle(new Rect(hole.X + hole.Width, hole.Y, Math.Max(0, _lockedW - hole.X - hole.Width), hole.Height), dim);
+    }
+
+    private void DrawHandles(CanvasDrawingSession ds, Rect rect)
+    {
+        DrawHandle(ds, rect.X, rect.Y);
+        DrawHandle(ds, rect.X + rect.Width, rect.Y);
+        DrawHandle(ds, rect.X, rect.Y + rect.Height);
+        DrawHandle(ds, rect.X + rect.Width, rect.Y + rect.Height);
+        DrawHandle(ds, rect.X + rect.Width / 2, rect.Y);
+        DrawHandle(ds, rect.X + rect.Width / 2, rect.Y + rect.Height);
+        DrawHandle(ds, rect.X, rect.Y + rect.Height / 2);
+        DrawHandle(ds, rect.X + rect.Width, rect.Y + rect.Height / 2);
+    }
+
+    private static void DrawHandle(CanvasDrawingSession ds, double cx, double cy)
+    {
+        float s = (float)HandleSize;
+        var r = new Rect(cx - s / 2, cy - s / 2, s, s);
+        ds.FillRectangle(r, Colors.White);
+        ds.DrawRectangle(r, Colors.Black, 1);
+    }
+
+    private CanvasRenderTarget? FlattenSelection()
+    {
+        if (_displayBitmap is null || SelectionRect.Width < 2 || SelectionRect.Height < 2)
+        {
+            return null;
+        }
+
+        var src = GetPhysicalSourceRect();
+        int w = Math.Max(1, (int)src.Width);
+        int h = Math.Max(1, (int)src.Height);
+        var rt = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), w, h, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
+        float ratioX = _displayBitmap.SizeInPixels.Width / _lockedW;
+        float ratioY = _displayBitmap.SizeInPixels.Height / _lockedH;
+        using (var ds = rt.CreateDrawingSession())
+        {
+            ds.DrawImage(_displayBitmap, new Rect(0, 0, w, h), src, 1f, CanvasImageInterpolation.Linear);
+        }
+
+        using (var ds = rt.CreateDrawingSession())
+        {
+            foreach (var mosaic in _editor.Document.Elements.OfType<MosaicElement>())
+            {
+                var mapped = new MosaicElement
+                {
+                    BlockSize = mosaic.BlockSize,
+                    Bounds = new EditorRect(
+                        mosaic.Bounds.X * ratioX - src.X,
+                        mosaic.Bounds.Y * ratioY - src.Y,
+                        mosaic.Bounds.Width * ratioX,
+                        mosaic.Bounds.Height * ratioY),
+                };
+                EditorRenderer.DrawPixelate(ds, rt, mapped);
+            }
+
+            ds.Transform = Matrix3x2.CreateScale(ratioX, ratioY) * Matrix3x2.CreateTranslation(-(float)src.X, -(float)src.Y);
+            foreach (var element in _editor.Document.Elements)
+            {
+                if (element is not MosaicElement)
+                {
+                    EditorRenderer.Draw(ds, element);
+                }
+            }
+        }
+
+        return rt;
+    }
+
+    private void SetExcludeFromCapture(bool exclude)
+    {
+        try { SetWindowDisplayAffinity(WindowHandle, exclude ? WdaExcludeFromCapture : WdaNone); } catch { }
+    }
+
+    private EditorRect CanvasBounds() => new(0, 0, _lockedW, _lockedH);
+
+    private static EditorRect ToEditorRect(Rect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+
+    private static Rect ToRect(EditorRect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
     public Rect GetPhysicalSourceRect()
     {

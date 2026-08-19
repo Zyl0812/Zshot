@@ -262,45 +262,34 @@ internal class ScreenCaptureService
             // 弹覆盖层，等用户选区
             _logger.LogInformation("Region capture: showing overlay window");
             _regionWindow ??= new RegionCaptureWindow();
-            _regionWindow.SetCapture(composite, sdrWhiteLevel, vw, vh);
+            _regionWindow.SetCapture(composite, sdrWhiteLevel, vw, vh, copyOnly);
 
-            bool confirmed = await _regionWindow.Completion.Task;
+            var overlayResult = await _regionWindow.Completion.Task;
+            sdrCrop = overlayResult.FlattenedSdr ?? _regionWindow.SdrCrop;
 
-            if (!confirmed || _regionWindow.SelectionRect.Width < 2 || _regionWindow.SelectionRect.Height < 2)
+            if (!overlayResult.Confirmed || sdrCrop is null || _regionWindow.SelectionRect.Width < 2 || _regionWindow.SelectionRect.Height < 2)
             {
-                return; // 取消
-            }
-
-            // 覆盖层隐藏时已从 _displayBitmap（tonemap 好的 SDR）裁出选区
-            sdrCrop = _regionWindow.SdrCrop;
-
-            if (copyOnly)
-            {
-                // 仅复制：不存文件、无视"自动复制"开关
-                await CopyCaptureToClipboardAsync(sdrCrop, force: true);
-                var mon = User32.MonitorFromWindow(fgHwnd, User32.MonitorFlags.MONITOR_DEFAULTTONEAREST);
-                var dispId = new Microsoft.UI.DisplayId((ulong)mon.DangerousGetHandle());
-                _infoWindow ??= new ScreenCaptureInfoWindow();
-                _infoWindow.CaptureCopySuccess(dispId, sdrCrop);
-                _logger.LogInformation("Region copy-only done");
                 return;
             }
 
-            // 裁剪 HDR 选区用于保存（用窗口提供的物理像素坐标）
             var srcRect = _regionWindow.GetPhysicalSourceRect();
             int cx = (int)srcRect.X;
             int cy = (int)srcRect.Y;
             int cw = (int)srcRect.Width;
             int ch = (int)srcRect.Height;
-            cropped = new CanvasRenderTarget(device, cw, ch, 96, pixelFormat, CanvasAlphaMode.Premultiplied);
-            using (var ds = cropped.CreateDrawingSession())
+            bool longCapture = overlayResult.End == RegionOverlayEnd.LongCapture;
+            if (!longCapture)
             {
-                ds.DrawImage(composite, 0, 0, new Windows.Foundation.Rect(cx, cy, cw, ch));
+                cropped = new CanvasRenderTarget(device, cw, ch, 96, pixelFormat, CanvasAlphaMode.Premultiplied);
+                using (var ds = cropped.CreateDrawingSession())
+                {
+                    ds.DrawImage(composite, 0, 0, new Windows.Foundation.Rect(cx, cy, cw, ch));
+                }
             }
 
             DateTimeOffset frameTime = DateTimeOffset.Now;
-            bool hdr = cropped.Format is DirectXPixelFormat.R16G16B16A16Float;
-            float maxCLL = hdr ? GetMaxCLL(cropped) : -1;
+            bool hdr = cropped is not null && cropped.Format is DirectXPixelFormat.R16G16B16A16Float;
+            float maxCLL = hdr ? GetMaxCLL(cropped!) : -1;
 
             string processName = GetProcessNameFromWindowHandle(fgHwnd);
             string processExeName = GetProcessExeNameFromWindowHandle(fgHwnd);
@@ -320,52 +309,30 @@ internal class ScreenCaptureService
             Microsoft.UI.DisplayId regionDisplayId = new((ulong)fgMonitor.DangerousGetHandle());
             using DisplayInformation regionDisplayInfo = DisplayInformation.CreateForDisplayId(regionDisplayId);
 
-            Interlocked.Exchange(ref _isCapturing, 0);
-            guardReleased = true;
-
-            if (sdrCrop is null)
+            var action = overlayResult.End switch
             {
-                return;
+                RegionOverlayEnd.CopyOnly => OverlayExportAction.CopyOnly,
+                RegionOverlayEnd.Save => OverlayExportAction.Save,
+                _ => OverlayExportAction.Complete,
+            };
+            var decision = ScreenshotSavePolicy.ResolveOverlayExport(
+                action,
+                AppConfig.AutoSaveScreenshotToFile,
+                AppConfig.AutoCopyScreenshotToClipboard);
+
+            CanvasBitmap export = sdrCrop;
+            bool writeFile = decision.WriteFile;
+            bool copy = decision.CopyToClipboard;
+
+            if (hdr && writeFile && cropped is not null)
+            {
+                await SaveCaptureAsync(cropped, processName, processExeName, windowTitle, frameTime, regionDisplayInfo, maxCLL, sdrWhiteLevel, regionDisplayId, true, copyToClipboard: false, notifyInfoWindow: false, convertUneditedSdr: false);
             }
 
-            var editor = new CaptureEditorWindow();
-            bool edited = await editor.EditAsync(sdrCrop);
-            CanvasBitmap? longImage = null;
-            if (editor.RequestedLongCapture)
+            string? sdrPath = null;
+            if (writeFile)
             {
-                var runner = new LongCaptureRunner();
-                longImage = await runner.RunAsync(sdrCrop, srcRect, AppConfig.LongCaptureMaxHeight, default);
-                if (longImage is null)
-                {
-                    editor.Flattened?.Dispose();
-                    return;
-                }
-            }
-            else if (!edited)
-            {
-                editor.Flattened?.Dispose();
-                return;
-            }
-
-            CanvasBitmap export = longImage ?? editor.Flattened ?? sdrCrop;
-            bool writeFile = ScreenshotSavePolicy.ShouldWriteFile(AppConfig.AutoSaveScreenshotToFile, copyOnlyHotkey: false);
-            bool copy = ScreenshotSavePolicy.ShouldCopyToClipboard(AppConfig.AutoCopyScreenshotToClipboard, copyOnlyHotkey: false);
-
-            _infoWindow ??= new ScreenCaptureInfoWindow();
-            _infoWindow.CaptureStart(regionDisplayId, export, maxCLL);
-
-            if (hdr && writeFile)
-            {
-                await SaveCaptureAsync(cropped, processName, processExeName, windowTitle, frameTime, regionDisplayInfo, maxCLL, sdrWhiteLevel, regionDisplayId, true, copyToClipboard: false);
-            }
-
-            if (writeFile && !hdr)
-            {
-                await SaveSdrExportAsync(export, processName, processExeName, windowTitle, frameTime, isRegion: true);
-            }
-            else if (writeFile && hdr)
-            {
-                await SaveSdrExportAsync(export, processName, processExeName, windowTitle + "_SDR", frameTime, isRegion: true);
+                sdrPath = await SaveSdrExportAsync(export, processName, processExeName, hdr ? windowTitle + "_SDR" : windowTitle, frameTime, isRegion: true);
             }
 
             if (copy)
@@ -373,8 +340,16 @@ internal class ScreenCaptureService
                 await CopyCaptureToClipboardAsync(export, force: true);
             }
 
-            editor.Flattened?.Dispose();
-            longImage?.Dispose();
+            _infoWindow ??= new ScreenCaptureInfoWindow();
+            if (writeFile && sdrPath is not null)
+            {
+                _infoWindow.CaptureSuccess(regionDisplayId, export, sdrPath, maxCLL);
+            }
+            else if (copy)
+            {
+                _infoWindow.CaptureCopySuccess(regionDisplayId, export, maxCLL);
+            }
+
             _logger.LogInformation("Region screenshot saved");
         }
         catch (Exception ex)
@@ -399,7 +374,8 @@ internal class ScreenCaptureService
 
     private async Task SaveCaptureAsync(CanvasBitmap bitmap, string processName, string processExeName,
         string windowTitle, DateTimeOffset frameTime, DisplayInformation displayInfo,
-        float maxCLL, float sdrWhiteLevel, Microsoft.UI.DisplayId displayId, bool isRegion = false, bool copyToClipboard = true)
+        float maxCLL, float sdrWhiteLevel, Microsoft.UI.DisplayId displayId, bool isRegion = false, bool copyToClipboard = true,
+        bool notifyInfoWindow = true, bool convertUneditedSdr = true)
     {
         bool hdr = bitmap.Format is DirectXPixelFormat.R16G16B16A16Float;
         bool writeFile = ScreenshotSavePolicy.ShouldWriteFile(AppConfig.AutoSaveScreenshotToFile, copyOnlyHotkey: false);
@@ -412,6 +388,7 @@ internal class ScreenCaptureService
             if (clipboardKind is ClipboardExportKind.SdrBitmap)
             {
                 await CopySdrBitmapToClipboardAsync(bitmap, sdrWhiteLevel);
+                _infoWindow?.CaptureCopySuccess(displayId, bitmap, maxCLL);
             }
             return;
         }
@@ -419,7 +396,7 @@ internal class ScreenCaptureService
         // 提前判定内容是否真 HDR + 各分支标志（maxCLL 入口已有，无需等编码后再判）
         bool contentIsHDR = hdr && maxCLL > sdrWhiteLevel + 5;
         bool deleteHDR = hdr && AppConfig.DeleteHDRIfSDRContent && !contentIsHDR;
-        bool autoConvertSDR = hdr && AppConfig.AutoConvertScreenshotToSDR && !deleteHDR;
+        bool autoConvertSDR = convertUneditedSdr && hdr && AppConfig.AutoConvertScreenshotToSDR && !deleteHDR;
         bool outputIsHDR = hdr && !deleteHDR;  // 主文件是否走 HDR 编码
 
         int quality = AppConfig.ScreenCaptureEncodeQuality switch { 0 => 80, 1 => 90, 2 => 100, _ => 90 };
@@ -532,7 +509,10 @@ internal class ScreenCaptureService
             await CopySdrBitmapToClipboardAsync(bitmap, sdrWhiteLevel);
         }
 
-        _infoWindow?.CaptureSuccess(displayId, bitmap, finalFile, maxCLL);
+        if (notifyInfoWindow)
+        {
+            _infoWindow?.CaptureSuccess(displayId, bitmap, finalFile, maxCLL);
+        }
     }
 
 
@@ -550,7 +530,7 @@ internal class ScreenCaptureService
     }
 
 
-    private async Task SaveSdrExportAsync(CanvasBitmap bitmap, string processName, string processExeName, string windowTitle, DateTimeOffset frameTime, bool isRegion)
+    private async Task<string> SaveSdrExportAsync(CanvasBitmap bitmap, string processName, string processExeName, string windowTitle, DateTimeOffset frameTime, bool isRegion)
     {
         string? targetFolder = AppConfig.ScreenshotFolder;
         if (string.IsNullOrWhiteSpace(targetFolder))
@@ -594,6 +574,7 @@ internal class ScreenCaptureService
         using var fs = File.Create(filePath);
         ms.Seek(0, SeekOrigin.Begin);
         await ms.CopyToAsync(fs);
+        return filePath;
     }
 
 
@@ -603,28 +584,7 @@ internal class ScreenCaptureService
     /// </summary>
     private static CanvasRenderTarget TonemapToSdr(CanvasBitmap hdrBitmap, float sdrWhiteLevel)
     {
-        var device = CanvasDevice.GetSharedDevice();
-        int w = (int)hdrBitmap.SizeInPixels.Width;
-        int h = (int)hdrBitmap.SizeInPixels.Height;
-        var sdr = new CanvasRenderTarget(device, w, h, 96, DirectXPixelFormat.R8G8B8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
-        using (var ds = sdr.CreateDrawingSession())
-        {
-            var wle = new WhiteLevelAdjustmentEffect
-            {
-                Source = hdrBitmap,
-                InputWhiteLevel = 80,
-                OutputWhiteLevel = sdrWhiteLevel,
-                BufferPrecision = CanvasBufferPrecision.Precision16Float,
-            };
-            var gamma = new SrgbGammaEffect
-            {
-                Source = wle,
-                GammaMode = SrgbGammaMode.OETF,
-                BufferPrecision = CanvasBufferPrecision.Precision16Float,
-            };
-            ds.DrawImage(gamma);
-        }
-        return sdr;
+        return ScreenCaptureHelper.TonemapToSdr(hdrBitmap, sdrWhiteLevel);
     }
 
 

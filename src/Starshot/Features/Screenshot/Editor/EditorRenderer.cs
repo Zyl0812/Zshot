@@ -95,7 +95,7 @@ internal static class EditorRenderer
         {
             if (element is MosaicElement mosaic)
             {
-                DrawMosaic(ds, background, mosaic);
+                DrawPixelate(ds, background, mosaic);
             }
             else
             {
@@ -104,7 +104,7 @@ internal static class EditorRenderer
         }
     }
 
-    private static void DrawMosaic(CanvasDrawingSession ds, CanvasBitmap background, MosaicElement mosaic)
+    public static void DrawPixelate(CanvasDrawingSession ds, CanvasBitmap background, MosaicElement mosaic)
     {
         int block = Math.Max(4, mosaic.BlockSize);
         int x0 = (int)Math.Floor(mosaic.Bounds.X);

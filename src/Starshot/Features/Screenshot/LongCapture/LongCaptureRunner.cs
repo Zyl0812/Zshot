@@ -1,4 +1,5 @@
 using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Display;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Starshot.Core.LongCapture;
@@ -15,36 +16,41 @@ namespace Starshot.Features.Screenshot.LongCapture;
 internal sealed class LongCaptureRunner
 {
     public async Task<CanvasRenderTarget?> RunAsync(
-        CanvasBitmap firstFrame,
         Rect regionOnVirtualScreen,
         int maxHeight,
+        Action<string> setStatus,
+        Task<bool> userDecision,
         CancellationToken cancellationToken)
     {
+        var firstFrame = await CaptureRegionSdrAsync(regionOnVirtualScreen).ConfigureAwait(true);
+        if (firstFrame is null)
+        {
+            return null;
+        }
+
         var buffer = new LongImageBuffer(maxHeight);
         int width = (int)firstFrame.SizeInPixels.Width;
         int height = (int)firstFrame.SizeInPixels.Height;
         if (!buffer.TryAppend(height))
         {
+            firstFrame.Dispose();
             throw new InvalidOperationException("First frame exceeds the long-capture height limit.");
         }
 
         var segments = new List<(CanvasBitmap Bitmap, int CropY, int Height)>
         {
-            (CloneSdr(firstFrame), 0, height),
+            (firstFrame, 0, height),
         };
 
         byte[] previousGray = ToGray(firstFrame);
-
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var control = new LongCaptureControlWindow();
-        var dialogTask = control.WaitAsync();
+        setStatus($"已捕获 1 段 / {buffer.TotalHeight}px");
 
         try
         {
-            while (!cts.IsCancellationRequested && !dialogTask.IsCompleted)
+            while (!cancellationToken.IsCancellationRequested && !userDecision.IsCompleted)
             {
-                await Task.Delay(450, cts.Token).ConfigureAwait(true);
-                var frame = await CaptureRegionAsync(regionOnVirtualScreen).ConfigureAwait(true);
+                await Task.Delay(450, cancellationToken).ConfigureAwait(true);
+                var frame = await CaptureRegionSdrAsync(regionOnVirtualScreen).ConfigureAwait(true);
                 if (frame is null)
                 {
                     continue;
@@ -67,22 +73,30 @@ internal sealed class LongCaptureRunner
 
                 if (!buffer.TryAppend(appendHeight))
                 {
-                    control.SetStatus("已达最大高度");
+                    setStatus("已达最大高度");
                     frame.Dispose();
                     break;
                 }
 
                 segments.Add((frame, align.OffsetY, appendHeight));
                 previousGray = currentGray;
-                control.SetStatus($"已捕获 {buffer.SegmentCount} 段 / {buffer.TotalHeight}px");
+                setStatus($"已捕获 {buffer.SegmentCount} 段 / {buffer.TotalHeight}px");
             }
         }
         catch (OperationCanceledException)
         {
-            // finished or cancelled
         }
 
-        bool confirmed = await dialogTask.ConfigureAwait(true);
+        bool confirmed;
+        try
+        {
+            confirmed = await userDecision.ConfigureAwait(true);
+        }
+        catch
+        {
+            confirmed = false;
+        }
+
         if (!confirmed)
         {
             foreach (var s in segments)
@@ -109,7 +123,7 @@ internal sealed class LongCaptureRunner
         return output;
     }
 
-    private static async Task<CanvasBitmap?> CaptureRegionAsync(Rect region)
+    private static async Task<CanvasBitmap?> CaptureRegionSdrAsync(Rect region)
     {
         int vx = User32.GetSystemMetrics((User32.SystemMetric)76);
         int vy = User32.GetSystemMetrics((User32.SystemMetric)77);
@@ -130,15 +144,35 @@ internal sealed class LongCaptureRunner
         display ??= DisplayArea.Primary;
         int localX = (int)region.X - (display.OuterBounds.X - vx);
         int localY = (int)region.Y - (display.OuterBounds.Y - vy);
-        using var frame = await ScreenCaptureHelper.CaptureMonitorAsync((nint)display.DisplayId.Value, DirectXPixelFormat.R8G8B8A8UIntNormalized);
+
+        using var info = DisplayInformation.CreateForDisplayId(display.DisplayId);
+        var color = info.GetAdvancedColorInfo();
+        bool hdr = color.CurrentAdvancedColorKind is DisplayAdvancedColorKind.HighDynamicRange;
+        var format = hdr ? DirectXPixelFormat.R16G16B16A16Float : DirectXPixelFormat.R8G8B8A8UIntNormalized;
+        using var frame = await ScreenCaptureHelper.CaptureMonitorAsync((nint)display.DisplayId.Value, format);
         using var full = CanvasBitmap.CreateFromDirect3D11Surface(CanvasDevice.GetSharedDevice(), frame.Surface, 96);
-        var cropped = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), (float)region.Width, (float)region.Height, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
-        using (var ds = cropped.CreateDrawingSession())
+        CanvasBitmap source = full;
+        CanvasRenderTarget? toneMapped = null;
+        if (hdr)
         {
-            ds.DrawImage(full, new Rect(0, 0, region.Width, region.Height), new Rect(localX, localY, region.Width, region.Height));
+            toneMapped = ScreenCaptureHelper.TonemapToSdr(full, (float)color.SdrWhiteLevelInNits);
+            source = toneMapped;
         }
 
-        return cropped;
+        try
+        {
+            var cropped = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), (float)region.Width, (float)region.Height, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
+            using (var ds = cropped.CreateDrawingSession())
+            {
+                ds.DrawImage(source, new Rect(0, 0, region.Width, region.Height), new Rect(localX, localY, region.Width, region.Height));
+            }
+
+            return cropped;
+        }
+        finally
+        {
+            toneMapped?.Dispose();
+        }
     }
 
     private static byte[] ToGray(CanvasBitmap bitmap)
@@ -154,13 +188,5 @@ internal sealed class LongCaptureRunner
 
         var src = sdr ?? bitmap;
         return GrayscaleConvert.BgraToGray(src.GetPixelBytes(), (int)src.SizeInPixels.Width, (int)src.SizeInPixels.Height);
-    }
-
-    private static CanvasBitmap CloneSdr(CanvasBitmap bitmap)
-    {
-        var clone = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), bitmap.SizeInPixels.Width, bitmap.SizeInPixels.Height, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
-        using var ds = clone.CreateDrawingSession();
-        ds.DrawImage(bitmap);
-        return clone;
     }
 }

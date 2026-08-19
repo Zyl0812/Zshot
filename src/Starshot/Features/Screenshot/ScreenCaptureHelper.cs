@@ -1,4 +1,6 @@
 using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Effects;
+using Starshot.Features.Codec;
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -44,6 +46,32 @@ internal partial class ScreenCaptureHelper
         return await CaptureAsync(item, pixelFormat, device, cancellationToken);
     }
 
+
+    public static CanvasRenderTarget TonemapToSdr(CanvasBitmap hdrBitmap, float sdrWhiteLevel)
+    {
+        int w = (int)hdrBitmap.SizeInPixels.Width;
+        int h = (int)hdrBitmap.SizeInPixels.Height;
+        var sdr = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), w, h, 96, DirectXPixelFormat.R8G8B8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
+        using (var ds = sdr.CreateDrawingSession())
+        {
+            var wle = new WhiteLevelAdjustmentEffect
+            {
+                Source = hdrBitmap,
+                InputWhiteLevel = 80,
+                OutputWhiteLevel = sdrWhiteLevel,
+                BufferPrecision = CanvasBufferPrecision.Precision16Float,
+            };
+            var gamma = new SrgbGammaEffect
+            {
+                Source = wle,
+                GammaMode = SrgbGammaMode.OETF,
+                BufferPrecision = CanvasBufferPrecision.Precision16Float,
+            };
+            ds.DrawImage(gamma);
+        }
+
+        return sdr;
+    }
 
     public static async Task<Direct3D11CaptureFrame> CaptureMonitorAsync(nint monitor, DirectXPixelFormat pixelFormat, CanvasDevice? device = null, CancellationToken cancellationToken = default)
     {
