@@ -8,6 +8,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Zshot.Features.Codec;
 using Zshot.Core;
 using Zshot.Core.Editor;
@@ -1006,7 +1007,70 @@ public sealed partial class RegionCaptureWindow : WindowEx
         {
             _editor.Tool = tool;
             _editor.ClearSelection();
+            SyncToolChrome();
         }
+    }
+
+    private void ColorSwatch_Click(object sender, RoutedEventArgs e)
+    {
+        ColorChipBorder.Visibility = ColorChipBorder.Visibility == Visibility.Visible
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+        LayoutChrome();
+    }
+
+    private void StrokeColor_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string color })
+        {
+            _editor.StrokeColor = color;
+            if (TryParseHex(color, out var parsed))
+            {
+                ColorSwatch.Background = new SolidColorBrush(parsed);
+            }
+        }
+    }
+
+    private void StrokeWidth_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string tag } && double.TryParse(tag, out double width))
+        {
+            _editor.StrokeWidth = width;
+            StrokeChipLabel.Text = $"{width:0}px";
+        }
+    }
+
+    private static bool TryParseHex(string hex, out Windows.UI.Color color)
+    {
+        color = default;
+        hex = hex.TrimStart('#');
+        if (hex.Length == 6)
+        {
+            hex = "FF" + hex;
+        }
+
+        if (hex.Length != 8)
+        {
+            return false;
+        }
+
+        color = Windows.UI.Color.FromArgb(
+            Convert.ToByte(hex[..2], 16),
+            Convert.ToByte(hex[2..4], 16),
+            Convert.ToByte(hex[4..6], 16),
+            Convert.ToByte(hex[6..8], 16));
+        return true;
+    }
+
+    private void SyncToolChrome()
+    {
+        ColorChipBorder.Visibility = _editor.Tool is "select" or "" ? Visibility.Collapsed : Visibility.Visible;
+        LayoutChrome();
+    }
+
+    private void ResultClose_Click(object sender, RoutedEventArgs e)
+    {
+        ResultPanel.Visibility = Visibility.Collapsed;
     }
 
     private void Undo_Click(object sender, RoutedEventArgs e) => _editor.Undo();
@@ -1245,10 +1309,33 @@ public sealed partial class RegionCaptureWindow : WindowEx
             8);
         Microsoft.UI.Xaml.Controls.Canvas.SetLeft(bar, pos.X);
         Microsoft.UI.Xaml.Controls.Canvas.SetTop(bar, pos.Y);
+
+        if (ColorChipBorder.Visibility == Visibility.Visible)
+        {
+            ColorChipBorder.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            double chipX = pos.X - ColorChipBorder.DesiredSize.Width - 8;
+            if (chipX < ml)
+            {
+                chipX = pos.X;
+            }
+
+            Microsoft.UI.Xaml.Controls.Canvas.SetLeft(ColorChipBorder, chipX);
+            Microsoft.UI.Xaml.Controls.Canvas.SetTop(ColorChipBorder, pos.Y - ColorChipBorder.DesiredSize.Height - 8);
+        }
+
         if (ResultPanel.Visibility == Visibility.Visible)
         {
-            Microsoft.UI.Xaml.Controls.Canvas.SetLeft(ResultPanel, pos.X);
-            Microsoft.UI.Xaml.Controls.Canvas.SetTop(ResultPanel, pos.Y + bar.DesiredSize.Height + 6);
+            ResultPanel.Measure(new Size(280, 280));
+            double rx = SelectionRect.X + SelectionRect.Width + 8;
+            if (rx + 280 > mr)
+            {
+                rx = SelectionRect.X - 288;
+            }
+
+            rx = Math.Clamp(rx, ml, Math.Max(ml, mr - 280));
+            double ry = Math.Clamp(SelectionRect.Y, mt, Math.Max(mt, mb - 120));
+            Microsoft.UI.Xaml.Controls.Canvas.SetLeft(ResultPanel, rx);
+            Microsoft.UI.Xaml.Controls.Canvas.SetTop(ResultPanel, ry);
         }
     }
 
@@ -1258,6 +1345,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
         LongCaptureBar.Visibility = Visibility.Collapsed;
         TextInputBorder.Visibility = Visibility.Collapsed;
         ResultPanel.Visibility = Visibility.Collapsed;
+        ColorChipBorder.Visibility = Visibility.Collapsed;
         HintText.Visibility = Visibility.Collapsed;
     }
 
@@ -1280,7 +1368,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void FillDimOutside(CanvasDrawingSession ds, Rect hole)
     {
-        var dim = Color.FromArgb(51, 0, 0, 0);
+        var dim = Color.FromArgb(102, 0, 0, 0);
         ds.FillRectangle(new Rect(0, 0, _lockedW, Math.Max(0, hole.Y)), dim);
         ds.FillRectangle(new Rect(0, hole.Y + hole.Height, _lockedW, Math.Max(0, _lockedH - hole.Y - hole.Height)), dim);
         ds.FillRectangle(new Rect(0, hole.Y, Math.Max(0, hole.X), hole.Height), dim);

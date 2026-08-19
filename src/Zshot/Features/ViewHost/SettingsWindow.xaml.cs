@@ -23,7 +23,7 @@ public sealed partial class SettingsWindow : WindowEx
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AdaptTitleBarButtonColorToActuallTheme();
         SetDragRectangles(new RectInt32(0, 0, 100000, (int)(48 * UIScale)));
-        CenterInScreen(960, 720);
+        CenterInScreen(580, 640);
         new SystemBackdropHelper(this).TrySetMica();
         AppWindow.Closing += AppWindow_Closing;
         ((FrameworkElement)Content).Loaded += SettingsWindow_Loaded;

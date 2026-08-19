@@ -15,6 +15,8 @@ internal sealed class OverlayAnnotationController
     public EditorDocument Document { get; } = new();
     public EditorHistory History { get; } = new();
     public string Tool { get; set; } = "select";
+    public string StrokeColor { get; set; } = "#FF0066FF";
+    public double StrokeWidth { get; set; } = 3;
     public EditorElement? Draft { get; private set; }
     public EditorElement? Selected { get; private set; }
     public bool IsDragging => _dragging;
@@ -83,6 +85,8 @@ internal sealed class OverlayAnnotationController
             {
                 Number = _nextNumber++,
                 Bounds = new EditorRect(pt.X - 14, pt.Y - 14, 28, 28),
+                StrokeColor = StrokeColor,
+                StrokeWidth = StrokeWidth,
             }));
             _dragging = false;
             return PressKind.None;
@@ -153,6 +157,8 @@ internal sealed class OverlayAnnotationController
         {
             Text = text,
             FontSize = 20,
+            StrokeColor = StrokeColor,
+            StrokeWidth = StrokeWidth,
             Bounds = new EditorRect(pt.X, pt.Y, Math.Max(40, text.Length * 12), 28),
         }));
     }
@@ -172,19 +178,31 @@ internal sealed class OverlayAnnotationController
         }
     }
 
-    private EditorElement CreateDraft(EditorPoint pt) => Tool switch
+    private EditorElement CreateDraft(EditorPoint pt)
     {
-        "ellipse" => new EllipseElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
-        "line" => new LineElement { Start = pt, End = pt, Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
-        "arrow" => new ArrowElement { Start = pt, End = pt, Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
-        "pen" => CreatePen(pt),
-        "mosaic" => new MosaicElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
-        _ => new RectangleElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
-    };
+        EditorElement element = Tool switch
+        {
+            "ellipse" => new EllipseElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
+            "line" => new LineElement { Start = pt, End = pt, Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
+            "arrow" => new ArrowElement { Start = pt, End = pt, Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
+            "pen" => CreatePen(pt),
+            "mosaic" => new MosaicElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
+            _ => new RectangleElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
+        };
+        ApplyStroke(element);
+        return element;
+    }
 
-    private static PenElement CreatePen(EditorPoint pt)
+    private void ApplyStroke(EditorElement element)
+    {
+        element.StrokeColor = StrokeColor;
+        element.StrokeWidth = StrokeWidth;
+    }
+
+    private PenElement CreatePen(EditorPoint pt)
     {
         var pen = new PenElement();
+        ApplyStroke(pen);
         pen.Points.Add(pt);
         pen.RecalculateBounds();
         return pen;

@@ -9,9 +9,8 @@
              mc:Ignorable="d">
 
     <ScrollViewer Padding="0">
-        <StackPanel MaxWidth="720"
-                    Padding="48,24,48,48"
-                    Spacing="20">
+        <StackPanel Padding="20,16,24,24"
+                    Spacing="16">
 
             <Grid Margin="0,0,0,0">
                 <StackPanel VerticalAlignment="Center"

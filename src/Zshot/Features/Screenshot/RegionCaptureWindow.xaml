@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+THESIS: The shot is the product; chrome is a PixPin/QQ/钉钉 glass strip that never outshines the selection.
+OWN-WORLD: 40% dim unused, marching-ants + white handles, pill frosted bar #1A1A1E, icon-only tools, #0066FF 完成, result docks to the selection’s right.
+STORY: Freeze, mark, read or translate, copy/save, vanish. Settings is the same glass in a compact panel.
+FIRST VIEWPORT: Dimmed desktop, lit selection, single icon strip under the box, color chip left of the strip, OCR/译文 on the right, magnifier at the cursor.
+FORM: Category standard (canon) · seed 4f3a059c · composition overlay-c.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
 <sf:WindowEx x:Class="Zshot.Features.Screenshot.RegionCaptureWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -11,65 +19,259 @@
     <Grid x:Name="RootGrid"
           Background="Transparent"
           KeyDown="RootGrid_KeyDown">
+        <Grid.Resources>
+            <!-- Default Button PointerOver writes ThemeResource Foreground and never restores it in Normal. -->
+            <ControlTemplate x:Key="OverlayButtonTemplate" TargetType="Button">
+                <Grid x:Name="Root"
+                      Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      CornerRadius="{TemplateBinding CornerRadius}"
+                      Padding="{TemplateBinding Padding}">
+                    <Border x:Name="HoverOverlay"
+                            Background="Transparent"
+                            CornerRadius="{TemplateBinding CornerRadius}" />
+                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      FontSize="{TemplateBinding FontSize}"
+                                      FontWeight="{TemplateBinding FontWeight}"
+                                      Foreground="{TemplateBinding Foreground}" />
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="PointerOver">
+                                <VisualState.Setters>
+                                    <Setter Target="HoverOverlay.Background" Value="#14000000" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Target="HoverOverlay.Background" Value="#22000000" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Target="Root.Opacity" Value="0.4" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                </Grid>
+            </ControlTemplate>
+            <ControlTemplate x:Key="OverlayAccentButtonTemplate" TargetType="Button">
+                <Grid x:Name="Root"
+                      Background="{TemplateBinding Background}"
+                      CornerRadius="{TemplateBinding CornerRadius}"
+                      Padding="{TemplateBinding Padding}">
+                    <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Content}"
+                                      FontWeight="{TemplateBinding FontWeight}"
+                                      Foreground="{TemplateBinding Foreground}" />
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="PointerOver">
+                                <VisualState.Setters>
+                                    <Setter Target="Root.Background" Value="#FF3385FF" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Target="Root.Background" Value="#FF0052CC" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Target="Root.Opacity" Value="0.4" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                </Grid>
+            </ControlTemplate>
+            <Style x:Key="OverlayIconButton" TargetType="Button">
+                <Setter Property="Width" Value="36" />
+                <Setter Property="Height" Value="36" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="#1C1C1E" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Template" Value="{StaticResource OverlayButtonTemplate}" />
+            </Style>
+            <Style x:Key="OverlayChipButton" TargetType="Button">
+                <Setter Property="Height" Value="28" />
+                <Setter Property="Padding" Value="8,2" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="#1C1C1E" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Template" Value="{StaticResource OverlayButtonTemplate}" />
+            </Style>
+            <Style x:Key="OverlayAccentButton" TargetType="Button">
+                <Setter Property="Height" Value="36" />
+                <Setter Property="MinWidth" Value="64" />
+                <Setter Property="Padding" Value="14,0" />
+                <Setter Property="Background" Value="#FF0066FF" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="CornerRadius" Value="18" />
+                <Setter Property="Template" Value="{StaticResource OverlayAccentButtonTemplate}" />
+            </Style>
+        </Grid.Resources>
+
         <mgcux:CanvasSwapChainPanel x:Name="Canvas"
                              PointerPressed="Canvas_PointerPressed"
                              PointerMoved="Canvas_PointerMoved"
                              PointerReleased="Canvas_PointerReleased"
                              PointerCaptureLost="Canvas_PointerCaptureLost" />
-        <Canvas x:Name="ChromeLayer">
-            <Border x:Name="ToolbarBorder"
-                    Padding="6"
-                    Background="#E0222222"
-                    CornerRadius="6"
+        <Canvas x:Name="ChromeLayer" RequestedTheme="Light">
+            <Border x:Name="ColorChipBorder"
+                    Padding="10,8"
+                    Background="#F2F7F7F8"
+                    BorderBrush="#26000000"
+                    BorderThickness="1"
+                    CornerRadius="12"
                     Visibility="Collapsed">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Button Click="Tool_Click" Content="选择" Tag="select" />
-                        <Button Click="Tool_Click" Content="矩形" Tag="rect" />
-                        <Button Click="Tool_Click" Content="椭圆" Tag="ellipse" />
-                        <Button Click="Tool_Click" Content="直线" Tag="line" />
-                        <Button Click="Tool_Click" Content="箭头" Tag="arrow" />
-                        <Button Click="Tool_Click" Content="画笔" Tag="pen" />
-                        <Button Click="Tool_Click" Content="文字" Tag="text" />
-                        <Button Click="Tool_Click" Content="马赛克" Tag="mosaic" />
-                        <Button Click="Tool_Click" Content="序号" Tag="number" />
-                        <Button Click="Undo_Click" Content="撤销" />
-                        <Button Click="Redo_Click" Content="重做" />
-                        <Button Click="Clear_Click" Content="清空" />
+                <StackPanel Spacing="6">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button Width="22" Height="22" Padding="0" Background="#FFFF3B30" BorderThickness="0" CornerRadius="11" Tag="#FFFF3B30" Click="StrokeColor_Click" Template="{StaticResource OverlayButtonTemplate}" />
+                        <Button Width="22" Height="22" Padding="0" Background="#FFFFCC00" BorderThickness="0" CornerRadius="11" Tag="#FFFFCC00" Click="StrokeColor_Click" Template="{StaticResource OverlayButtonTemplate}" />
+                        <Button Width="22" Height="22" Padding="0" Background="#FF0066FF" BorderThickness="0" CornerRadius="11" Tag="#FF0066FF" Click="StrokeColor_Click" Template="{StaticResource OverlayButtonTemplate}" />
+                        <Button Width="22" Height="22" Padding="0" Background="#FF34C759" BorderThickness="0" CornerRadius="11" Tag="#FF34C759" Click="StrokeColor_Click" Template="{StaticResource OverlayButtonTemplate}" />
+                        <Button Width="22" Height="22" Padding="0" Background="#FFFFFFFF" BorderBrush="#26000000" BorderThickness="1" CornerRadius="11" Tag="#FFFFFFFF" Click="StrokeColor_Click" Template="{StaticResource OverlayButtonTemplate}" />
+                        <Button Width="22" Height="22" Padding="0" Background="#FF111111" BorderThickness="0" CornerRadius="11" Tag="#FF111111" Click="StrokeColor_Click" Template="{StaticResource OverlayButtonTemplate}" />
                     </StackPanel>
-                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal" Spacing="4">
-                        <Button Click="Ocr_Click" Content="OCR" />
-                        <Button Click="Translate_Click" Content="翻译" />
-                        <Button Click="LongCapture_Click" Content="长截图" />
-                        <Button Click="Copy_Click" Content="复制" />
-                        <Button Click="Save_Click" Content="保存" />
-                        <Button Click="Complete_Click" Content="完成" />
-                        <Button Click="Cancel_Click" Content="取消" />
-                        <TextBlock x:Name="HintText"
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button Style="{StaticResource OverlayChipButton}" Tag="2" Click="StrokeWidth_Click" Content="2" />
+                        <Button Style="{StaticResource OverlayChipButton}" Tag="3" Click="StrokeWidth_Click" Content="3" />
+                        <Button Style="{StaticResource OverlayChipButton}" Tag="6" Click="StrokeWidth_Click" Content="6" />
+                        <TextBlock x:Name="StrokeChipLabel"
                                    VerticalAlignment="Center"
-                                   Foreground="White"
-                                   Visibility="Collapsed" />
+                                   FontSize="12"
+                                   Foreground="#6C6C70"
+                                   Text="3px" />
                     </StackPanel>
                 </StackPanel>
             </Border>
+
+            <Border x:Name="ToolbarBorder"
+                    Padding="8,6,6,6"
+                    Background="#F2F7F7F8"
+                    BorderBrush="#26000000"
+                    BorderThickness="1"
+                    CornerRadius="22"
+                    Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                    <Button x:Name="ColorSwatchButton"
+                            Style="{StaticResource OverlayIconButton}"
+                            Click="ColorSwatch_Click"
+                            CornerRadius="18"
+                            ToolTipService.ToolTip="颜色 / 线宽">
+                        <Border x:Name="ColorSwatch"
+                                Width="16"
+                                Height="16"
+                                Background="#FF0066FF"
+                                CornerRadius="8" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="select" ToolTipService.ToolTip="选择">
+                        <FontIcon FontSize="16" Glyph="&#xE8B0;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="rect" ToolTipService.ToolTip="矩形">
+                        <FontIcon FontSize="16" Glyph="&#xE739;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="ellipse" ToolTipService.ToolTip="椭圆">
+                        <FontIcon FontSize="16" Glyph="&#xEA3A;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="line" ToolTipService.ToolTip="直线">
+                        <FontIcon FontSize="16" Glyph="&#xE76F;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="arrow" ToolTipService.ToolTip="箭头">
+                        <FontIcon FontSize="16" Glyph="&#xF54E;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="pen" ToolTipService.ToolTip="画笔">
+                        <FontIcon FontSize="16" Glyph="&#xED63;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="text" ToolTipService.ToolTip="文字">
+                        <FontIcon FontSize="16" Glyph="&#xE8D2;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="mosaic" ToolTipService.ToolTip="马赛克">
+                        <FontIcon FontSize="16" Glyph="&#xE7B3;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="number" ToolTipService.ToolTip="序号">
+                        <FontIcon FontSize="16" Glyph="&#xE8FD;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Undo_Click" ToolTipService.ToolTip="撤销">
+                        <FontIcon FontSize="16" Glyph="&#xE7A7;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Redo_Click" ToolTipService.ToolTip="重做">
+                        <FontIcon FontSize="16" Glyph="&#xE7A6;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Clear_Click" ToolTipService.ToolTip="清空">
+                        <FontIcon FontSize="16" Glyph="&#xE74D;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Ocr_Click" ToolTipService.ToolTip="OCR">
+                        <FontIcon FontSize="16" Glyph="&#xE8EC;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Translate_Click" ToolTipService.ToolTip="翻译">
+                        <FontIcon FontSize="16" Glyph="&#xE8C1;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="LongCapture_Click" ToolTipService.ToolTip="长截图">
+                        <FontIcon FontSize="16" Glyph="&#xE8A4;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Copy_Click" ToolTipService.ToolTip="复制">
+                        <FontIcon FontSize="16" Glyph="&#xE8C8;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Save_Click" ToolTipService.ToolTip="保存">
+                        <FontIcon FontSize="16" Glyph="&#xE74E;" />
+                    </Button>
+                    <Button Style="{StaticResource OverlayAccentButton}"
+                            Click="Complete_Click"
+                            Content="完成" />
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Cancel_Click" ToolTipService.ToolTip="取消">
+                        <FontIcon FontSize="16" Glyph="&#xE711;" />
+                    </Button>
+                    <TextBlock x:Name="HintText"
+                               VerticalAlignment="Center"
+                               Margin="8,0,4,0"
+                               Foreground="#1C1C1E"
+                               Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
             <Border x:Name="LongCaptureBar"
-                    Padding="8"
-                    Background="#E0222222"
-                    CornerRadius="6"
+                    Padding="12,8"
+                    Background="#F2F7F7F8"
+                    BorderBrush="#26000000"
+                    BorderThickness="1"
+                    CornerRadius="16"
                     Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock x:Name="LongCaptureStatus"
                                VerticalAlignment="Center"
-                               Foreground="White"
+                               Foreground="#1C1C1E"
                                Text="请滚动页面以继续截图" />
-                    <Button Click="LongCaptureFinish_Click" Content="完成" />
-                    <Button Click="LongCaptureCancel_Click" Content="取消" />
+                    <Button Style="{StaticResource OverlayAccentButton}"
+                            Height="32"
+                            Click="LongCaptureFinish_Click"
+                            Content="完成" />
+                    <Button Style="{StaticResource OverlayChipButton}"
+                            Click="LongCaptureCancel_Click"
+                            Content="取消" />
                 </StackPanel>
             </Border>
             <Border x:Name="TextInputBorder"
-                    Padding="4"
-                    Background="#F0222222"
-                    CornerRadius="4"
+                    Padding="6"
+                    Background="#F2F7F7F8"
+                    BorderBrush="#26000000"
+                    BorderThickness="1"
+                    CornerRadius="8"
                     Visibility="Collapsed">
                 <TextBox x:Name="TextInputBox"
                          MinWidth="180"
@@ -77,20 +279,45 @@
             </Border>
             <Border x:Name="ResultPanel"
                     Width="280"
-                    MaxHeight="240"
-                    Padding="8"
-                    Background="#F0222222"
-                    CornerRadius="6"
+                    MaxHeight="280"
+                    Padding="12"
+                    Background="#F2F7F7F8"
+                    BorderBrush="#26000000"
+                    BorderThickness="1"
+                    CornerRadius="14"
                     Visibility="Collapsed">
-                <StackPanel Spacing="6">
-                    <TextBlock x:Name="ResultTitle" Foreground="White" Text="OCR" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <TextBlock x:Name="ResultTitle"
+                                   FontWeight="SemiBold"
+                                   Foreground="#1C1C1E"
+                                   Text="OCR" />
+                        <Button HorizontalAlignment="Right"
+                                Style="{StaticResource OverlayIconButton}"
+                                Width="28"
+                                Height="28"
+                                Click="ResultClose_Click">
+                            <FontIcon FontSize="12" Glyph="&#xE711;" />
+                        </Button>
+                    </Grid>
                     <TextBox x:Name="ResultText"
-                             MinHeight="80"
+                             Grid.Row="1"
+                             MinHeight="88"
+                             Margin="0,8,0,8"
                              AcceptsReturn="True"
                              IsReadOnly="True"
                              TextWrapping="Wrap" />
-                    <Button Click="ResultCopy_Click" Content="复制" />
-                </StackPanel>
+                    <Button Grid.Row="2"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource OverlayChipButton}"
+                            Click="ResultCopy_Click"
+                            Content="复制" />
+                </Grid>
             </Border>
         </Canvas>
     </Grid>

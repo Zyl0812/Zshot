@@ -11,12 +11,11 @@
              mc:Ignorable="d">
 
     <ScrollViewer Padding="0">
-        <StackPanel Width="820"
-                    Padding="36,24,36,36"
-                    Spacing="20">
+        <StackPanel Padding="20,16,24,24"
+                    Spacing="16">
 
-            <TextBlock FontSize="28"
-                       FontWeight="Bold"
+            <TextBlock FontSize="20"
+                       FontWeight="SemiBold"
                        Text="{x:Bind lang:Lang.Zshot_Nav_Settings}" />
 
 

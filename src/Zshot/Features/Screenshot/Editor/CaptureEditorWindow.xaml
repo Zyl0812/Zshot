@@ -24,26 +24,59 @@
                               PointerReleased="DrawCanvas_PointerReleased" />
 
         <Border Grid.Row="1"
-                Padding="8"
-                Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="6">
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="select" Content="选择" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="rect" Content="矩形" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="ellipse" Content="椭圆" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="line" Content="直线" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="arrow" Content="箭头" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="pen" Content="画笔" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="text" Content="文字" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="mosaic" Content="马赛克" />
-                <Button Command="{x:Bind SetToolCommand}" CommandParameter="number" Content="序号" />
-                <Button Command="{x:Bind UndoCommand}" Content="撤销" />
-                <Button Command="{x:Bind RedoCommand}" Content="重做" />
-                <Button Command="{x:Bind ClearCommand}" Content="清空" />
-                <Button Command="{x:Bind RunOcrCommand}" Content="OCR" />
-                <Button Command="{x:Bind RunTranslateCommand}" Content="翻译" />
-                <Button Command="{x:Bind RequestLongCaptureCommand}" Content="长截图" />
-                <Button Command="{x:Bind CompleteCommand}" Content="完成" Style="{ThemeResource AccentButtonStyle}" />
-                <Button Command="{x:Bind CancelCommand}" Content="取消" />
+                Padding="10,8"
+                Background="#F21A1A1E">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="2">
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="select" ToolTipService.ToolTip="选择">
+                    <FontIcon FontSize="16" Glyph="&#xE8B0;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="rect" ToolTipService.ToolTip="矩形">
+                    <FontIcon FontSize="16" Glyph="&#xE739;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="ellipse" ToolTipService.ToolTip="椭圆">
+                    <FontIcon FontSize="16" Glyph="&#xEA3A;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="line" ToolTipService.ToolTip="直线">
+                    <FontIcon FontSize="16" Glyph="&#xE76F;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="arrow" ToolTipService.ToolTip="箭头">
+                    <FontIcon FontSize="16" Glyph="&#xF54E;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="pen" ToolTipService.ToolTip="画笔">
+                    <FontIcon FontSize="16" Glyph="&#xED63;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="text" ToolTipService.ToolTip="文字">
+                    <FontIcon FontSize="16" Glyph="&#xE8D2;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="mosaic" ToolTipService.ToolTip="马赛克">
+                    <FontIcon FontSize="16" Glyph="&#xE7B3;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind SetToolCommand}" CommandParameter="number" ToolTipService.ToolTip="序号">
+                    <FontIcon FontSize="16" Glyph="&#xE8FD;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind UndoCommand}" ToolTipService.ToolTip="撤销">
+                    <FontIcon FontSize="16" Glyph="&#xE7A7;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind RedoCommand}" ToolTipService.ToolTip="重做">
+                    <FontIcon FontSize="16" Glyph="&#xE7A6;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind RunOcrCommand}" ToolTipService.ToolTip="OCR">
+                    <FontIcon FontSize="16" Glyph="&#xE8EC;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind RunTranslateCommand}" ToolTipService.ToolTip="翻译">
+                    <FontIcon FontSize="16" Glyph="&#xE8C1;" />
+                </Button>
+                <Button Width="36" Height="36" Padding="0" Command="{x:Bind RequestLongCaptureCommand}" ToolTipService.ToolTip="长截图">
+                    <FontIcon FontSize="16" Glyph="&#xE8A4;" />
+                </Button>
+                <Button Height="36"
+                        MinWidth="64"
+                        Padding="14,0"
+                        Command="{x:Bind CompleteCommand}"
+                        Content="完成"
+                        CornerRadius="18"
+                        Style="{ThemeResource AccentButtonStyle}" />
+                <Button Height="36" Padding="12,0" Command="{x:Bind CancelCommand}" Content="取消" />
             </StackPanel>
         </Border>
     </Grid>
