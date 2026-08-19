@@ -8,6 +8,7 @@ using Starward.Codec.ICC;
 using Starshot.Core;
 using Starshot.Features.Codec;
 using Starshot.Features.Screenshot.Editor;
+using Starshot.Features.Screenshot.LongCapture;
 using Starshot.Helpers;
 using System;
 using System.Collections.Generic;
@@ -329,13 +330,24 @@ internal class ScreenCaptureService
 
             var editor = new CaptureEditorWindow();
             bool edited = await editor.EditAsync(sdrCrop);
-            if (!edited)
+            CanvasBitmap? longImage = null;
+            if (editor.RequestedLongCapture)
+            {
+                var runner = new LongCaptureRunner();
+                longImage = await runner.RunAsync(sdrCrop, srcRect, AppConfig.LongCaptureMaxHeight, default);
+                if (longImage is null)
+                {
+                    editor.Flattened?.Dispose();
+                    return;
+                }
+            }
+            else if (!edited)
             {
                 editor.Flattened?.Dispose();
                 return;
             }
 
-            CanvasBitmap export = editor.Flattened ?? sdrCrop;
+            CanvasBitmap export = longImage ?? editor.Flattened ?? sdrCrop;
             bool writeFile = ScreenshotSavePolicy.ShouldWriteFile(AppConfig.AutoSaveScreenshotToFile, copyOnlyHotkey: false);
             bool copy = ScreenshotSavePolicy.ShouldCopyToClipboard(AppConfig.AutoCopyScreenshotToClipboard, copyOnlyHotkey: false);
 
@@ -362,6 +374,7 @@ internal class ScreenCaptureService
             }
 
             editor.Flattened?.Dispose();
+            longImage?.Dispose();
             _logger.LogInformation("Region screenshot saved");
         }
         catch (Exception ex)
