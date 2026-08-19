@@ -7,6 +7,7 @@ using Microsoft.UI.Windowing;
 using Starward.Codec.ICC;
 using Starshot.Core;
 using Starshot.Features.Codec;
+using Starshot.Features.Screenshot.Editor;
 using Starshot.Helpers;
 using System;
 using System.Collections.Generic;
@@ -296,7 +297,6 @@ internal class ScreenCaptureService
                 ds.DrawImage(composite, 0, 0, new Windows.Foundation.Rect(cx, cy, cw, ch));
             }
 
-            // ===== 走保存管线 =====
             DateTimeOffset frameTime = DateTimeOffset.Now;
             bool hdr = cropped.Format is DirectXPixelFormat.R16G16B16A16Float;
             float maxCLL = hdr ? GetMaxCLL(cropped) : -1;
@@ -319,17 +319,49 @@ internal class ScreenCaptureService
             Microsoft.UI.DisplayId regionDisplayId = new((ulong)fgMonitor.DangerousGetHandle());
             using DisplayInformation regionDisplayInfo = DisplayInformation.CreateForDisplayId(regionDisplayId);
 
-            _infoWindow ??= new ScreenCaptureInfoWindow();
-            _infoWindow.CaptureStart(regionDisplayId, cropped, maxCLL);
-
-            // 守卫只挡"抓帧+选区"；编码慢且已由 _encodeSlim 单独串行，这里放守卫让下一次按下能立刻进
             Interlocked.Exchange(ref _isCapturing, 0);
             guardReleased = true;
 
-            // 选好后并行：保存（完整 HDR，不内嵌剪贴板）+ 直接从覆盖层裁好的 SDR 选区复制
-            await Task.WhenAll(
-                SaveCaptureAsync(cropped, processName, processExeName, windowTitle, frameTime, regionDisplayInfo, maxCLL, sdrWhiteLevel, regionDisplayId, true, copyToClipboard: false),
-                CopyCaptureToClipboardAsync(sdrCrop));
+            if (sdrCrop is null)
+            {
+                return;
+            }
+
+            var editor = new CaptureEditorWindow();
+            bool edited = await editor.EditAsync(sdrCrop);
+            if (!edited)
+            {
+                editor.Flattened?.Dispose();
+                return;
+            }
+
+            CanvasBitmap export = editor.Flattened ?? sdrCrop;
+            bool writeFile = ScreenshotSavePolicy.ShouldWriteFile(AppConfig.AutoSaveScreenshotToFile, copyOnlyHotkey: false);
+            bool copy = ScreenshotSavePolicy.ShouldCopyToClipboard(AppConfig.AutoCopyScreenshotToClipboard, copyOnlyHotkey: false);
+
+            _infoWindow ??= new ScreenCaptureInfoWindow();
+            _infoWindow.CaptureStart(regionDisplayId, export, maxCLL);
+
+            if (hdr && writeFile)
+            {
+                await SaveCaptureAsync(cropped, processName, processExeName, windowTitle, frameTime, regionDisplayInfo, maxCLL, sdrWhiteLevel, regionDisplayId, true, copyToClipboard: false);
+            }
+
+            if (writeFile && !hdr)
+            {
+                await SaveSdrExportAsync(export, processName, processExeName, windowTitle, frameTime, isRegion: true);
+            }
+            else if (writeFile && hdr)
+            {
+                await SaveSdrExportAsync(export, processName, processExeName, windowTitle + "_SDR", frameTime, isRegion: true);
+            }
+
+            if (copy)
+            {
+                await CopyCaptureToClipboardAsync(export, force: true);
+            }
+
+            editor.Flattened?.Dispose();
             _logger.LogInformation("Region screenshot saved");
         }
         catch (Exception ex)
@@ -502,6 +534,53 @@ internal class ScreenCaptureService
         }
 
         await CopyCaptureToClipboardAsync(bitmap, force: true);
+    }
+
+
+    private async Task SaveSdrExportAsync(CanvasBitmap bitmap, string processName, string processExeName, string windowTitle, DateTimeOffset frameTime, bool isRegion)
+    {
+        string? targetFolder = AppConfig.ScreenshotFolder;
+        if (string.IsNullOrWhiteSpace(targetFolder))
+        {
+            targetFolder = Path.Join(AppConfig.UserDataFolder, "Screenshots");
+        }
+
+        string screenshotFolder = Path.GetFullPath(targetFolder);
+        Directory.CreateDirectory(screenshotFolder);
+        string extension = AppConfig.ScreenCaptureSDRFormat switch { 1 => "avif", 2 => "jxl", _ => "png" };
+        string filePath = Path.Combine(screenshotFolder,
+            $"{BuildFileName(processName, processExeName, windowTitle, frameTime, bitmap.SizeInPixels.Width, bitmap.SizeInPixels.Height, isRegion ? AppConfig.RegionScreenshotFileNamePattern : null)}.{extension}");
+        filePath = EnsureUniquePath(filePath);
+
+        byte[] xmpData = BuildXMPMetadata(frameTime);
+        int quality = AppConfig.ScreenCaptureEncodeQuality switch { 0 => 80, 1 => 90, 2 => 100, _ => 90 };
+        float distance = AppConfig.ScreenCaptureEncodeQuality switch { 0 => 2, 1 => 1, 2 => 0, _ => 1 };
+
+        using MemoryStream ms = new();
+        await _encodeSlim.WaitAsync();
+        try
+        {
+            if (extension is "png")
+            {
+                await ImageSaver.SaveAsPngAsync(bitmap, ms, ColorPrimaries.BT709, xmpData, false);
+            }
+            else if (extension is "avif")
+            {
+                await ImageSaver.SaveAsAvifAsync(bitmap, ms, ColorPrimaries.BT709, quality, xmpData, false);
+            }
+            else
+            {
+                await ImageSaver.SaveAsJxlAsync(bitmap, ms, ColorPrimaries.BT709, distance, xmpData, false);
+            }
+        }
+        finally
+        {
+            _encodeSlim.Release();
+        }
+
+        using var fs = File.Create(filePath);
+        ms.Seek(0, SeekOrigin.Begin);
+        await ms.CopyToAsync(fs);
     }
 
 
