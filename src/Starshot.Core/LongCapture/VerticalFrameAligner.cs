@@ -50,7 +50,9 @@ public static class VerticalFrameAligner
 
         double score = 1.0 - (bestSad / (double)(stripHeight * width * 255));
         bool accepted = score >= acceptScore;
-        return new FrameAlignResult(bestY, score, accepted);
+        // bestY 是上一帧底带在当前帧中的起点；跳过整段重叠后，新内容从 bestY+stripHeight 开始。
+        int offsetY = Math.Min(height, bestY + stripHeight);
+        return new FrameAlignResult(offsetY, score, accepted);
     }
 }
 

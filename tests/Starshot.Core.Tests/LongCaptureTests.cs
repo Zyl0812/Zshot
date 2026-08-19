@@ -28,7 +28,8 @@ public class LongCaptureTests
 
         var result = VerticalFrameAligner.Align(previous, current, w, h, stripHeight: 8, acceptScore: 0.5);
         Assert.True(result.Accepted);
-        Assert.Equal(h - shift - 8, result.OffsetY);
+        Assert.Equal(h - shift, result.OffsetY);
+        Assert.Equal(shift, h - result.OffsetY);
     }
 
     [Fact]
