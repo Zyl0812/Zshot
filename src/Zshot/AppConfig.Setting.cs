@@ -446,8 +446,8 @@ public static partial class AppConfig
 
     public static int LongCaptureMaxHeight
     {
-        get => GetValue(20000);
-        set => SetValue(value);
+        get => Math.Clamp(GetValue(16384), 1000, 16384);
+        set => SetValue(Math.Clamp(value, 1000, 16384));
     }
 
 

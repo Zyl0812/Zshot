@@ -268,7 +268,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
                     <TextBlock x:Name="LongCaptureStatus"
                                VerticalAlignment="Center"
                                Foreground="#1C1C1E"
-                               Text="请滚动页面以继续截图" />
+                               Text="{x:Bind lang:Lang.Overlay_ScrollToContinue}" />
                     <Button Style="{StaticResource OverlayAccentButton}"
                             Height="32"
                             Click="LongCaptureFinish_Click"

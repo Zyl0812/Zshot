@@ -144,8 +144,8 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="长截图最大高度" />
-                <NumberBox Value="{x:Bind LongCaptureMaxHeight, Mode=TwoWay}" Minimum="1000" Maximum="100000" SpinButtonPlacementMode="Inline" />
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_LongCaptureMaxHeight}" />
+                <NumberBox Value="{x:Bind LongCaptureMaxHeight, Mode=TwoWay}" Minimum="1000" Maximum="16384" SpinButtonPlacementMode="Inline" />
             </StackPanel>
 
             <!--  捕获显示器  -->

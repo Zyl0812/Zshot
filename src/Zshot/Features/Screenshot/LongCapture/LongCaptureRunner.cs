@@ -3,6 +3,7 @@ using Microsoft.Graphics.Display;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Zshot.Core.LongCapture;
+using Zshot.Language;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -28,6 +29,7 @@ internal sealed class LongCaptureRunner
             return null;
         }
 
+        maxHeight = Math.Clamp(maxHeight, 1000, 16384);
         var buffer = new LongImageBuffer(maxHeight);
         int width = (int)firstFrame.SizeInPixels.Width;
         int height = (int)firstFrame.SizeInPixels.Height;
@@ -43,7 +45,7 @@ internal sealed class LongCaptureRunner
         };
 
         byte[] previousGray = ToGray(firstFrame);
-        setStatus($"已捕获 1 段 / {buffer.TotalHeight}px");
+        setStatus(string.Format(Lang.Overlay_CapturedSegments, 1, buffer.TotalHeight));
 
         try
         {
@@ -73,14 +75,14 @@ internal sealed class LongCaptureRunner
 
                 if (!buffer.TryAppend(appendHeight))
                 {
-                    setStatus("已达最大高度");
+                    setStatus(Lang.Overlay_MaxHeightReached);
                     frame.Dispose();
                     break;
                 }
 
                 segments.Add((frame, align.OffsetY, appendHeight));
                 previousGray = currentGray;
-                setStatus($"已捕获 {buffer.SegmentCount} 段 / {buffer.TotalHeight}px");
+                setStatus(string.Format(Lang.Overlay_CapturedSegments, buffer.SegmentCount, buffer.TotalHeight));
             }
         }
         catch (OperationCanceledException)
@@ -107,7 +109,21 @@ internal sealed class LongCaptureRunner
             return null;
         }
 
-        var output = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), width, buffer.TotalHeight, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
+        CanvasRenderTarget output;
+        try
+        {
+            output = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), width, buffer.TotalHeight, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
+        }
+        catch
+        {
+            foreach (var s in segments)
+            {
+                s.Bitmap.Dispose();
+            }
+
+            throw;
+        }
+
         using (var ds = output.CreateDrawingSession())
         {
             ds.Clear(Colors.Transparent);

@@ -1156,7 +1156,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
         ToolbarBorder.Visibility = Visibility.Collapsed;
         ResultPanel.Visibility = Visibility.Collapsed;
         LongCaptureBar.Visibility = Visibility.Visible;
-        LongCaptureStatus.Text = "请滚动页面以继续截图";
+        LongCaptureStatus.Text = Lang.Overlay_ScrollToContinue;
         LayoutChrome();
         SetExcludeFromCapture(true);
 
@@ -1182,6 +1182,8 @@ public sealed partial class RegionCaptureWindow : WindowEx
         }
         catch (Exception)
         {
+            HintText.Text = Lang.Overlay_LongCaptureFailed;
+            HintText.Visibility = Visibility.Visible;
             RestoreAfterLongCapture();
         }
     }

@@ -60,7 +60,7 @@ public sealed class LongImageBuffer
 {
     private readonly List<int> _segmentHeights = new();
 
-    public LongImageBuffer(int maxHeight = 32000)
+    public LongImageBuffer(int maxHeight = 16384)
     {
         MaxHeight = Math.Max(1, maxHeight);
     }
