@@ -817,4 +817,64 @@
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← 如要调节此选项，请关闭高优先级启动</value>
   </data>
+  <data name="ScreenshotSetting_Ocr" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="ScreenshotSetting_OcrWindows" xml:space="preserve">
+    <value>本地 PP-OCRv6 识别，截图不会上传。</value>
+  </data>
+  <data name="ScreenshotSetting_Translation" xml:space="preserve">
+    <value>AI 翻译</value>
+  </data>
+  <data name="ScreenshotSetting_Model" xml:space="preserve">
+    <value>模型</value>
+  </data>
+  <data name="ScreenshotSetting_TargetLanguage" xml:space="preserve">
+    <value>目标语言</value>
+  </data>
+  <data name="ScreenshotSetting_Timeout" xml:space="preserve">
+    <value>超时（秒）</value>
+  </data>
+  <data name="ScreenshotSetting_LongCaptureMaxHeight" xml:space="preserve">
+    <value>长截图最大高度</value>
+  </data>
+  <data name="Overlay_Mosaic" xml:space="preserve">
+    <value>马赛克</value>
+  </data>
+  <data name="Overlay_MosaicFine" xml:space="preserve">
+    <value>细</value>
+  </data>
+  <data name="Overlay_MosaicMedium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="Overlay_MosaicCoarse" xml:space="preserve">
+    <value>粗</value>
+  </data>
+  <data name="Overlay_ScrollToContinue" xml:space="preserve">
+    <value>请滚动页面以继续截图</value>
+  </data>
+  <data name="Overlay_SaveOrCopyFirst" xml:space="preserve">
+    <value>请先保存或复制</value>
+  </data>
+  <data name="Overlay_OcrFailed" xml:space="preserve">
+    <value>OCR 失败</value>
+  </data>
+  <data name="Overlay_Recognizing" xml:space="preserve">
+    <value>识别中…</value>
+  </data>
+  <data name="Overlay_NoText" xml:space="preserve">
+    <value>未识别到文字</value>
+  </data>
+  <data name="Overlay_TranslateFailed" xml:space="preserve">
+    <value>翻译失败</value>
+  </data>
+  <data name="Overlay_CapturedSegments" xml:space="preserve">
+    <value>已捕获 {0} 段 / {1}px</value>
+  </data>
+  <data name="Overlay_MaxHeightReached" xml:space="preserve">
+    <value>已达最大高度</value>
+  </data>
+  <data name="Overlay_LongCaptureFailed" xml:space="preserve">
+    <value>长截图失败</value>
+  </data>
 </root>

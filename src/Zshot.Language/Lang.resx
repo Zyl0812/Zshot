@@ -817,4 +817,64 @@
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← To change this option, turn off high priority start first</value>
   </data>
+  <data name="ScreenshotSetting_Ocr" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="ScreenshotSetting_OcrWindows" xml:space="preserve">
+    <value>Local PP-OCRv6 recognition. Screenshots are not uploaded.</value>
+  </data>
+  <data name="ScreenshotSetting_Translation" xml:space="preserve">
+    <value>AI translation</value>
+  </data>
+  <data name="ScreenshotSetting_Model" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="ScreenshotSetting_TargetLanguage" xml:space="preserve">
+    <value>Target language</value>
+  </data>
+  <data name="ScreenshotSetting_Timeout" xml:space="preserve">
+    <value>Timeout (seconds)</value>
+  </data>
+  <data name="ScreenshotSetting_LongCaptureMaxHeight" xml:space="preserve">
+    <value>Long capture max height</value>
+  </data>
+  <data name="Overlay_Mosaic" xml:space="preserve">
+    <value>Mosaic</value>
+  </data>
+  <data name="Overlay_MosaicFine" xml:space="preserve">
+    <value>Fine</value>
+  </data>
+  <data name="Overlay_MosaicMedium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="Overlay_MosaicCoarse" xml:space="preserve">
+    <value>Coarse</value>
+  </data>
+  <data name="Overlay_ScrollToContinue" xml:space="preserve">
+    <value>Scroll the page to continue capturing</value>
+  </data>
+  <data name="Overlay_SaveOrCopyFirst" xml:space="preserve">
+    <value>Save or copy first</value>
+  </data>
+  <data name="Overlay_OcrFailed" xml:space="preserve">
+    <value>OCR failed</value>
+  </data>
+  <data name="Overlay_Recognizing" xml:space="preserve">
+    <value>Recognizing…</value>
+  </data>
+  <data name="Overlay_NoText" xml:space="preserve">
+    <value>No text recognized</value>
+  </data>
+  <data name="Overlay_TranslateFailed" xml:space="preserve">
+    <value>Translation failed</value>
+  </data>
+  <data name="Overlay_CapturedSegments" xml:space="preserve">
+    <value>Captured {0} segments / {1}px</value>
+  </data>
+  <data name="Overlay_MaxHeightReached" xml:space="preserve">
+    <value>Maximum height reached</value>
+  </data>
+  <data name="Overlay_LongCaptureFailed" xml:space="preserve">
+    <value>Long capture failed</value>
+  </data>
 </root>

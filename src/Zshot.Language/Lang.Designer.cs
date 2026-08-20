@@ -2141,5 +2141,26 @@
                 return ResourceManager.GetString("Zshot_WelcomeWallpaperTitle", resourceCulture);
             }
         }
+
+        public static string ScreenshotSetting_Ocr => ResourceManager.GetString("ScreenshotSetting_Ocr", resourceCulture);
+        public static string ScreenshotSetting_OcrWindows => ResourceManager.GetString("ScreenshotSetting_OcrWindows", resourceCulture);
+        public static string ScreenshotSetting_Translation => ResourceManager.GetString("ScreenshotSetting_Translation", resourceCulture);
+        public static string ScreenshotSetting_Model => ResourceManager.GetString("ScreenshotSetting_Model", resourceCulture);
+        public static string ScreenshotSetting_TargetLanguage => ResourceManager.GetString("ScreenshotSetting_TargetLanguage", resourceCulture);
+        public static string ScreenshotSetting_Timeout => ResourceManager.GetString("ScreenshotSetting_Timeout", resourceCulture);
+        public static string ScreenshotSetting_LongCaptureMaxHeight => ResourceManager.GetString("ScreenshotSetting_LongCaptureMaxHeight", resourceCulture);
+        public static string Overlay_Mosaic => ResourceManager.GetString("Overlay_Mosaic", resourceCulture);
+        public static string Overlay_MosaicFine => ResourceManager.GetString("Overlay_MosaicFine", resourceCulture);
+        public static string Overlay_MosaicMedium => ResourceManager.GetString("Overlay_MosaicMedium", resourceCulture);
+        public static string Overlay_MosaicCoarse => ResourceManager.GetString("Overlay_MosaicCoarse", resourceCulture);
+        public static string Overlay_ScrollToContinue => ResourceManager.GetString("Overlay_ScrollToContinue", resourceCulture);
+        public static string Overlay_SaveOrCopyFirst => ResourceManager.GetString("Overlay_SaveOrCopyFirst", resourceCulture);
+        public static string Overlay_OcrFailed => ResourceManager.GetString("Overlay_OcrFailed", resourceCulture);
+        public static string Overlay_Recognizing => ResourceManager.GetString("Overlay_Recognizing", resourceCulture);
+        public static string Overlay_NoText => ResourceManager.GetString("Overlay_NoText", resourceCulture);
+        public static string Overlay_TranslateFailed => ResourceManager.GetString("Overlay_TranslateFailed", resourceCulture);
+        public static string Overlay_CapturedSegments => ResourceManager.GetString("Overlay_CapturedSegments", resourceCulture);
+        public static string Overlay_MaxHeightReached => ResourceManager.GetString("Overlay_MaxHeightReached", resourceCulture);
+        public static string Overlay_LongCaptureFailed => ResourceManager.GetString("Overlay_LongCaptureFailed", resourceCulture);
     }
 }

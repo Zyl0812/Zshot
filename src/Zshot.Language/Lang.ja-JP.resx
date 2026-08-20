@@ -817,4 +817,64 @@
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← このオプションを変更するには、先に高優先起動をオフにしてください</value>
   </data>
+  <data name="ScreenshotSetting_Ocr" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="ScreenshotSetting_OcrWindows" xml:space="preserve">
+    <value>ローカル PP-OCRv6 で認識します。スクリーンショットはアップロードされません。</value>
+  </data>
+  <data name="ScreenshotSetting_Translation" xml:space="preserve">
+    <value>AI 翻訳</value>
+  </data>
+  <data name="ScreenshotSetting_Model" xml:space="preserve">
+    <value>モデル</value>
+  </data>
+  <data name="ScreenshotSetting_TargetLanguage" xml:space="preserve">
+    <value>翻訳先言語</value>
+  </data>
+  <data name="ScreenshotSetting_Timeout" xml:space="preserve">
+    <value>タイムアウト（秒）</value>
+  </data>
+  <data name="ScreenshotSetting_LongCaptureMaxHeight" xml:space="preserve">
+    <value>長距離キャプチャの最大高さ</value>
+  </data>
+  <data name="Overlay_Mosaic" xml:space="preserve">
+    <value>モザイク</value>
+  </data>
+  <data name="Overlay_MosaicFine" xml:space="preserve">
+    <value>細</value>
+  </data>
+  <data name="Overlay_MosaicMedium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="Overlay_MosaicCoarse" xml:space="preserve">
+    <value>粗</value>
+  </data>
+  <data name="Overlay_ScrollToContinue" xml:space="preserve">
+    <value>ページをスクロールして撮影を続けてください</value>
+  </data>
+  <data name="Overlay_SaveOrCopyFirst" xml:space="preserve">
+    <value>先に保存またはコピーしてください</value>
+  </data>
+  <data name="Overlay_OcrFailed" xml:space="preserve">
+    <value>OCR に失敗しました</value>
+  </data>
+  <data name="Overlay_Recognizing" xml:space="preserve">
+    <value>認識中…</value>
+  </data>
+  <data name="Overlay_NoText" xml:space="preserve">
+    <value>文字を認識できませんでした</value>
+  </data>
+  <data name="Overlay_TranslateFailed" xml:space="preserve">
+    <value>翻訳に失敗しました</value>
+  </data>
+  <data name="Overlay_CapturedSegments" xml:space="preserve">
+    <value>{0} セグメント / {1}px を取得</value>
+  </data>
+  <data name="Overlay_MaxHeightReached" xml:space="preserve">
+    <value>最大高さに達しました</value>
+  </data>
+  <data name="Overlay_LongCaptureFailed" xml:space="preserve">
+    <value>長距離キャプチャに失敗しました</value>
+  </data>
 </root>
