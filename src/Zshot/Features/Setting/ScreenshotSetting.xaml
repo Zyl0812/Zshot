@@ -134,12 +134,17 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="AI 翻译" />
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_Translation}" />
                 <TextBox Header="Base URL" Text="{x:Bind TranslationBaseUrl, Mode=TwoWay}" />
-                <PasswordBox x:Name="ApiKeyBox" Header="API Key" PasswordChanged="ApiKeyBox_PasswordChanged" />
-                <TextBox Header="模型" Text="{x:Bind TranslationModel, Mode=TwoWay}" />
-                <TextBox Header="目标语言" Text="{x:Bind TranslationTargetLanguage, Mode=TwoWay}" />
+                <PasswordBox x:Name="ApiKeyBox" Header="API Key" LostFocus="ApiKeyBox_LostFocus" />
+                <TextBox Header="{x:Bind lang:Lang.ScreenshotSetting_Model}" Text="{x:Bind TranslationModel, Mode=TwoWay}" />
+                <TextBox Header="{x:Bind lang:Lang.ScreenshotSetting_TargetLanguage}" Text="{x:Bind TranslationTargetLanguage, Mode=TwoWay}" />
                 <TextBox Header="Prompt" Text="{x:Bind TranslationPrompt, Mode=TwoWay}" />
+                <NumberBox Header="{x:Bind lang:Lang.ScreenshotSetting_Timeout}"
+                           Value="{x:Bind TranslationTimeoutSeconds, Mode=TwoWay}"
+                           Minimum="5"
+                           Maximum="120"
+                           SpinButtonPlacementMode="Inline" />
             </StackPanel>
 
             <StackPanel Spacing="8">

@@ -35,25 +35,37 @@ public static class ChatCompletionParser
 {
     public static string? ExtractFirstMessageContent(string json)
     {
-        if (string.IsNullOrWhiteSpace(json))
+        if (string.IsNullOrWhiteSpace(json) || json.TrimStart().StartsWith('<'))
         {
             return null;
         }
 
-        using var doc = System.Text.Json.JsonDocument.Parse(json);
-        var root = doc.RootElement;
-        if (root.TryGetProperty("choices", out var choices) && choices.GetArrayLength() > 0)
+        try
         {
-            var message = choices[0].GetProperty("message");
-            if (message.TryGetProperty("content", out var content))
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("choices", out var choices) && choices.ValueKind is System.Text.Json.JsonValueKind.Array && choices.GetArrayLength() > 0)
             {
-                return content.GetString();
+                var first = choices[0];
+                if (first.TryGetProperty("message", out var message) && message.TryGetProperty("content", out var content))
+                {
+                    return content.GetString();
+                }
+
+                if (first.TryGetProperty("delta", out var delta) && delta.TryGetProperty("content", out var deltaContent))
+                {
+                    return deltaContent.GetString();
+                }
+            }
+
+            if (root.TryGetProperty("output_text", out var outputText))
+            {
+                return outputText.GetString();
             }
         }
-
-        if (root.TryGetProperty("output_text", out var outputText))
+        catch (System.Text.Json.JsonException)
         {
-            return outputText.GetString();
+            return null;
         }
 
         return null;

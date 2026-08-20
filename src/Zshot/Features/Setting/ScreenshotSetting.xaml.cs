@@ -261,7 +261,7 @@ public sealed partial class ScreenshotSetting : PageBase
     }
 
 
-    private void ApiKeyBox_PasswordChanged(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void ApiKeyBox_LostFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         SecretStorageService.Save("apiKey", ApiKeyBox.Password);
     }

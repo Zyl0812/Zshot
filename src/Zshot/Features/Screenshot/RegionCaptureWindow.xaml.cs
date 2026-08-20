@@ -1142,19 +1142,19 @@ public sealed partial class RegionCaptureWindow : WindowEx
                 SystemPrompt = AppConfig.TranslationPrompt,
                 TimeoutSeconds = AppConfig.TranslationTimeoutSeconds,
             });
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Max(5, AppConfig.TranslationTimeoutSeconds)));
+            // 超时由 provider 按 TimeoutSeconds 内部计时，这里不再叠一层
             var result = await provider.TranslateAsync(new TranslationRequest
             {
                 Text = _lastOcrText,
                 TargetLanguage = AppConfig.TranslationTargetLanguage,
                 SystemPrompt = AppConfig.TranslationPrompt,
                 Model = AppConfig.TranslationModel,
-            }, cts.Token);
-            ShowResult("翻译", result.TranslatedText);
+            });
+            ShowResult(Lang.ScreenshotSetting_Translation, result.TranslatedText);
         }
         catch (Exception ex)
         {
-            ShowResult("翻译失败", ex.Message);
+            ShowResult(Lang.Overlay_TranslateFailed, ex.Message);
         }
     }
 

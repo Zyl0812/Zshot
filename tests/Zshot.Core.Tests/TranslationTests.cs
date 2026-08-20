@@ -16,6 +16,14 @@ public class TranslationTests
     }
 
     [Fact]
+    public void Parser_returns_null_for_html_and_missing_message()
+    {
+        Assert.Null(ChatCompletionParser.ExtractFirstMessageContent("<html>error</html>"));
+        Assert.Null(ChatCompletionParser.ExtractFirstMessageContent("""{"choices":[{"delta":{}}]}"""));
+        Assert.Null(ChatCompletionParser.ExtractFirstMessageContent("not-json"));
+    }
+
+    [Fact]
     public void Prompt_includes_target_language()
     {
         string prompt = TranslationPrompt.BuildSystemPrompt(null, "en-US");

@@ -57,8 +57,10 @@ public sealed class CustomApiTranslationProvider : ITranslationProvider
         };
         message.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
-        using var response = await _http.SendAsync(message, cancellationToken).ConfigureAwait(false);
-        string body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCts.CancelAfter(TimeSpan.FromSeconds(Math.Max(5, _settings.TimeoutSeconds)));
+        using var response = await _http.SendAsync(message, timeoutCts.Token).ConfigureAwait(false);
+        string body = await response.Content.ReadAsStringAsync(timeoutCts.Token).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException($"Translation API failed ({(int)response.StatusCode}).");
