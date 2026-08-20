@@ -3,15 +3,37 @@ namespace Zshot.Core.Ocr;
 public static class OcrReadingOrder
 {
     public static IReadOnlyList<OcrBlock> Sort(IReadOnlyList<OcrBlock> blocks)
+        => GroupLines(blocks).SelectMany(line => line).ToList();
+
+    public static string ToPlainText(IEnumerable<OcrBlock> blocks, bool keepLineBreaks = true)
     {
-        if (blocks.Count <= 1)
+        var lines = GroupLines(blocks as IReadOnlyList<OcrBlock> ?? blocks.ToList());
+        if (lines.Count == 0)
         {
-            return blocks;
+            return "";
         }
 
-        double medianHeight = MedianHeight(blocks);
-        double threshold = Math.Max(8, medianHeight * 0.6);
+        if (!keepLineBreaks)
+        {
+            return string.Join(" ", lines.SelectMany(line => line).Select(b => b.Text).Where(t => !string.IsNullOrWhiteSpace(t)));
+        }
 
+        return string.Join(Environment.NewLine, lines.Select(JoinLine));
+    }
+
+    private static List<List<OcrBlock>> GroupLines(IReadOnlyList<OcrBlock> blocks)
+    {
+        if (blocks.Count == 0)
+        {
+            return [];
+        }
+
+        if (blocks.Count == 1)
+        {
+            return [[blocks[0]]];
+        }
+
+        double threshold = Math.Max(8, MedianHeight(blocks) * 0.6);
         var ordered = blocks.OrderBy(b => b.Centroid.Y).ThenBy(b => b.Centroid.X).ToList();
         var lines = new List<List<OcrBlock>>();
         foreach (var block in ordered)
@@ -19,7 +41,7 @@ public static class OcrReadingOrder
             var line = lines.LastOrDefault();
             if (line is null || Math.Abs(block.Centroid.Y - line.Average(x => x.Centroid.Y)) > threshold)
             {
-                lines.Add(new List<OcrBlock> { block });
+                lines.Add([block]);
             }
             else
             {
@@ -27,42 +49,16 @@ public static class OcrReadingOrder
             }
         }
 
-        return lines
-            .SelectMany(line => line.OrderBy(b => b.Centroid.X))
-            .ToList();
+        foreach (var line in lines)
+        {
+            line.Sort((a, b) => a.Centroid.X.CompareTo(b.Centroid.X));
+        }
+
+        return lines;
     }
 
-    public static string ToPlainText(IEnumerable<OcrBlock> blocks, bool keepLineBreaks = true)
-    {
-        var sorted = Sort(blocks as IReadOnlyList<OcrBlock> ?? blocks.ToList());
-        if (!keepLineBreaks)
-        {
-            return string.Join(" ", sorted.Select(b => b.Text).Where(t => !string.IsNullOrWhiteSpace(t)));
-        }
-
-        if (sorted.Count == 0)
-        {
-            return "";
-        }
-
-        double medianHeight = MedianHeight(sorted);
-        double threshold = Math.Max(8, medianHeight * 0.6);
-        var lines = new List<List<OcrBlock>>();
-        foreach (var block in sorted)
-        {
-            var line = lines.LastOrDefault();
-            if (line is null || Math.Abs(block.Centroid.Y - line.Average(x => x.Centroid.Y)) > threshold)
-            {
-                lines.Add(new List<OcrBlock> { block });
-            }
-            else
-            {
-                line.Add(block);
-            }
-        }
-
-        return string.Join(Environment.NewLine, lines.Select(line => string.Join(" ", line.Select(b => b.Text))));
-    }
+    private static string JoinLine(List<OcrBlock> line)
+        => string.Join(" ", line.Select(b => b.Text).Where(t => !string.IsNullOrWhiteSpace(t)));
 
     private static double MedianHeight(IReadOnlyList<OcrBlock> blocks)
     {
