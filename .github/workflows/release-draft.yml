@@ -49,12 +49,12 @@ jobs:
       - name: Download x64
         uses: actions/download-artifact@v8
         with:
-          name: Starshot-${{ needs.build.outputs.vl }}-win-x64
+          name: Zshot-${{ needs.build.outputs.vl }}-win-x64
           path: x64
       - name: Download arm64
         uses: actions/download-artifact@v8
         with:
-          name: Starshot-${{ needs.build.outputs.vl }}-win-arm64
+          name: Zshot-${{ needs.build.outputs.vl }}-win-arm64
           path: arm64
 
       - name: Create Draft Release
@@ -65,7 +65,7 @@ jobs:
           draft: true
           prerelease: ${{ inputs.prerelease }}
           files: |
-            x64/Starshot-${{ needs.build.outputs.vl }}-win-x64.zip
-            arm64/Starshot-${{ needs.build.outputs.vl }}-win-arm64.zip
+            x64/Zshot-${{ needs.build.outputs.vl }}-win-x64.zip
+            arm64/Zshot-${{ needs.build.outputs.vl }}-win-arm64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

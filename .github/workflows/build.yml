@@ -112,11 +112,15 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v3
 
+      - name: Test
+        if: matrix.platform == 'x64'
+        run: dotnet test tests/Zshot.Core.Tests/Zshot.Core.Tests.csproj -c Release --nologo
+
       - name: Build launcher
-        run: msbuild src/Starshot.Launcher/Starshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=${{ matrix.platform }}
+        run: msbuild src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=${{ matrix.platform }}
 
       - name: Publish main app
-        run: dotnet publish src/Starshot/Starshot.csproj -c Release -p:Platform=${{ matrix.platform }} -r win-${{ matrix.platform }} -p:Version=${{ needs.resolve-version.outputs.v }}
+        run: dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=${{ matrix.platform }} -r win-${{ matrix.platform }} -p:Version=${{ needs.resolve-version.outputs.v }}
 
       - name: Remove unuse
         run: |
@@ -125,8 +129,8 @@ jobs:
 
       - name: Trim unsupported locales
         run: |
-          # 从 Starshot.Language 的 Lang.{locale}.resx 读程序支持的语言（Lang.resx 是默认 en，主 dll 内无目录）
-          $supported = Get-ChildItem src/Starshot.Language/Lang.*.resx | ForEach-Object {
+          # 从 Zshot.Language 的 Lang.{locale}.resx 读程序支持的语言（Lang.resx 是默认 en，主 dll 内无目录）
+          $supported = Get-ChildItem src/Zshot.Language/Lang.*.resx | ForEach-Object {
             if ($_.Name -match '^Lang\.([a-z]{2}(-[A-Za-z0-9]+)?)\.resx$') { $Matches[1] }
           }
           Write-Host "Supported locales: $($supported -join ', ')"
@@ -239,7 +243,7 @@ jobs:
           foreach ($oldTag in $targetTags) {
             Write-Host "--- delta: $oldTag -> $newTag ($arch) ---"
             $oldZip = "old-$oldTag.zip"
-            gh release download $oldTag --pattern "Starshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
+            gh release download $oldTag --pattern "Zshot-${oldTag}-win-${arch}.zip" --output $oldZip --repo ${{ github.repository }} 2>$null
             if ($LASTEXITCODE -ne 0 -or !(Test-Path $oldZip)) {
               Write-Host "Skip ${oldTag}: prev release zip not found"
               continue
@@ -284,21 +288,21 @@ jobs:
 
       - name: Copy launcher (if updated)
         if: ${{ inputs.launcher_updated }}
-        run: Copy-Item build/release/Starshot.exe "launcher-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.exe"
+        run: Copy-Item build/release/Zshot.exe "launcher-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.exe"
 
       - name: Zip release
         run: |
           Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $zip = "Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip"
+          $zip = "Zshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip"
           if (Test-Path $zip) { Remove-Item $zip }
           [System.IO.Compression.ZipFile]::CreateFromDirectory("build/release", $zip, [System.IO.Compression.CompressionLevel]::SmallestSize, $false)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}
+          name: Zshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}
           path: |
-            Starshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip
+            Zshot-${{ needs.resolve-version.outputs.vl }}-win-${{ matrix.platform }}.zip
             diff-*-win-${{ matrix.platform }}.patch
             launcher-*-win-${{ matrix.platform }}.exe
 
@@ -319,12 +323,12 @@ jobs:
       - name: Download x64 artifact
         uses: actions/download-artifact@v8
         with:
-          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-x64
+          name: Zshot-${{ needs.resolve-version.outputs.vl }}-win-x64
           path: upload/
       - name: Download arm64 artifact
         uses: actions/download-artifact@v8
         with:
-          name: Starshot-${{ needs.resolve-version.outputs.vl }}-win-arm64
+          name: Zshot-${{ needs.resolve-version.outputs.vl }}-win-arm64
           path: upload/
 
       - name: List files
@@ -337,8 +341,8 @@ jobs:
           $pre = "$env:PRE" -eq "true"
           $files = Get-ChildItem upload/ -Name
 
-          $x64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-x64.zip" }) | Select-Object -First 1
-          $arm64Full = ($files | Where-Object { $_ -eq "Starshot-$vl-win-arm64.zip" }) | Select-Object -First 1
+          $x64Full = ($files | Where-Object { $_ -eq "Zshot-$vl-win-x64.zip" }) | Select-Object -First 1
+          $arm64Full = ($files | Where-Object { $_ -eq "Zshot-$vl-win-arm64.zip" }) | Select-Object -First 1
           $x64Launcher = ($files | Where-Object { $_ -eq "launcher-$vl-win-x64.exe" }) | Select-Object -First 1
           $arm64Launcher = ($files | Where-Object { $_ -eq "launcher-$vl-win-arm64.exe" }) | Select-Object -First 1
           $x64Diffs = @(); $arm64Diffs = @()
