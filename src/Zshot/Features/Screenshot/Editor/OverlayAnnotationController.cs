@@ -24,17 +24,22 @@ internal sealed class OverlayAnnotationController
 
     public bool Undo()
     {
-        Selected = null;
+        ClearSelection();
         return History.Undo(Document);
     }
 
-    public bool Redo() => History.Redo(Document);
+    public bool Redo()
+    {
+        ClearSelection();
+        return History.Redo(Document);
+    }
 
     public void Clear()
     {
         History.Execute(Document, new ClearElementsCommand());
         Selected = null;
         Draft = null;
+        _nextNumber = 1;
     }
 
     public bool DeleteSelected()
