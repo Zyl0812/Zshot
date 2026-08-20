@@ -434,14 +434,16 @@ public sealed partial class RegionCaptureWindow : WindowEx
                 DrawHandles(ds, rect);
                 using (ds.CreateLayer(1, rect))
                 {
+                    double sampleX = physW / Math.Max(1, _lockedW);
+                    double sampleY = physH / Math.Max(1, _lockedH);
                     foreach (var element in _editor.Document.Elements)
                     {
-                        EditorRenderer.Draw(ds, element);
+                        EditorRenderer.Draw(ds, element, _displayBitmap, sampleX, sampleY);
                     }
 
                     if (_editor.Draft is not null)
                     {
-                        EditorRenderer.Draw(ds, _editor.Draft);
+                        EditorRenderer.Draw(ds, _editor.Draft, _displayBitmap, sampleX, sampleY);
                     }
                 }
             }
@@ -1020,6 +1022,19 @@ public sealed partial class RegionCaptureWindow : WindowEx
         }
     }
 
+    private void MosaicSize_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string tag } && int.TryParse(tag, out int size))
+        {
+            _editor.MosaicBlockSize = size;
+            MosaicChipLabel.Text = $"{size}px";
+            if (_editor.Selected is MosaicElement mosaic)
+            {
+                mosaic.BlockSize = size;
+            }
+        }
+    }
+
     private static bool TryParseHex(string hex, out Windows.UI.Color color)
     {
         color = default;
@@ -1395,27 +1410,10 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
         using (var ds = rt.CreateDrawingSession())
         {
-            foreach (var mosaic in _editor.Document.Elements.OfType<MosaicElement>())
-            {
-                var mapped = new MosaicElement
-                {
-                    BlockSize = mosaic.BlockSize,
-                    Bounds = new EditorRect(
-                        mosaic.Bounds.X * ratioX - src.X,
-                        mosaic.Bounds.Y * ratioY - src.Y,
-                        mosaic.Bounds.Width * ratioX,
-                        mosaic.Bounds.Height * ratioY),
-                };
-                EditorRenderer.DrawPixelate(ds, rt, mapped);
-            }
-
             ds.Transform = Matrix3x2.CreateScale(ratioX, ratioY) * Matrix3x2.CreateTranslation(-(float)src.X, -(float)src.Y);
             foreach (var element in _editor.Document.Elements)
             {
-                if (element is not MosaicElement)
-                {
-                    EditorRenderer.Draw(ds, element);
-                }
+                EditorRenderer.Draw(ds, element, _displayBitmap, ratioX, ratioY);
             }
         }
 

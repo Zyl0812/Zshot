@@ -17,6 +17,7 @@ internal sealed class OverlayAnnotationController
     public string Tool { get; set; } = "select";
     public string StrokeColor { get; set; } = "#FF0066FF";
     public double StrokeWidth { get; set; } = 3;
+    public int MosaicBlockSize { get; set; } = 16;
     public EditorElement? Draft { get; private set; }
     public EditorElement? Selected { get; private set; }
     public bool IsDragging => _dragging;
@@ -186,7 +187,7 @@ internal sealed class OverlayAnnotationController
             "line" => new LineElement { Start = pt, End = pt, Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
             "arrow" => new ArrowElement { Start = pt, End = pt, Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
             "pen" => CreatePen(pt),
-            "mosaic" => new MosaicElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
+            "mosaic" => new MosaicElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1), BlockSize = MosaicBlockSize },
             _ => new RectangleElement { Bounds = new EditorRect(pt.X, pt.Y, 1, 1) },
         };
         ApplyStroke(element);

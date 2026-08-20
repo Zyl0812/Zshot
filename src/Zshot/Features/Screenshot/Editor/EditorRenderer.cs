@@ -1,18 +1,34 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI;
 using Zshot.Core.Editor;
 using Windows.Foundation;
+using Windows.Graphics.DirectX;
 using Windows.UI;
 
 namespace Zshot.Features.Screenshot.Editor;
 
 internal static class EditorRenderer
 {
-    public static void Draw(CanvasDrawingSession ds, EditorElement element)
+    public static void Draw(CanvasDrawingSession ds, EditorElement element, CanvasBitmap? background = null, double sampleScaleX = 1, double sampleScaleY = 1)
+    {
+        if (element is MosaicElement mosaic && background is not null)
+        {
+            DrawPixelate(ds, background, mosaic, sampleScaleX, sampleScaleY);
+            if (mosaic.IsSelected)
+            {
+                ds.DrawRectangle(ToRect(mosaic.Bounds), Colors.White, 1);
+            }
+
+            return;
+        }
+
+        DrawShape(ds, element);
+    }
+
+    private static void DrawShape(CanvasDrawingSession ds, EditorElement element)
     {
         var stroke = Parse(element.StrokeColor);
         float width = (float)Math.Max(1, element.StrokeWidth);
@@ -67,7 +83,6 @@ internal static class EditorRenderer
                 }
                 break;
             case MosaicElement mosaic:
-                ds.FillRectangle(ToRect(mosaic.Bounds), Color.FromArgb(80, 80, 80, 80));
                 ds.DrawRectangle(ToRect(mosaic.Bounds), stroke, 1);
                 break;
             case NumberElement number:
@@ -88,44 +103,36 @@ internal static class EditorRenderer
         }
     }
 
-    public static void Flatten(CanvasDrawingSession ds, CanvasBitmap background, IEnumerable<EditorElement> elements)
+    public static void DrawPixelate(CanvasDrawingSession ds, CanvasBitmap background, MosaicElement mosaic, double sampleScaleX = 1, double sampleScaleY = 1)
     {
-        ds.DrawImage(background);
-        foreach (var element in elements)
+        var dest = ToRect(mosaic.Bounds);
+        if (dest.Width < 1 || dest.Height < 1)
         {
-            if (element is MosaicElement mosaic)
-            {
-                DrawPixelate(ds, background, mosaic);
-            }
-            else
-            {
-                Draw(ds, element);
-            }
+            return;
         }
-    }
 
-    public static void DrawPixelate(CanvasDrawingSession ds, CanvasBitmap background, MosaicElement mosaic)
-    {
-        int block = Math.Max(4, mosaic.BlockSize);
-        int x0 = (int)Math.Floor(mosaic.Bounds.X);
-        int y0 = (int)Math.Floor(mosaic.Bounds.Y);
-        int x1 = (int)Math.Ceiling(mosaic.Bounds.X + mosaic.Bounds.Width);
-        int y1 = (int)Math.Ceiling(mosaic.Bounds.Y + mosaic.Bounds.Height);
-        x0 = Math.Clamp(x0, 0, (int)background.SizeInPixels.Width - 1);
-        y0 = Math.Clamp(y0, 0, (int)background.SizeInPixels.Height - 1);
-        x1 = Math.Clamp(x1, 0, (int)background.SizeInPixels.Width);
-        y1 = Math.Clamp(y1, 0, (int)background.SizeInPixels.Height);
-
-        for (int y = y0; y < y1; y += block)
+        // 采样矩形必须钳在 background 内：越界会让 DrawImage 抛 E_BOUNDS（同放大镜那处）
+        float bw = background.SizeInPixels.Width;
+        float bh = background.SizeInPixels.Height;
+        float sx = Math.Clamp((float)(dest.X * sampleScaleX), 0, bw);
+        float sy = Math.Clamp((float)(dest.Y * sampleScaleY), 0, bh);
+        float sw = Math.Clamp((float)(dest.Width * sampleScaleX), 0, bw - sx);
+        float sh = Math.Clamp((float)(dest.Height * sampleScaleY), 0, bh - sy);
+        if (sw < 1 || sh < 1)
         {
-            for (int x = x0; x < x1; x += block)
-            {
-                int bw = Math.Min(block, x1 - x);
-                int bh = Math.Min(block, y1 - y);
-                var colors = background.GetPixelColors(x, y, 1, 1);
-                ds.FillRectangle(x, y, bw, bh, colors[0]);
-            }
+            return;
         }
+
+        int block = Math.Max(2, mosaic.BlockSize);
+        float tw = Math.Max(1, (float)dest.Width / block);
+        float th = Math.Max(1, (float)dest.Height / block);
+        using var tiny = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), tw, th, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
+        using (var tds = tiny.CreateDrawingSession())
+        {
+            tds.DrawImage(background, new Rect(0, 0, tw, th), new Rect(sx, sy, sw, sh));
+        }
+
+        ds.DrawImage(tiny, dest, new Rect(0, 0, tw, th), 1f, CanvasImageInterpolation.NearestNeighbor);
     }
 
     private static void DrawArrowHead(CanvasDrawingSession ds, EditorPoint start, EditorPoint end, Color color, float width, float head)

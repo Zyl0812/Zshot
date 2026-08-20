@@ -12,6 +12,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mgcux="using:Microsoft.Graphics.Canvas.UI.Xaml"
              xmlns:sf="using:Zshot.Frameworks"
+             xmlns:lang="using:Zshot.Language"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d">
@@ -158,6 +159,17 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
                                    FontSize="12"
                                    Foreground="#6C6C70"
                                    Text="3px" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="#6C6C70" Text="{x:Bind lang:Lang.Overlay_Mosaic}" />
+                        <Button Style="{StaticResource OverlayChipButton}" Tag="8" Click="MosaicSize_Click" Content="{x:Bind lang:Lang.Overlay_MosaicFine}" />
+                        <Button Style="{StaticResource OverlayChipButton}" Tag="16" Click="MosaicSize_Click" Content="{x:Bind lang:Lang.Overlay_MosaicMedium}" />
+                        <Button Style="{StaticResource OverlayChipButton}" Tag="32" Click="MosaicSize_Click" Content="{x:Bind lang:Lang.Overlay_MosaicCoarse}" />
+                        <TextBlock x:Name="MosaicChipLabel"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   Foreground="#6C6C70"
+                                   Text="16px" />
                     </StackPanel>
                 </StackPanel>
             </Border>
