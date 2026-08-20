@@ -4,447 +4,273 @@
 
 # Zshot
 
-**Next-generation Windows-native HDR Screenshot Tool**
+**常驻托盘的 Windows 截图工具**
 
-Full 16-bit HDR Pipeline · Region Screenshot · AVIF / JPEG XL / PNGv3 Encoding · Color Management
+标注编辑 · 本地 OCR · 自带 API 翻译 · 长截图 · 真 HDR 管线
 
 [![Release](https://img.shields.io/github/v/release/Zyl0812/Zshot?style=flat-square)](../../releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/Zyl0812/Zshot?tab=MIT-1-ov-file)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows)](../../releases)
 
-[Download](../../releases) · [Quick Start](#quick-start) · [Features](#features) · [Build from Source](#build-from-source)
+[下载](../../releases) · [快速上手](#快速上手) · [功能](#功能) · [从源码构建](#从源码构建)
 
-**English** | **[简体中文](docs/README.zh-CN.md)** | **[繁體中文](docs/README.zh-TW.md)** | **[日本語](docs/README.ja.md)** | **[Français](docs/README.fr.md)** | **[Русский](docs/README.ru.md)** | **[Español](docs/README.es.md)**
+**简体中文** | **[English](docs/README.en.md)**
 
 </div>
 
 ---
 
-## Why Zshot
+## 这是什么
 
-Windows' built-in screenshot tool (Snipping Tool, Win+Shift+S) can only capture 8-bit SDR images even on HDR displays — the system compositor compresses 16-bit HDR frames on output, highlights are clipped, the color gamut is narrowed, resulting in screenshots that appear washed out, overexposed, or have incorrect color mapping. Common third-party screenshot tools are likewise limited by the traditional GDI/BitBlt capture pipeline and cannot perceive HDR data.
+按下热键 → 框选 → 标注 / 取字 / 翻译 / 接着往下滚 → 自动保存并复制 → 回到托盘。
 
-Zshot directly captures the raw `R16G16B16A16Float` scRGB framebuffer from the DXGI layer, fully preserving HDR luminance information (up to thousands of nits). Screenshots are encoded as 16bit HDR AVIF, JPEG XL, or PNGv3 with BT.2020 color space and PQ transfer function metadata. It also provides SDR display auto-degradation, region screenshot, multi-format batch conversion, and everything else you'd expect from a general-purpose screenshot tool.
+全程不出现主窗口。没有启动器，没有欢迎页，没有图库。设置是从托盘单独打开的一个窗口，关掉它进程不退出。
 
-**Key Features**
+Zshot 基于 [Starshot](https://github.com/loliri/Starshot) 二次开发，继承了它那套 16bit HDR 捕获与编解码管线，在其之上把交互重做成了 PixPin / QQ 那一类的即用即走截图工具。
 
-- 🎯 **Full HDR Pipeline** — Lossless capture, encoding, and color management in 16bit throughout. No lossy tone mapping.
-- 🧠 **Smart HDR/SDR Detection** — Automatically distinguishes genuine HDR content from SDR content wrapped in an HDR format, avoiding wasted space.
-- ✂️ **Region Screenshot** — Frozen-frame multi-monitor overlay with window detection and magnifier for pixel-precise selection.
-- 📋 **Clipboard Support** — Screenshots auto-copy to clipboard; browse clipboard history images in a dedicated page, preview / recopy / delete
-- 🗂️ **Multi-format Support** — AVIF / JPEG XL / PNGv3 / UHDR JPEG / PNG, including a batch conversion tool.
-- 🖥️ **Multi-Monitor** — Region screenshots can span across monitors, composing captures that cross screen boundaries.
-- 🔄 **Auto Update Check** — Built-in update check; on a new release it streams the download, extracts, and replaces in place.
+## 为什么
 
-<div align="center">
-<table>
-<tr>
-<td align="center" width="50%">
+主流截图工具二选一：要么交互顺手但截 HDR 屏幕发灰过曝，要么色彩正确却没有标注和取字。
 
-**Other Tools**
+- **HDR 屏幕上截图是对的。** 直接从 DXGI 拿 `R16G16B16A16Float` scRGB 帧缓冲，不经过系统合成器的 8bit 压缩，高光不削顶、色域不收窄。
+- **取字不出机器。** OCR 用本地 PP-OCRv6 模型推理，截图不上传任何服务器。
+- **翻译用你自己的 API。** 填自己的 Base URL 和 Key，不经过任何中间服务，密钥存 Windows 凭据库。
 
-<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.broken.jpg" width="100%" alt="SDR screenshot showing clipped highlights and washed out colors">
-</td>
-<td align="center" width="50%">
+## 快速上手
 
-**Zshot (Ultra HDR JPEG)**
+装好后程序静默进托盘，直接按热键即可：
 
-<img src="https://r2.cialo.site/endfield/3840x2160.dlaa.uhdr.jpg" width="100%" alt="Zshot Ultra HDR JPEG preserving full highlight detail via gain map">
-</td>
-</tr>
-</table>
-<sub>In-game footage from *Arknights: Endfield*</sub>
-</div>
-</br>
+| 热键 | 动作 |
+| --- | --- |
+| `Alt` + `Q` | 区域截图（最常用） |
+| `Alt` + `W` | 全屏截图 |
+| `Alt` + `A` | 区域截图，只进剪贴板不存文件 |
 
-> [!NOTE]
-> GitHub does not support AVIF rendering, so the comparison above uses Ultra HDR JPEG. The original AVIF image can be viewed [here](https://r2.cialo.site/endfield/3840x2160.dlaa.avif).
+托盘左键单击 = 区域截图；右键出菜单：全屏截图 / 区域截图 / 区域截图（仅复制）/ 设置 / 退出。
 
-On SDR displays, Zshot automatically falls back to the standard SDR screenshot path and works as a general-purpose screenshot tool. On HDR displays, it is one of the few desktop screenshot solutions that can fully preserve HDR data.
+框选完成后覆盖层不会关闭，直接就在选区上标注、取字、翻译或继续长截图，按 `Enter` 或点「完成」结束。
 
-## System Requirements
+默认保存到 `图片\Zshot`，同时自动复制到剪贴板，两个开关都可以在设置里单独关掉。
 
-- Windows 10 / 11; Windows 11 recommended for the best experience
-- x64 / arm64 architecture
-- **An HDR display is required for HDR screenshot capture** (automatically falls back to SDR path on SDR displays)
+## 功能
 
-## Download
+### 区域截图覆盖层
 
-Download the archive from [Releases](../../releases), extract it, and run `Zshot.exe` from the root directory. No installation needed — just extract and run.
+冻结帧渲染，框选期间画面不会变。窗口自动探测（悬停高亮、可吸附到客户区）、像素放大镜、实时坐标、多显示器跨屏框选。选区确认后可以八向缩放和拖动。
 
-## Screenshots
+`Esc` 或右键取消，`Enter` 确认。
 
-![Screenshot](docs/Screenshot.jpg)
+### 标注编辑
 
-## Quick Start
+在选区内直接画，不弹独立编辑窗：
 
-| Action                                                            | Default Shortcut |
-| ----------------------------------------------------------------- | ---------------- |
-| Full-screen screenshot                                            | Alt+W            |
-| Region screenshot (save file + copy to clipboard after selection) | Alt+Q            |
-| Region copy only (copy to clipboard only, no file saved)          | Alt+A            |
+矩形 · 椭圆 · 直线 · 箭头 · 画笔 · 文字 · 马赛克 · 序号标记
 
-All shortcuts can be customized in Settings.
+支持选中、移动、删除元素，撤销 / 重做 / 清空，颜色与线宽可调，马赛克有细 / 中 / 粗三档。
 
-## Features
+马赛克走 GPU 降采样重绘，实时预览不掉帧。
 
-### HDR Screenshot Pipeline
+**工具栏可自定义**：17 个按钮都能在设置里显示或隐藏。默认隐藏椭圆、文字、序号、重做四项，保持工具栏精简；需要时勾上即可。
 
-Most screenshot tools can only capture 8bit SDR even on HDR displays — the system compositor's 16bit floating-point scRGB output gets crushed into SDR with clipped highlights and narrowed gamut. Zshot captures the **raw HDR framebuffer**:
+### 本地 OCR
 
-1. **HDR Capture**: When the display reports HDR, requests `R16G16B16A16Float` pixel format to obtain the full scRGB floating-point data (luminance up to thousands of nits).
-2. **HDR Save**: 16bit AVIF / JPEG XL / PNGv3 with BT.2020 color space + PQ transfer function. Highlights are not clipped, gamut is not narrowed.
-3. **maxCLL Calculation**: Win2D histogram effect computes the maximum content light level, used to distinguish genuine HDR content from SDR content in an HDR container.
-4. **Color Management**: Reads the display ICC profile to extract real gamut primaries, writes cICP/ICC chunks into the output file. HDR is always BT.2020; for SDR it defaults to off (BT.709) and can optionally be enabled (reads the ICC real gamut) — enabling first probes the monitor's color configuration, and cannot be turned on if it's invalid (e.g. VMs, devices without an ICC profile).
+选区里的文字一键提取，识别结果可整段复制。
 
-#### SDR Content Handling
+- 模型是 **PP-OCRv6 Small**（RapidOcrNet + ONNX Runtime），随安装包一起发布，装完即用，不需要联网下载
+- 多语言单模型：简体中文、繁体中文、英文、日文及 46 种拉丁语系
+- 按行输出并还原自然阅读顺序，中文不会逐字插空格
+- **全程本地推理，截图不上传**
+- 典型选区约 1 秒出结果；模型文件缺失时自动回退到 Windows 内置 OCR
 
-On an HDR display, the desktop and SDR applications are also captured in the HDR format (R16G16B16A16Float), but the actual content luminance is at SDR levels. Zshot handles this as follows:
+### AI 翻译
 
-- **Default**: Still saved in HDR format (16bit), **no 8bit tone mapping**, avoiding degradation and color shifts.
-- **Delete HDR for SDR Content** (optional): When enabled, content below the maxCLL threshold is automatically converted to SDR (using the user's configured SDR storage format) and the HDR file is deleted to save space.
+OCR 取出文字后一键翻译，用你自己的 API：
 
-#### UHDR JPEG Fallback
+- 兼容 OpenAI 格式的任意服务，填 Base URL / API Key / 模型名
+- 目标语言、系统提示词、超时（5~120 秒）都可配
+- API Key 存进 Windows 凭据库，不写进配置文件，也不会出现在日志里
+- 对返回格式做了容错：网关返回 HTML 错误页、流式 `delta`、缺字段都不会让程序崩
 
-HDR screenshots can simultaneously produce an Ultra HDR JPEG (SDR base image + HDR gain map), which displays correctly even in software that doesn't support HDR. Encoded via `Starward.Codec`'s `UhdrEncoder`.
+### 长截图
 
-#### Region Screenshot HDR Trade-off
+固定选区，手动滚动页面，自动检测新内容并拼接。
 
-The region screenshot overlay **intentionally** tone-maps HDR frames to SDR for display — because WinUI's `CanvasControl` uses an SDR swap chain, and raw scRGB floating-point output would appear discolored or darkened. **The saved file is full HDR**, untouched; highlight compression during selection only affects the preview, never the output.
+- 按重叠区域做灰度 SAD 匹配对齐，避免重复条带
+- 实时显示已捕获段数与总高度
+- 上限 16384px（D3D11 纹理尺寸上限），达到上限会提示
+- 拼接期间覆盖层自动排除出捕获，不会把自己拍进去
+- HDR 屏幕下同样输出正确的 SDR 结果
 
-### Three Screenshot Modes
+### HDR 截图管线
 
-| Mode             | Target                                                         | Clipboard Format     | File Saved |
-| ---------------- | -------------------------------------------------------------- | -------------------- | ---------- |
-| Full-screen      | Entire monitor (foreground window / cursor screen, switchable) | CF_HDROP (file)      | Yes        |
-| Region           | Marquee selection / click-to-window                            | CF_DIB (BGRA bitmap) | Yes        |
-| Region Copy Only | Marquee selection / click-to-window                            | CF_DIB (BGRA bitmap) | No         |
+继承自 Starshot 的核心能力，本次二开未改动其算法：
 
-All three modes share the same HDR detection, color management, filename templates, save pipeline, and info toast.
-
-### Region Screenshot Overlay
+- 全程 16bit：`R16G16B16A16Float` scRGB 捕获 → 编码，不做有损 tone mapping
+- HDR 输出格式：AVIF（默认）/ JPEG XL / PNGv3，带 BT.2020 色域与 PQ 传输函数元数据
+- SDR 输出格式：PNG（默认）/ AVIF / JPEG XL
+- 智能判定内容是否真 HDR，SDR 内容不会被塞进 HDR 容器白占空间
+- 编码质量三档可选
+- SDR 显示器上自动走降级路径
 
-- **Frozen Frame**: Captures all monitors into a single stitched bitmap first; the overlay displays this frozen frame so the image stays still during selection. The overlay itself is excluded from the screenshot.
-- **Multi-Monitor**: Covers the entire virtual screen. Selections can span across monitors (brightness stays accurate even on mixed HDR+SDR setups); the magnifier and coordinate box are limited to the cursor's current monitor.
-- **Window Detection**: EnumWindows + DWM cloaked/toolwindow filtering + DWM extended frame bounds (de-shadow) + client-area dual candidate + Z-order selection. Click a window to capture it directly (QuickCrop).
-- **Magnifier**: NearestNeighbor integer-aligned + pixel grid (15×15 pixels, 10px each), making individual pixels clearly distinguishable.
-- **Animated Marching Ants + Real-time Coordinates**: Selection X/Y/W/H + cursor physical coordinates.
-- **Pixel Precision**: Drag marquee +1px; window rectangle +0.
-- ESC / Right-click to cancel; Enter to confirm window hover selection.
-
-### Clipboard
-
-The WinRT `Clipboard.SetContent` from unpackaged WinUI apps is unreliable (deferred rendering + flush issues — content often never reaches other applications). Zshot uses Win32 native APIs (`OpenClipboard` / `SetClipboardData`) directly:
-
-- **Full-screen**: CF_HDROP (file drop format) — paste into Explorer or chat apps to get the file directly.
-- **Region**: CF_DIB (BGRA bitmap) — the cropped SDR bitmap from the overlay is placed directly on the clipboard with no file read, no re-encode, no secondary tone mapping.
-- Callable from any thread, with 10×20ms retry to handle clipboard contention.
+> 标注在 SDR 图层上进行，HDR 原图与标注后的 SDR 输出是两条独立的保存管线。
 
-### Save
-
-- **Flat structure** (no subfolders). Defaults to `Pictures\Zshot`, customizable.
-- **SDR format** (PNG / AVIF / JPEG XL; default PNG) and **HDR format** (AVIF / JPEG XL / PNGv3; default AVIF) configured separately.
-- Quality levels: Medium / High / Lossless.
-- XMP metadata (CreatorTool = Zshot).
-- Serialized encoding (SemaphoreSlim) to avoid concurrent encoding conflicts.
-- **Storage Statistics**: Settings page shows disk usage for screenshots / thumbnail cache / wallpapers / logs / backups, with refresh and one-click cache cleanup (also cleans up orphaned wallpaper files).
+### 保存与剪贴板
 
-#### Supported Formats
+- 自动保存到文件、自动复制到剪贴板，两个开关独立
+- 「仅复制」热键永不写文件，无视自动保存设置
+- 保存和复制发生在编辑器点「完成」之后，不是按下热键的瞬间
+- 保存目录可改，支持一键打开
 
-| Format    | Bit Depth            | HDR Support                                      | Use Case                      |
-| --------- | -------------------- | ------------------------------------------------ | ----------------------------- |
-| PNG       | 8bit / 16bit         | —                                                | SDR default, lossless         |
-| AVIF      | 8bit / 10bit / 12bit | Full HDR                                         | HDR default, high compression |
-| JPEG XL   | 8bit / 16bit         | Full HDR                                         | HDR alternative, reversible   |
-| PNGv3     | 16bit                | cICP-tagged HDR; browsers yes, viewers mostly no | HDR alternative               |
-| UHDR JPEG | 8bit + gain map      | SDR-compatible HDR fallback                      | HDR bonus output              |
-
-### Filename Templates
+### 文件名模板
 
-Full-screen and region screenshots use **independent templates**.
+全屏截图与区域截图使用**各自独立**的模板，在「设置 → 存储」里配置。
 
-| Placeholder                                               | Meaning                                          | Example             |
-| --------------------------------------------------------- | ------------------------------------------------ | ------------------- |
-| `{process}`                                               | Process name (no extension)                      | `explorer`          |
-| `{processPath}`                                           | EXE filename (with extension)                    | `explorer.exe`      |
-| `{title}`                                                 | Window title (trimmed + configurable truncation) | `Genshin Impact`    |
-| `{timestamp}`                                             | Unix timestamp                                   | `1721234567`        |
-| `{time}`                                                  | yyyyMMdd_HHmmssff                                | `20260718_14302512` |
-| `{date}`                                                  | yyyyMMdd                                         | `20260718`          |
-| `{width}` `{height}`                                      | Image dimensions (px)                            | `1920` `1080`       |
-| `{year}` `{month}` `{day}` `{hour}` `{minute}` `{second}` | Time components                                  |                     |
+| 占位符 | 含义 | 示例 |
+| --- | --- | --- |
+| `{process}` | 进程名（不含扩展名） | `explorer` |
+| `{processPath}` | EXE 文件名（含扩展名） | `explorer.exe` |
+| `{title}` | 窗口标题（去空白，长度可截断） | `原神` |
+| `{timestamp}` | Unix 时间戳（秒） | `1721234567` |
+| `{time}` | `yyyyMMdd_HHmmssff` | `20260718_14302512` |
+| `{date}` | `yyyyMMdd` | `20260718` |
+| `{width}` `{height}` | 图像宽高（像素） | `1920` `1080` |
+| `{year}` `{month}` `{day}` | 年 / 月 / 日 | `2026` `07` `18` |
+| `{hour}` `{minute}` `{second}` | 时 / 分 / 秒 | `14` `30` `25` |
 
-Illegal filename characters are uniformly replaced with `_`.
+文件名中的非法字符统一替换为 `_`。
 
-### Info Toast
+### 托盘与热键
 
-After a screenshot, a thumbnail + status toast pops up (does not interfere with screenshots — has `WDA_EXCLUDEFROMCAPTURE` set so other screenshot tools cannot capture this window):
+- 开机自启（写注册表 Run 项或计划任务，可实时检测外部禁用）
+- 三个全局热键均可自定义
+- 二次启动不会打开任何窗口
+- 更新检查：发现新版本后流式下载、解压、原地替换，支持差分补丁
 
-- **Processing** (spinner animation) / **Saved** (with open button) / **Copied** (green checkmark) / **Failed**
-- Multi-shot counter for bursts (e.g., 2/3).
-- Composition slide-in / slide-out animations.
+## 已知限制
 
-### Screenshot Library
+- OCR 单次约 1 秒（CPU 推理，PP-OCRv6 Small 的固有开销），点击后会显示「识别中…」
+- 长截图需要手动滚动，不会自动滚屏；上限 16384px
+- HDR 截图需要 HDR 显示器，SDR 屏幕自动降级
+- 翻译依赖你自己提供的 API，程序不内置任何翻译服务
 
-- Multi-folder browsing (default screenshot directory + user-added folders).
-- `FileSystemWatcher` for real-time add/delete detection.
-- Grouped by date, lazy-loaded thumbnails.
-- Context menu: Open / Copy File / Copy as JPG / Open in Explorer / Open With / Delete.
-- Multi-select + drag-out + batch conversion entry point.
+## 系统要求
 
-### Clipboard History
+- Windows 10 / 11（推荐 11）
+- x64 / arm64
+- HDR 截图需要 HDR 显示器，否则自动走 SDR 路径
 
-- Dedicated page for browsing Windows clipboard history (Win+V) image items
-- Reads `Clipboard.GetHistoryItemsAsync`, flat layout sorted by time
-- Auto-refresh on clipboard change (ContentChanged + throttle) + refresh on window activation
-- Click to preview (image viewer, with previous/next navigation)
-- Context menu: Info (format/size/dimensions) / Open / Recopy / Delete from history
-- Requires clipboard history enabled in Windows Settings
-- Empty state: prompt + link to `ms-settings:clipboard` when not enabled; "no images" when empty
+## 架构
 
-### Image Viewer
-
-- Zoom (slider / buttons / mouse wheel smooth animation / double-click to fit), fullscreen mode (F11).
-- Previous / Next (arrow keys, mouse wheel, bottom thumbnail strip).
-- Drag-and-drop files to open directly.
-- Context menu: Copy File / Path / Image, Delete, Open in Explorer, Open With.
-- **Edit Panel**: HDR / SDR / Auto display mode toggle, SDR brightness slider (100–500 nits), image and display info.
-- **Format Conversion**: Export as PNG / AVIF / JPEG XL (SDR display) or UHDR JPEG / AVIF / JPEG XL (HDR display).
-- **Color Management**: Reads display ICC profile and AdvancedColorInfo.
-
-### Batch Format Conversion
-
-| Conversion Direction                | Engine                                  |
-| ----------------------------------- | --------------------------------------- |
-| JPG / PNG → AVIF / JXL              | avifenc.exe / cjxl.exe (CLI)            |
-| AVIF / JXL → JPG / PNG              | avifdec.exe / djxl.exe (CLI)            |
-| JXR / WEBP / HEIC etc. → AVIF / JXL | In-process ImageSaver (avifEncoderLite) |
-
-### Personalization
-
-- **Custom Wallpaper**: Three modes
-  - **Specific Image**: Pick an image, always displayed.
-  - **Specific Video**: Loops muted; auto-pauses when the main window is hidden.
-  - **Random from Folder**: Picks a random image or video from a folder on each launch; an optional "Prefer video" sub-toggle prefers videos when on.
-  - Lost wallpaper sources are auto-detected, with config cleanup and fallback to no wallpaper + toast notification.
-- **Accent Color**:
-  - **Auto-extract from wallpaper** (on by default): Samples the wallpaper's dominant color as the app accent color (HSV saturation boost). For videos, only the first frame is sampled to avoid color flickering.
-  - **Custom Color**: Manual color picker overrides auto-extraction.
-- **Theme**: Follow System / Light / Dark.
-- **Acrylic Effect**: In wallpaper mode, choose between frosted-glass backdrop layer or direct wallpaper transparency.
-
-### Splash Screen
-
-Displays the logo + tagline on startup. Delays 700ms then fades out over 400ms. Only plays on first window open; does not replay when restoring from the system tray.
-
-### System Tray
-
-- Left-click shows the main window; right-click opens a context menu (Show / Exit).
-- Closing the main window minimizes to tray (toggleable).
-- `ForceExit` mechanism ensures "Exit" from the tray truly exits.
-
-### Auto-start on Boot
-
-- Registry key `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, pointing to the launcher (root `Zshot.exe`).
-- Optional `--hide` flag to start minimized to tray (requires tray to be enabled).
-- The toggle reads the registry in real time (no cached database): Task Manager disabling only touches StartupApproved without removing the Run entry — the toggle still shows as on.
-- On startup, checks whether the exe pointed to by the auto-start entry exists; if not, automatically removes the startup entry and shows a toast.
-
-### Check for Updates
-
-- Throttled check on startup (≥24h + toggle on) against GitHub Releases latest version, or manual check from the About page.
-- Updates prefer chained delta packages (only changed files, a few MB vs ~80MB full package); matches layer by layer from the current version upward, up to 5 layers (adjustable in Settings → Advanced); falls back to the full package if too many versions behind or no match is found.
-- **Manual full update**: The update window's main button dropdown lets you pick "Full update" to skip delta and download the full package directly.
-- Both full and delta packages use SharpCompress true streaming extraction (direct network stream, no zip saved to disk), writing each entry directly to the root directory. On failure, the previous state is restored. On success, restarts the launcher with `--clean` to remove old versions.
-- Only checks CI/CD releases (reads `version.ini` version number). Local builds (no `version.ini`, `AppVersion = Local`) are treated as 0.0.0, so they can update to any CI/CD release.
-- Version case convention: the GitHub tag, zip name, and `app-{version}/` dir are all lowercase (e.g. `0.3.1-preview`); `version.ini` keeps the original case (`0.3.1-Preview`, shown on the About page), and the launcher lowercases it when locating the dir.
-
-## Known Limitations
-
-- The region screenshot overlay displays HDR frames as SDR (WinUI CanvasControl uses an SDR swap chain); saved files are unaffected.
-- Custom wallpapers use `UniformToFill` to cover the window, but WinUI's crop is not centered — it is currently **top-left** aligned. For example, a narrow (portrait) wallpaper in a wide window will only show the upper portion (cropped from the top rather than centered).
-- When the region screenshot overlay first opens, the cursor remains the default system shape. **You need to move the mouse once** for the crosshair cursor to appear (WinUI `ProtectedCursor` does not take immediate effect on a stationary pointer already over the element — moving once triggers a pointer event, after which it works normally).
-- When hovering certain windows in region capture, the coordinate box may show negative values (e.g. `-11,-11`). This is the window extended frame bounds reported by Windows DWM (including off-screen shadow/border); Zshot reads it as-is — the off-screen part is invisible and does not affect the screenshot.
-- Video wallpaper may fail to initialize on startup due to MF media pipeline contention (intermittent, not fully resolved); during load a random image from the video's directory is shown as a placeholder, and kept if the video gets stuck — no black screen.
-
-## Architecture
-
-### Directory Structure
+### 目录结构
 
 ```
-Root/
-  Zshot.exe            ← C++ launcher (reads version.ini to decide which app dir to launch)
-  ZshotDatabase.db     ← SQLite settings database
-  version.ini             ← Version number (CI/CD release only; absent in local builds)
-  app-{version}/          ← Main program directory (versioned for CI/CD release, app/ for local builds)
-    Zshot.exe          ← Main program (WinUI 3 / .NET 10)
-    *.dll                 ← Dependencies
-    avifenc.exe etc.      ← Codec tools (from Starward.Codec NuGet)
-  backup/                 ← Database backups
-%LOCALAPPDATA%/Zshot/  (default, configurable)
-  log/                    ← Logs
-  bg/                     ← Wallpapers
-  thumb/                  ← Thumbnail cache
+src/
+├── Zshot/              主程序（WinUI 3）
+│   └── Features/
+│       ├── Screenshot/     捕获、覆盖层、编辑器、OCR、长截图
+│       ├── Codec/          HDR 编解码与色彩管理
+│       ├── Setting/        设置页
+│       ├── Update/         更新检查与差分升级
+│       └── ViewHost/       托盘窗口、设置窗口
+├── Zshot.Core/         纯逻辑，无 UI 依赖，单测覆盖
+│   ├── Editor/             标注元素与撤销栈
+│   ├── Overlay/           选区几何与工具栏定位
+│   ├── Ocr/               阅读顺序整理
+│   ├── LongCapture/       帧对齐与拼接
+│   └── Translation/       翻译请求与响应解析
+├── Zshot.Language/     多语言资源（en / zh-CN / ja-JP）
+└── Zshot.Launcher/     原生 C++ 启动器
+tests/
+└── Zshot.Core.Tests/   Zshot.Core 的单元测试
 ```
 
-### Launcher
+`Zshot.Core` 刻意不引用任何 WinUI / DirectX 类型，几何计算、撤销栈、拼接对齐、保存策略、阅读顺序这些逻辑都能直接跑单测。
 
-Native C++ program (~400KB). Reads `version.ini` to decide whether to launch `app-{version}/Zshot.exe` (if no version.ini, falls back to `app/` for debug/local builds). When launched with `--clean` (or `--clean=<pid>`), iterates `app-*` directories and deletes non-current versions.
+### 技术栈
 
-### Tray & Background Startup
+| 层 | 技术 |
+| --- | --- |
+| UI 框架 | WinUI 3（Windows App SDK 1.8） |
+| 运行时 | .NET 10 |
+| 图形 | Win2D 1.3（D3D11 互操作、HDR tone mapping） |
+| 编解码 | Starward.Codec（libavif / libjxl / UltraHDR） |
+| OCR | RapidOcrNet 4.0.2 + ONNX Runtime + SkiaSharp |
+| OCR 模型 | PP-OCRv6 Small（det + rec）+ PP-OCRv5 方向分类器 |
+| 数据存储 | SQLite + Dapper |
+| 日志 | Serilog |
+| 托盘 | H.NotifyIcon.WinUI |
+| 启动器 | 原生 C++（v145 工具集，静态 CRT） |
 
-- `--hide`: When auto-starting, MainWindow is not created. Global hotkeys are registered against SystemTrayWindow's hwnd (the tray window serves as the persistent host).
-- H.NotifyIcon.WinUI's TaskbarIcon requires one Window.Show to trigger `Loaded` before the icon registers. During initialization, `WS_EX_LAYERED + alpha=0` makes the window complete this show transparently, avoiding visible flash on `--hide` auto-start.
-- The C++ launcher re-joins `argv[1..]` to pass through command-line arguments.
+## 从源码构建
 
-### Tech Stack
+### 前置要求
 
-| Layer          | Technology                                                          |
-| -------------- | ------------------------------------------------------------------- |
-| UI Framework   | WinUI 3 (Windows App SDK 1.8)                                       |
-| Runtime        | .NET 10                                                             |
-| Graphics       | Win2D 1.3 (D3D11 interop, HDR tone mapping, histogram effects)      |
-| Codecs         | Starward.Codec NuGet (libavif / libjxl / UltraHDR P/Invoke wrapper) |
-| Data Storage   | SQLite + Dapper                                                     |
-| Logging        | Serilog                                                             |
-| System Tray    | H.NotifyIcon.WinUI                                                  |
-| Thumbnails     | Scighost.WinUI ImageEx + custom CachedImage                         |
-| Region Overlay | Win2D CanvasControl (frozen-frame rendering + selection drawing)    |
-| Clipboard      | Win32 native API (OpenClipboard / SetClipboardData)                 |
-| Launcher       | Native C++ (v145 toolset, static CRT)                               |
-
-### Re-entry Protection
-
-`Interlocked.CompareExchange` global guard. Full-screen, region, and copy-only modes share a single `_isCapturing` flag — rapid key repeats or consecutive hotkey presses will not trigger multiple captures.
-
-### Build Configuration
-
-|                       | Debug                                     | Release                                                                                |
-| --------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------- |
-| .NET Runtime          | Self-contained                            | Self-contained                                                                         |
-| Native Libs           | win-x64 only (default RuntimeIdentifier)  | Same as Debug; arm64 requires an explicit `-r win-arm64`                               |
-| Trim                  | Not applied (no trimming)                 | Partial                                                                                |
-| CsWinRT AOT Optimizer | Off (faster builds)                       | On — keeps WinRT interop trim-safe                                                     |
-| ReadyToRun            | Not applied (standard JIT)                | AOT precompiled                                                                        |
-| Output Path           | `build/app/`                              | `build/release/app/`; the launcher is copied to `build/release/` if it was built first |
-| Size                  | ~260MB (self-contained runtime dominates) | Smaller (Trim)                                                                         |
-
-## Build from Source
-
-### Prerequisites
-
-- Visual Studio 2026 (with C++ Desktop Development and .NET Desktop Development)
+- Visual Studio 2022（含「使用 C++ 的桌面开发」工作负载，构建启动器需要 MSBuild）
 - .NET 10 SDK
-- Windows SDK 10.0.26100
+- Windows 11 SDK
 
-### Steps
+### 步骤
 
 ```bash
-git clone https://github.com/Zyl0812/Zshot
-cd Zshot
-
 # === Debug ===
-# Build the main program (outputs to build/app/)
+# 主程序（输出到 build/app/）
 dotnet build src/Zshot/Zshot.csproj -c Debug -p:Platform=x64
 
-# Build the launcher (outputs to build/Zshot.exe; requires VS MSBuild)
-"C:\Program Files\Microsoft Visual Studio\<version>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
+# 启动器（输出到 build/Zshot.exe，需要 VS 的 MSBuild）
+msbuild src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Debug -p:Platform=x64
 
-# Run: build/Zshot.exe (launcher) or build/app/Zshot.exe (main program)
+# 单元测试
+dotnet test tests/Zshot.Core.Tests/Zshot.Core.Tests.csproj
 
-# === Release Publish ===
-# 1. Build the launcher first (outputs to build/Zshot.exe)
-"C:\Program Files\Microsoft Visual Studio\<version>\Community\MSBuild\Current\Bin\MSBuild.exe" src/Zshot.Launcher/Zshot.Launcher.vcxproj -p:Configuration=Release -p:Platform=x64
-
-# 2. Publish the main program (outputs to build/release/app/, auto-copies launcher to build/release/Zshot.exe + removes AI libs)
-dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=x64
-
-# Resulting directory structure:
-# build/release/
-#   Zshot.exe        ← Launcher (auto-copied)
-#   app/
-#     Zshot.exe      ← Main program (self-contained + trim + R2R)
-#     *.dll / avifenc.exe etc.
+# === Release 发布 ===
+dotnet publish src/Zshot/Zshot.csproj -c Release -p:Platform=x64 -r win-x64
 ```
 
-## Internationalization (i18n)
+### OCR 模型
 
-Translations are based on `.resx` resource files under `src/Zshot.Language/` (`Lang.resx` is the English default; `Lang.zh-CN.resx` etc. are per-locale). You also need to add an option to the language ComboBox in `GeneralSetting` + its `LanguageIndex` mapping.
+模型不入库，由 CI 在打包时从 [RapidOCR 官方清单](https://github.com/RapidAI/RapidOCR/blob/main/python/rapidocr/default_models.yaml) 下载并校验 SHA256，放进发布包的 `models/v6/`。
 
-Translation contributions welcome: fork the repo → copy `Lang.resx` to `Lang.{your-locale}.resx` → translate → open a PR.
+本地开发时若该目录为空，OCR 会自动回退到 Windows 内置引擎。想在本地用 PP-OCRv6，把这三个文件放到 `build/app/models/v6/` 即可：
 
-## Development Notes
+| 文件 | 大小 |
+| --- | --- |
+| `PP-OCRv6_det_small.onnx` | 9.5 MB |
+| `PP-OCRv6_rec_small.onnx` | 20.3 MB |
+| `ppocrv6_dict.txt` | 70 KB |
 
-This project is under active development. Features may change at any time — stay tuned for updates!
+方向分类器 `models/v5/ch_PP-LCNet_x0_25_textline_ori_cls_mobile.onnx` 由 RapidOcrNet 包自带，无需手动准备。
 
-Contributions welcome:
+## 常见问题
 
-- Found a bug? [Submit an Issue](../../issues/new)
-- Have a feature suggestion? [Start a Discussion](../../issues/new)
-- Want to contribute code? Submit a [Pull Request](../../pulls)
+**截图发灰 / 过曝？**
+确认在设置里选了合适的 HDR 输出格式。若显示器不是 HDR，程序会自动走 SDR 路径，此时输出的就是普通 SDR 图。
 
-## FAQ
+**OCR 第一次特别慢？**
+首次调用要加载 ONNX 模型（约 200~400ms），之后进程内复用。稳定后典型选区约 1 秒。
 
-<details>
-<summary><b>Screenshot library (home page) images show incorrect / garbled colors</b></summary>
+**OCR 认不出某种语言？**
+PP-OCRv6 Small 覆盖中日英与拉丁语系。韩文、阿拉伯文等不在支持范围内。
 
-This is typically a Windows system image codec issue (AVIF / HEIF / JPEG XL extensions), not a Zshot bug. Try searching for and updating the following in the Microsoft Store:
+**翻译报错？**
+先确认 Base URL 填的是兼容 OpenAI 格式的地址（通常以 `/v1` 结尾即可，程序会自动补 `/chat/completions`）。错误信息会直接显示 API 返回的状态码。
 
-- **AV1 Video Extension**
-- **HEIF Image Extensions**
-- **HEVC Video Extensions**
-- **Webp Image Extensions**
+**长截图拼接错位？**
+滚动慢一点。每次滚动的距离若超过选区高度，相邻两帧就没有重叠区域可供对齐，该帧会被丢弃。
 
-Restart Zshot after updating. If the issue persists, please [submit an Issue](../../issues/new) with a screenshot attached.
+**关掉设置窗口程序就退出了？**
+不会。设置是独立窗口，关掉后程序继续留在托盘。要退出请用托盘右键菜单的「退出」。
 
-</details>
+## 致谢
 
-<details>
-<summary><b>HDR PNG (PNGv3) looks grayish/dim in image viewers?</b></summary>
+- [Starshot](https://github.com/loliri/Starshot) — HDR 捕获 / 编解码 / 覆盖层底座，作者 [@loliri](https://github.com/loliri)（MIT）
+- [RapidOcrNet](https://github.com/BobLd/RapidOcrNet) — OCR 推理封装，作者 BobLd 与 RapidAI（Apache-2.0）
+- [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) — PP-OCRv6 / PP-OCRv5 模型，作者 PaddlePaddle（Apache-2.0）
+- [ONNX Runtime](https://github.com/microsoft/onnxruntime) · [SkiaSharp](https://github.com/mono/SkiaSharp) · [Win2D](https://github.com/microsoft/Win2D)（MIT）
 
-HDR in PNGv3 (W3C PNG Third Edition, finalized in 2025) relies on cICP metadata tagging BT.2020 + PQ — a brand-new standard. Chrome / Edge / Firefox render its HDR correctly, but most image viewers (e.g. Windows Photos) still decode it as a plain PNG, so it looks grayish/dim. This is the current ecosystem, not a broken file. For broad compatibility choose AVIF (the mainstream HDR format) or enable the UHDR JPEG fallback.
+完整的第三方声明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
-</details>
+## 许可证
 
-<details>
-<summary><b>Screenshot save crashes (VMs / some monitors)</b></summary>
+MIT，见 [LICENSE](LICENSE)。
 
-These environments (VMs, devices without an ICC profile) report invalid monitor color configurations; with color management on, the encoder (lcms2) crashes processing the malformed gamut data. Keep color management off (the default) to avoid this; HDR screenshots are unaffected.
-
-</details>
-
-<details>
-<summary><b>Screenshot colors look different from what I see on screen</b></summary>
-
-If you're using an HDR display, make sure the Windows HDR toggle is enabled (Settings → System → Display → HDR). HDR screenshot functionality only works in HDR mode.
-
-</details>
-
-<details>
-<summary><b>Can't paste from clipboard after taking a screenshot</b></summary>
-
-Zshot uses the Win32 native clipboard API for writing, which is theoretically more reliable than WinRT. If pasting still fails, the target application may not support the corresponding clipboard format (CF_HDROP for files / CF_DIB for bitmaps). Try pasting into Explorer (files) or Paint (bitmaps) to verify.
-
-</details>
-
-Zshot is an independent product forked from [Starshot](https://github.com/loliri/Starshot) (MIT). It is not an official Starshot release.
-
-## Acknowledgments
-
-- [Starshot](https://github.com/loliri/Starshot) — HDR capture / codec / overlay base, by [@loliri](https://github.com/loliri).
-- [Starward](https://github.com/Scighost/Starward) — Screenshot core, codec engine, and window framework all originate from Starward, developed by [@Scighost](https://github.com/Scighost).
-- [ShareX](https://github.com/ShareX/ShareX) — Reference for the region screenshot overlay's window detection and interaction design.
-
-**And all the third-party libraries**:
-
-- [CommunityToolkit](https://github.com/CommunityToolkit) — MVVM framework + WinUI controls (Segmented / Behaviors / Helpers)
-- [SharpCompress](https://github.com/adamhathcock/sharpcompress) — Streaming decompression
-- [Dapper](https://github.com/DapperLib/Dapper) — Lightweight SQLite ORM
-- [H.NotifyIcon.WinUI](https://github.com/HavenDV/H.NotifyIcon) — System tray
-- [Vanara.PInvoke](https://github.com/dahall/Vanara) — Win32 API wrappers (DwmApi / Ole / Shell32)
-- [ComputeSharp.D2D1](https://github.com/Sergio0694/ComputeSharp) — GPU compute effects
-- [Serilog](https://github.com/serilog/serilog) — Structured logging
-
-## License
-
-MIT
+Zshot 是基于 Starshot 二次开发的独立产品，不是 Starshot 官方版本。
