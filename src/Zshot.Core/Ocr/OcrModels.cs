@@ -41,13 +41,6 @@ public sealed class OcrRequest
     public required int Width { get; init; }
     public required int Height { get; init; }
     public string? LanguageHint { get; init; }
-    public OcrAccuracy Accuracy { get; init; } = OcrAccuracy.Balanced;
-}
-
-public enum OcrAccuracy
-{
-    Balanced,
-    High,
 }
 
 public sealed class OcrResult

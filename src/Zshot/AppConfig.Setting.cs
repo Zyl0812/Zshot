@@ -401,14 +401,6 @@ public static partial class AppConfig
     }
 
 
-    /// <summary>0 = PP-OCRv6 Small / Balanced，1 = Medium / High</summary>
-    public static int OcrAccuracyMode
-    {
-        get => GetValue(0);
-        set => SetValue(value);
-    }
-
-
     public static string TranslationBaseUrl
     {
         get => GetValue("") ?? "";

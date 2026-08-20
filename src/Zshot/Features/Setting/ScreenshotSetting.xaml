@@ -127,11 +127,10 @@
 
 
             <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="OCR" />
-                <cwc:Segmented SelectedIndex="{x:Bind OcrAccuracyMode, Mode=TwoWay}">
-                    <cwc:SegmentedItem Content="Small / 均衡" />
-                    <cwc:SegmentedItem Content="Medium / 高精度" />
-                </cwc:Segmented>
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_Ocr}" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind lang:Lang.ScreenshotSetting_OcrWindows}"
+                           TextWrapping="Wrap" />
             </StackPanel>
 
             <StackPanel Spacing="8">

@@ -124,8 +124,36 @@ jobs:
 
       - name: Remove unuse
         run: |
-          Remove-Item -Force build/release/app/RestartAgent.exe, build/release/app/DirectML.dll, build/release/app/onnxruntime.dll, build/release/app/onnxruntime_providers_shared.dll, build/release/app/Microsoft.ML.OnnxRuntime.dll, build/release/app/VP9DecoderMFT.dll -ErrorAction SilentlyContinue
+          # onnxruntime / Microsoft.ML.OnnxRuntime 是 OCR 推理依赖，不能再删（原上游无此依赖）
+          Remove-Item -Force build/release/app/RestartAgent.exe, build/release/app/DirectML.dll, build/release/app/VP9DecoderMFT.dll -ErrorAction SilentlyContinue
           Remove-Item -Recurse -Force build/release/app/NpuDetect -ErrorAction SilentlyContinue
+          # RapidOcrNet 自带整套 v5 模型，我们只用它的 cls 分类器，其余 12MB 是死重
+          Remove-Item -Force build/release/app/models/v5/ch_PP-OCRv5_mobile_det.onnx, build/release/app/models/v5/latin_PP-OCRv5_rec_mobile_infer.onnx, build/release/app/models/v5/ppocrv5_latin_dict.txt -ErrorAction SilentlyContinue
+          # .lib 是链接期产物，运行时用不到
+          Remove-Item -Force build/release/app/onnxruntime.lib, build/release/app/onnxruntime_providers_shared.lib -ErrorAction SilentlyContinue
+
+      - name: Download PP-OCRv6 models
+        run: |
+          # 随安装包分发（约 31MB）。文件名必须与 RapidOcrModelSet.PPOCRv6Small 预设一致。
+          $dir = "build/release/app/models/v6"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $base = "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2"
+          $files = @(
+            @{ Url = "$base/onnx/PP-OCRv6/det/PP-OCRv6_det_small.onnx"; Name = "PP-OCRv6_det_small.onnx"; Sha = "090f04abcd9d9a7498bc4ebf677e4cb9bdce1fe4197ddb7e529f1ef44e1ff94f" },
+            @{ Url = "$base/onnx/PP-OCRv6/rec/PP-OCRv6_rec_small.onnx"; Name = "PP-OCRv6_rec_small.onnx"; Sha = "6f327246b50388f3c176ae304bd95767ea6dc0c9ae92153ef8cbe210b3c14884" },
+            @{ Url = "$base/paddle/PP-OCRv6/rec/PP-OCRv6_rec_small/ppocrv6_dict.txt"; Name = "ppocrv6_dict.txt"; Sha = "" }
+          )
+          foreach ($f in $files) {
+            $out = Join-Path $dir $f.Name
+            Write-Host "Downloading $($f.Name)"
+            Invoke-WebRequest -Uri $f.Url -OutFile $out -MaximumRetryCount 3 -RetryIntervalSec 5
+            if ($f.Sha) {
+              $actual = (Get-FileHash $out -Algorithm SHA256).Hash.ToLower()
+              if ($actual -ne $f.Sha) { throw "$($f.Name) SHA256 mismatch: expected $($f.Sha), got $actual" }
+            }
+            if ((Get-Item $out).Length -eq 0) { throw "$($f.Name) is empty" }
+          }
+          Get-ChildItem $dir | Format-Table Name, Length
 
       - name: Trim unsupported locales
         run: |

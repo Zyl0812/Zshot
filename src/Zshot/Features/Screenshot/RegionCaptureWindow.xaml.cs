@@ -12,7 +12,6 @@ using Microsoft.UI.Xaml.Media;
 using Zshot.Features.Codec;
 using Zshot.Core;
 using Zshot.Core.Editor;
-using Zshot.Core.Ocr;
 using Zshot.Core.Overlay;
 using Zshot.Core.Translation;
 using Zshot.Features.Screenshot.Editor;
@@ -102,7 +101,10 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private bool _manipulatingSelection;
     private EditorPoint _textPoint;
     private string _lastOcrText = "";
+    private bool _ocrRunning;
     private static readonly HttpClient TranslationHttp = new() { Timeout = Timeout.InfiniteTimeSpan };
+    // OCR 引擎持有已加载的 ONNX 模型，整个进程复用一份
+    private static readonly OcrSession SharedOcr = new(new RapidOcrRecognizer());
     private CancellationTokenSource? _longCts;
     private TaskCompletionSource<bool>? _longDecision;
 
@@ -201,6 +203,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
         _activeHit = SelectionHitKind.None;
         _manipulatingSelection = false;
         _lastOcrText = "";
+        _ocrRunning = false;
         CancelLongCaptureInternal(restorePhase: false);
         SetExcludeFromCapture(false);
         HideChrome();
@@ -1086,23 +1089,33 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private async Task RunOcrAsync()
     {
+        // PP-OCRv6 单次约 2 秒，连点会叠加多次推理
+        if (_ocrRunning)
+        {
+            return;
+        }
+
         using var crop = FlattenSelection();
         if (crop is null)
         {
             return;
         }
 
+        _ocrRunning = true;
+        ShowResult(Lang.ScreenshotSetting_Ocr, Lang.Overlay_Recognizing);
         try
         {
-            var session = new OcrSession(new PaddleOcrRecognizer(new OcrModelManager()));
-            var accuracy = AppConfig.OcrAccuracyMode == 1 ? OcrAccuracy.High : OcrAccuracy.Balanced;
-            var result = await session.RecognizeAsync(crop, accuracy);
+            var result = await SharedOcr.RecognizeAsync(crop);
             _lastOcrText = result.PlainText;
-            ShowResult("OCR", string.IsNullOrWhiteSpace(_lastOcrText) ? "未识别到文字" : _lastOcrText);
+            ShowResult(Lang.ScreenshotSetting_Ocr, string.IsNullOrWhiteSpace(_lastOcrText) ? Lang.Overlay_NoText : _lastOcrText);
         }
         catch (Exception ex)
         {
-            ShowResult("OCR 失败", ex.Message);
+            ShowResult(Lang.Overlay_OcrFailed, ex.Message);
+        }
+        finally
+        {
+            _ocrRunning = false;
         }
     }
 

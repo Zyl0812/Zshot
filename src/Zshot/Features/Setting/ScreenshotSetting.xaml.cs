@@ -178,16 +178,16 @@ public sealed partial class ScreenshotSetting : PageBase
     } = AppConfig.ScreenshotCaptureMonitorSource;
 
 
-    public int OcrAccuracyMode
+    public double TranslationTimeoutSeconds
     {
         get; set
         {
             if (SetProperty(ref field, value))
             {
-                AppConfig.OcrAccuracyMode = value;
+                AppConfig.TranslationTimeoutSeconds = (int)value;
             }
         }
-    } = AppConfig.OcrAccuracyMode;
+    } = AppConfig.TranslationTimeoutSeconds;
 
 
     public string TranslationBaseUrl

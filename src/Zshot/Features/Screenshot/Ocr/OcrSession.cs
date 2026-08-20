@@ -18,7 +18,7 @@ internal sealed class OcrSession
 
     public string Name => _engine.Name;
 
-    public async Task<OcrResult> RecognizeAsync(CanvasBitmap bitmap, OcrAccuracy accuracy, CancellationToken cancellationToken = default)
+    public async Task<OcrResult> RecognizeAsync(CanvasBitmap bitmap, CancellationToken cancellationToken = default)
     {
         byte[] pixels = GetBgra(bitmap);
         return await _engine.RecognizeAsync(new OcrRequest
@@ -26,7 +26,6 @@ internal sealed class OcrSession
             BgraPixels = pixels,
             Width = (int)bitmap.SizeInPixels.Width,
             Height = (int)bitmap.SizeInPixels.Height,
-            Accuracy = accuracy,
         }, cancellationToken).ConfigureAwait(false);
     }
 
