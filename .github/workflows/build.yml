@@ -225,7 +225,10 @@ jobs:
 
           # 本级 preview：上一个 stable 之后（更新于它）的所有 prerelease
           # releases 按发布时间倒序，prevStable 的 index 之前（index 更小=更新）的就是它之后的 prerelease
-          $stableIdx = [array]::IndexOf($releases, $prevStable)
+          $stableIdx = 0
+          while ($stableIdx -lt $releases.Count -and $releases[$stableIdx].id -ne $prevStable.id) {
+            $stableIdx++
+          }
           $recentPreviews = @()
           if ($stableIdx -gt 0) {
             $recentPreviews = $releases[0..($stableIdx - 1)] | Where-Object { $_.prerelease }
