@@ -1,4 +1,4 @@
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.AppLifecycle;
@@ -68,13 +68,6 @@ public partial class App : Application
 
     private AppInstance instance;
 
-    private MainWindow? m_MainWindow = null;
-
-    /// <summary>
-    /// 主窗口引用（供设置页等调用 ApplyTheme）。托盘优先后默认为 null。
-    /// </summary>
-    public MainWindow? MainWindow => m_MainWindow;
-
     private SystemTrayWindow? m_SystemTrayWindow;
 
     private SettingsWindow? m_SettingsWindow;
@@ -100,13 +93,6 @@ public partial class App : Application
 
 
 
-    public void EnsureMainWindow()
-    {
-        EnsureSettingsWindow();
-    }
-
-
-
     private void AppInstance_Activated(object? sender, AppActivationArguments e)
     {
         _uiDispatcherQueue.TryEnqueue(() =>
@@ -119,17 +105,12 @@ public partial class App : Application
 
     public new void Exit()
     {
-        if (m_MainWindow is not null)
-        {
-            m_MainWindow.ForceExit = true;
-        }
         if (m_SettingsWindow is not null)
         {
             m_SettingsWindow.ForceExit = true;
         }
         m_SystemTrayWindow?.Close();
         m_SettingsWindow?.Close();
-        m_MainWindow?.Close();
         Application.Current.Exit();
     }
 

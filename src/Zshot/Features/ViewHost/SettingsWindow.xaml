@@ -49,6 +49,26 @@
                         </Border>
                     </NavigationViewItem.Content>
                 </NavigationViewItem>
+                <NavigationViewItem Tag="Format">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontSize="20" Glyph="&#xEB9F;" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <Border Height="40">
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Zshot_Nav_Format}" />
+                        </Border>
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="Ocr">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontSize="20" Glyph="&#xE8D4;" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <Border Height="40">
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.ScreenshotSetting_Ocr}" />
+                        </Border>
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
                 <NavigationViewItem Tag="Hotkey">
                     <NavigationViewItem.Icon>
                         <FontIcon FontSize="20" Glyph="&#xEDA7;" />
@@ -59,17 +79,7 @@
                         </Border>
                     </NavigationViewItem.Content>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="Storage">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontSize="20" Glyph="&#xE8F1;" />
-                    </NavigationViewItem.Icon>
-                    <NavigationViewItem.Content>
-                        <Border Height="40">
-                            <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Zshot_Nav_Storage}" />
-                        </Border>
-                    </NavigationViewItem.Content>
-                </NavigationViewItem>
-                <NavigationViewItem Tag="Settings">
+                <NavigationViewItem Tag="General">
                     <NavigationViewItem.Icon>
                         <FontIcon FontSize="20" Glyph="&#xE713;" />
                     </NavigationViewItem.Icon>

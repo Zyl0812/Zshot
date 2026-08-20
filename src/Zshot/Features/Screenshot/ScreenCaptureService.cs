@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Display;
@@ -85,16 +85,8 @@ internal class ScreenCaptureService
         bool captureStarted = false;
         try
         {
-            HMONITOR monitor;
-            if ((CaptureMonitorSource)AppConfig.ScreenshotCaptureMonitorSource is CaptureMonitorSource.Cursor)
-            {
-                User32.GetCursorPos(out var pt);
-                monitor = User32.MonitorFromPoint(pt, User32.MonitorFlags.MONITOR_DEFAULTTONEAREST);
-            }
-            else
-            {
-                monitor = User32.MonitorFromWindow(hwnd, User32.MonitorFlags.MONITOR_DEFAULTTONEAREST);
-            }
+            User32.GetCursorPos(out var cursorPos);
+            HMONITOR monitor = User32.MonitorFromPoint(cursorPos, User32.MonitorFlags.MONITOR_DEFAULTTONEAREST);
             Microsoft.UI.DisplayId displayId = new((ulong)monitor.DangerousGetHandle());
             using DisplayInformation displayInfo = DisplayInformation.CreateForDisplayId(displayId);
             DisplayAdvancedColorInfo colorInfo = displayInfo.GetAdvancedColorInfo();

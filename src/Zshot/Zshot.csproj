@@ -49,6 +49,7 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<!--  DO NOT Update Segmented https://github.com/CommunityToolkit/Windows/pull/699  -->
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.250402" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.MarkdownTextBlock" Version="0.1.251030-build.2370" />

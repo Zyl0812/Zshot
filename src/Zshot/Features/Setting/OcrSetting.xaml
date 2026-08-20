@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sf:PageBase x:Class="Zshot.Features.Setting.OcrSetting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cwc="using:CommunityToolkit.WinUI.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Zshot.Language"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sf="using:Zshot.Frameworks"
+             x:DefaultBindMode="OneWay"
+             mc:Ignorable="d">
+
+    <ScrollViewer Padding="0">
+        <StackPanel Padding="24,4,24,24">
+
+            <TextBlock Margin="0,4,0,8"
+                       Style="{ThemeResource GroupHeaderStyle}"
+                       Text="{x:Bind lang:Lang.ScreenshotSetting_Ocr}" />
+
+            <cwc:SettingsCard Description="{x:Bind lang:Lang.ScreenshotSetting_OcrWindows}"
+                              Header="{x:Bind lang:Lang.Zshot_OcrEngine}">
+                <TextBlock VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind OcrEngineText}" />
+            </cwc:SettingsCard>
+
+
+            <TextBlock Style="{ThemeResource GroupHeaderStyle}" Text="{x:Bind lang:Lang.ScreenshotSetting_Translation}" />
+
+            <StackPanel Spacing="4">
+                <cwc:SettingsCard HorizontalContentAlignment="Stretch"
+                                  ContentAlignment="Vertical"
+                                  Header="Base URL">
+                    <TextBox HorizontalAlignment="Stretch"
+                             PlaceholderText="https://api.openai.com/v1"
+                             Text="{x:Bind TranslationBaseUrl, Mode=TwoWay}" />
+                </cwc:SettingsCard>
+
+                <cwc:SettingsCard Description="{x:Bind lang:Lang.Zshot_ApiKeyDesc}"
+                                  HorizontalContentAlignment="Stretch"
+                                  ContentAlignment="Vertical"
+                                  Header="API Key">
+                    <PasswordBox x:Name="ApiKeyBox"
+                                 HorizontalAlignment="Stretch"
+                                 LostFocus="ApiKeyBox_LostFocus" />
+                </cwc:SettingsCard>
+
+                <cwc:SettingsCard HorizontalContentAlignment="Stretch"
+                                  ContentAlignment="Vertical"
+                                  Header="{x:Bind lang:Lang.ScreenshotSetting_Model}">
+                    <TextBox HorizontalAlignment="Stretch" Text="{x:Bind TranslationModel, Mode=TwoWay}" />
+                </cwc:SettingsCard>
+
+                <cwc:SettingsCard Header="{x:Bind lang:Lang.ScreenshotSetting_TargetLanguage}">
+                    <TextBox MinWidth="180" Text="{x:Bind TranslationTargetLanguage, Mode=TwoWay}" />
+                </cwc:SettingsCard>
+
+                <cwc:SettingsCard Description="{x:Bind lang:Lang.Zshot_TimeoutDesc}"
+                                  Header="{x:Bind lang:Lang.ScreenshotSetting_Timeout}">
+                    <NumberBox Minimum="5"
+                               Maximum="300"
+                               SmallChange="5"
+                               SpinButtonPlacementMode="Compact"
+                               Value="{x:Bind TranslationTimeoutSeconds, Mode=TwoWay}" />
+                </cwc:SettingsCard>
+
+                <cwc:SettingsExpander Description="{x:Bind lang:Lang.Zshot_PromptDesc}" Header="Prompt">
+                    <cwc:SettingsExpander.Items>
+                        <cwc:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
+                            <TextBox HorizontalAlignment="Stretch"
+                                     AcceptsReturn="True"
+                                     MinHeight="96"
+                                     TextWrapping="Wrap"
+                                     Text="{x:Bind TranslationPrompt, Mode=TwoWay}" />
+                        </cwc:SettingsCard>
+                    </cwc:SettingsExpander.Items>
+                </cwc:SettingsExpander>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</sf:PageBase>

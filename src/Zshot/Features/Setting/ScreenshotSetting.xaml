@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <sf:PageBase x:Class="Zshot.Features.Setting.ScreenshotSetting"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -12,177 +12,123 @@
              mc:Ignorable="d">
 
     <ScrollViewer Padding="0">
-        <StackPanel Padding="20,16,24,24"
-                    Spacing="16">
+        <StackPanel Padding="24,4,24,24">
 
-            <TextBlock FontSize="20"
-                       FontWeight="SemiBold"
-                       Text="{x:Bind lang:Lang.Zshot_Nav_Screenshot}" />
+            <TextBlock Margin="0,4,0,8"
+                       Style="{ThemeResource GroupHeaderStyle}"
+                       Text="{x:Bind lang:Lang.ScreenshotSetting_Toolbar}" />
 
-            <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_Toolbar}" />
-                <TextBlock FontSize="12"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="{x:Bind lang:Lang.ScreenshotSetting_ToolbarDesc}"
-                           TextWrapping="Wrap" />
-                <ItemsControl ItemsSource="{x:Bind ToolbarItems}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VariableSizedWrapGrid Orientation="Horizontal"
-                                                   MaximumRowsOrColumns="4"
-                                                   ItemWidth="148" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="local:OverlayToolbarItemOption">
-                            <CheckBox Content="{x:Bind Label}"
-                                      IsChecked="{x:Bind IsVisible, Mode=TwoWay}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <cwc:SettingsExpander Description="{x:Bind lang:Lang.ScreenshotSetting_ToolbarDesc}"
+                                  Header="{x:Bind lang:Lang.ScreenshotSetting_Toolbar}">
+                <cwc:SettingsExpander.ItemsHeader>
+                    <TextBlock Margin="16,0,16,12"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                               Text="{x:Bind lang:Lang.ScreenshotSetting_ToolbarAlwaysOn}"
+                               TextWrapping="Wrap" />
+                </cwc:SettingsExpander.ItemsHeader>
+                <cwc:SettingsExpander.Content>
+                    <TextBlock VerticalAlignment="Center"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Text="{x:Bind HiddenCountText, Mode=OneWay}" />
+                </cwc:SettingsExpander.Content>
+                <cwc:SettingsExpander.Items>
+                    <cwc:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
+                        <ItemsControl ItemsSource="{x:Bind ToolbarItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid MaximumRowsOrColumns="4"
+                                                           ItemWidth="118"
+                                                           ItemHeight="36"
+                                                           Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="local:OverlayToolbarItemOption">
+                                    <CheckBox Content="{x:Bind Label}"
+                                              IsChecked="{x:Bind IsVisible, Mode=TwoWay}"
+                                              MinWidth="0" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </cwc:SettingsCard>
+                </cwc:SettingsExpander.Items>
+            </cwc:SettingsExpander>
+
+
+            <TextBlock Style="{ThemeResource GroupHeaderStyle}" Text="{x:Bind lang:Lang.Zshot_GroupSave}" />
+
+            <StackPanel Spacing="4">
+                <cwc:SettingsCard Description="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFileDesc}"
+                                  Header="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFile}">
+                    <ToggleSwitch IsOn="{x:Bind AutoSaveScreenshotToFile, Mode=TwoWay}" OffContent="" OnContent="" />
+                </cwc:SettingsCard>
+
+                <cwc:SettingsCard Description="{x:Bind ScreenshotFolderPath, Mode=OneWay}"
+                                  Header="{x:Bind lang:Lang.Zshot_ScreenshotFolder}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Command="{x:Bind ChangeScreenshotFolderCommand}" Content="{x:Bind lang:Lang.Zshot_Change}" />
+                        <Button Command="{x:Bind OpenScreenshotFolderCommand}"
+                                ToolTipService.ToolTip="{x:Bind lang:Lang.Zshot_OpenDataFolder}">
+                            <FontIcon FontSize="14" Glyph="&#xE8A7;" />
+                        </Button>
+                    </StackPanel>
+                </cwc:SettingsCard>
+
+                <cwc:SettingsCard Header="{x:Bind lang:Lang.ScreenshotSetting_AutoCopyScreenshotFile}">
+                    <ToggleSwitch IsOn="{x:Bind AutoCopyScreenshotToClipboard, Mode=TwoWay}" OffContent="" OnContent="" />
+                </cwc:SettingsCard>
             </StackPanel>
 
 
-            <!--  格式与质量  -->
-            <StackPanel Spacing="12">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Zshot_SDRFormat}" />
-                <cwc:Segmented SelectedIndex="{x:Bind ScreenshotSDRFormat, Mode=TwoWay}">
-                    <cwc:SegmentedItem Content="PNG" />
-                    <cwc:SegmentedItem Content="AVIF" />
-                    <cwc:SegmentedItem Content="JPEG XL" />
-                </cwc:Segmented>
-            </StackPanel>
+            <TextBlock Style="{ThemeResource GroupHeaderStyle}" Text="{x:Bind lang:Lang.Zshot_GroupFileName}" />
 
-            <StackPanel Spacing="12">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Zshot_HDRFormat}" />
-                <cwc:Segmented SelectedIndex="{x:Bind ScreenshotHDRFormat, Mode=TwoWay}">
-                    <cwc:SegmentedItem Content="AVIF" />
-                    <cwc:SegmentedItem Content="JPEG XL" />
-                    <cwc:SegmentedItem Content="PNGv3" />
-                </cwc:Segmented>
-            </StackPanel>
-
-            <StackPanel Spacing="12">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Zshot_Quality}" />
-                <cwc:Segmented SelectedIndex="{x:Bind ScreenshotQuality, Mode=TwoWay}">
-                    <cwc:SegmentedItem Content="{x:Bind lang:Lang.GameSettingPage_Medium}" />
-                    <cwc:SegmentedItem Content="{x:Bind lang:Lang.GameSettingPage_High}" />
-                    <cwc:SegmentedItem Content="{x:Bind lang:Lang.ScreenshotSetting_Lossless}" />
-                </cwc:Segmented>
-            </StackPanel>
-
-            <StackPanel Spacing="6">
-                <ToggleSwitch IsOn="{x:Bind EnableScreenshotColorManagement, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.ScreenshotSetting_ColorManagement}"
-                              OnContent="{x:Bind lang:Lang.ScreenshotSetting_ColorManagement}" />
-                <TextBlock FontSize="12"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="{x:Bind lang:Lang.Zshot_ColorManagementDesc}"
-                           TextWrapping="Wrap" />
-            </StackPanel>
-
-
-            <!--  HDR 处理  -->
-            <StackPanel Spacing="12">
-                <ToggleSwitch IsOn="{x:Bind AutoConvertScreenshotToSDR, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.ScreenshotSetting_AutoConvertToSDRImage}"
-                              OnContent="{x:Bind lang:Lang.ScreenshotSetting_AutoConvertToSDRImage}" />
-                <TextBlock FontSize="12"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="{x:Bind lang:Lang.Zshot_AutoConvertSDRDesc}"
-                           TextWrapping="Wrap" />
-                <ToggleSwitch IsOn="{x:Bind DeleteHDRIfSDRContent, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.Zshot_DeleteHDRIfSDR}"
-                              OnContent="{x:Bind lang:Lang.Zshot_DeleteHDRIfSDR}" />
-                <TextBlock FontSize="12"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="{x:Bind lang:Lang.Zshot_DeleteHDRIfSDRDesc}"
-                           TextWrapping="Wrap" />
-            </StackPanel>
-
-
-            <!--  自动保存  -->
-            <StackPanel Spacing="8">
-                <ToggleSwitch IsOn="{x:Bind AutoSaveScreenshotToFile, Mode=TwoWay}"
-                              OffContent="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFile}"
-                              OnContent="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFile}" />
-                <TextBlock FontSize="12"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="{x:Bind lang:Lang.ScreenshotSetting_AutoSaveScreenshotFileDesc}"
-                           TextWrapping="Wrap" />
-                <TextBlock FontSize="16" Text="{x:Bind lang:Lang.Zshot_ScreenshotFolder}" />
-                <Grid ColumnSpacing="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0"
-                            Height="40"
-                            Padding="16,0,16,0"
-                            BorderThickness="0"
-                            Command="{x:Bind ChangeScreenshotFolderCommand}"
-                            CornerRadius="8,20,20,8"
-                            Style="{ThemeResource AccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE8DE;" />
-                            <TextBlock Text="{x:Bind lang:Lang.Zshot_Change}" />
-                        </StackPanel>
-                    </Button>
-                    <Button Grid.Column="1"
-                            Height="40"
-                            Margin="16,0,0,0"
-                            Padding="20,0,20,1"
-                            HorizontalContentAlignment="Left"
-                            BorderThickness="0"
-                            Command="{x:Bind OpenScreenshotFolderCommand}"
-                            CornerRadius="20">
-                        <TextBlock VerticalAlignment="Center"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Text="{x:Bind ScreenshotFolderPath}"
+            <StackPanel Spacing="4">
+                <cwc:SettingsCard HorizontalContentAlignment="Stretch"
+                                  ContentAlignment="Vertical"
+                                  Header="{x:Bind lang:Lang.Zshot_FilenameTemplate}">
+                    <StackPanel Spacing="6">
+                        <TextBox x:Name="FileNameTextBox"
+                                 HorizontalAlignment="Stretch"
+                                 GotFocus="TemplateTextBox_GotFocus"
+                                 Text="{x:Bind FileNamePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                   Text="{x:Bind FileNamePreview, Mode=OneWay}"
                                    TextTrimming="CharacterEllipsis" />
-                    </Button>
-                </Grid>
-            </StackPanel>
+                    </StackPanel>
+                </cwc:SettingsCard>
 
-            <!--  自动复制  -->
-            <ToggleSwitch IsOn="{x:Bind AutoCopyScreenshotToClipboard, Mode=TwoWay}"
-                          OffContent="{x:Bind lang:Lang.ScreenshotSetting_AutoCopyScreenshotFile}"
-                          OnContent="{x:Bind lang:Lang.ScreenshotSetting_AutoCopyScreenshotFile}" />
+                <cwc:SettingsCard HorizontalContentAlignment="Stretch"
+                                  ContentAlignment="Vertical"
+                                  Header="{x:Bind lang:Lang.Zshot_RegionFilenameTemplate}">
+                    <StackPanel Spacing="6">
+                        <TextBox x:Name="RegionFileNameTextBox"
+                                 HorizontalAlignment="Stretch"
+                                 GotFocus="TemplateTextBox_GotFocus"
+                                 Text="{x:Bind RegionFileNamePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                   Text="{x:Bind RegionFileNamePreview, Mode=OneWay}"
+                                   TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </cwc:SettingsCard>
 
+                <cwc:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
+                    <TextBlock x:Name="PlaceholderTextBlock"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                               TextWrapping="Wrap" />
+                </cwc:SettingsCard>
 
-            <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_Ocr}" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="{x:Bind lang:Lang.ScreenshotSetting_OcrWindows}"
-                           TextWrapping="Wrap" />
-            </StackPanel>
-
-            <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_Translation}" />
-                <TextBox Header="Base URL" Text="{x:Bind TranslationBaseUrl, Mode=TwoWay}" />
-                <PasswordBox x:Name="ApiKeyBox" Header="API Key" LostFocus="ApiKeyBox_LostFocus" />
-                <TextBox Header="{x:Bind lang:Lang.ScreenshotSetting_Model}" Text="{x:Bind TranslationModel, Mode=TwoWay}" />
-                <TextBox Header="{x:Bind lang:Lang.ScreenshotSetting_TargetLanguage}" Text="{x:Bind TranslationTargetLanguage, Mode=TwoWay}" />
-                <TextBox Header="Prompt" Text="{x:Bind TranslationPrompt, Mode=TwoWay}" />
-                <NumberBox Header="{x:Bind lang:Lang.ScreenshotSetting_Timeout}"
-                           Value="{x:Bind TranslationTimeoutSeconds, Mode=TwoWay}"
-                           Minimum="5"
-                           Maximum="120"
-                           SpinButtonPlacementMode="Inline" />
-            </StackPanel>
-
-            <StackPanel Spacing="8">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_LongCaptureMaxHeight}" />
-                <NumberBox Value="{x:Bind LongCaptureMaxHeight, Mode=TwoWay}" Minimum="1000" Maximum="16384" SpinButtonPlacementMode="Inline" />
-            </StackPanel>
-
-            <!--  捕获显示器  -->
-            <StackPanel Spacing="12">
-                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.Zshot_MonitorSource}" />
-                <cwc:Segmented SelectedIndex="{x:Bind CaptureMonitorSource, Mode=TwoWay}">
-                    <cwc:SegmentedItem Content="{x:Bind lang:Lang.Zshot_MonitorForeground}" />
-                    <cwc:SegmentedItem Content="{x:Bind lang:Lang.Zshot_MonitorCursor}" />
-                </cwc:Segmented>
+                <cwc:SettingsCard Description="{x:Bind lang:Lang.Zshot_TitleMaxLengthDesc}"
+                                  Header="{x:Bind lang:Lang.Zshot_TitleMaxLength}">
+                    <NumberBox Minimum="0"
+                               Maximum="200"
+                               SmallChange="5"
+                               SpinButtonPlacementMode="Compact"
+                               Value="{x:Bind FileNameTitleMaxLength, Mode=TwoWay}" />
+                </cwc:SettingsCard>
             </StackPanel>
 
         </StackPanel>

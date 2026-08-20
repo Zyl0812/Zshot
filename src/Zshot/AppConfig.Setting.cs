@@ -1,4 +1,4 @@
-using Dapper;
+﻿using Dapper;
 using Zshot.Core.Overlay;
 using Zshot.Features.Database;
 using System;
@@ -12,119 +12,11 @@ using Microsoft.Win32.TaskScheduler;
 
 namespace Zshot;
 
-public enum CaptureMonitorSource
-{
-    ForegroundWindow = 0,
-    Cursor = 1,
-}
-
 public static partial class AppConfig
 {
 
 
     #region Static Setting
-
-
-    public static string? AccentColor
-    {
-        get => GetValue<string>();
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 主题：0=跟随系统, 1=浅色, 2=深色
-    /// </summary>
-    public static int Theme
-    {
-        get => GetValue(0);
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 启用亚克力效果（导航栏/内容覆盖层/弹窗的磨砂玻璃）。关则用纯色背景。
-    /// </summary>
-    public static bool EnableAcrylic
-    {
-        get => GetValue(true);
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 壁纸模式：0=无，1=指定图片(复制到 bg/)，2=指定视频(读源)，3=文件夹随机(读源)
-    /// </summary>
-    public static int WallpaperMode
-    {
-        get => GetValue(0);
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 壁纸文件名（模式 1，拷贝在 CacheFolder/bg/ 下），空=null=无
-    /// </summary>
-    public static string? WallpaperFile
-    {
-        get => GetValue<string>();
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 壁纸源文件夹（模式 3，读源不复制），空=null=无
-    /// </summary>
-    public static string? WallpaperFolder
-    {
-        get => GetValue<string>();
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 壁纸源视频文件（模式 2，读源不复制），空=null=无
-    /// </summary>
-    public static string? WallpaperVideoFile
-    {
-        get => GetValue<string>();
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 文件夹随机模式仅抽视频（模式 3 子选项），默认 false=图/视频混合
-    /// </summary>
-    public static bool WallpaperFolderVideoOnly
-    {
-        get => GetValue(false);
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 启用自定义壁纸（开则关 Mica，铺壁纸 + 亚克力隔层）。模式 0=无 → false；1/2/3 看对应路径。
-    /// </summary>
-    public static bool EnableWallpaper
-    {
-        get => WallpaperMode switch
-        {
-            1 => !string.IsNullOrWhiteSpace(WallpaperFile),
-            2 => !string.IsNullOrWhiteSpace(WallpaperVideoFile),
-            3 => !string.IsNullOrWhiteSpace(WallpaperFolder),
-            _ => false,
-        };
-    }
-
-
-    /// <summary>
-    /// 从壁纸自动取色应用为强调色
-    /// </summary>
-    public static bool EnableAccentFromWallpaper
-    {
-        get => GetValue(true);
-        set => SetValue(value);
-    }
 
 
     /// <summary>
@@ -225,16 +117,6 @@ public static partial class AppConfig
 
 
     /// <summary>
-    /// 开机自启时最小化到托盘（需托盘已开）
-    /// </summary>
-    public static bool AutoStartMinimized
-    {
-        get => GetValue(true);
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
     /// 启动时自动检查更新（节流 24h）
     /// </summary>
     public static bool EnableAutoUpdateCheck { get => GetValue(true); set => SetValue(value); }
@@ -244,12 +126,6 @@ public static partial class AppConfig
     /// 检查更新时是否包含预发布版本。开 = 用 /releases 端点（含 pre-release）；关 = 用 /releases/latest（只看正式版）。
     /// </summary>
     public static bool EnablePreReleaseUpdateCheck { get => GetValue(false); set => SetValue(value); }
-
-
-    /// <summary>
-    /// GitHub API（api.github.com）不走系统代理（直连）。仅影响 release 查询 API，不影响 zip 下载（CDN）。默认开。
-    /// </summary>
-    public static bool EnableGithubApiNoProxy { get => GetValue(true); set => SetValue(value); }
 
 
     /// <summary>
@@ -283,12 +159,6 @@ public static partial class AppConfig
 
 
     /// <summary>
-    /// 开发者模式：显示设置页调试组（流式解压测试）。默认关。
-    /// </summary>
-    public static bool DevMode { get => GetValue(false); set => SetValue(value); }
-
-
-    /// <summary>
     /// 日志/缓存文件夹，默认 %LOCALAPPDATA%\Zshot
     /// </summary>
     public static string LogFolder
@@ -299,37 +169,11 @@ public static partial class AppConfig
 
 
     /// <summary>
-    /// 日志级别：0=关 / 1=Error / 2=Warn / 3=Info(默认) / 4=Debug。重启生效。
-    /// </summary>
-    public static int LogLevelConfig
-    {
-        get => GetValue(
-#if DEBUG
-            4
-#else
-            3
-#endif
-        );
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
     /// 截图文件夹，默认 我的图片/Zshot
     /// </summary>
     public static string? ScreenshotFolder
     {
         get => GetValue(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Zshot"));
-        set => SetValue(value);
-    }
-
-
-    /// <summary>
-    /// 用户配置的截图库文件夹列表（分号分隔），供库浏览
-    /// </summary>
-    public static string? ScreenshotFolders
-    {
-        get => GetValue<string>();
         set => SetValue(value);
     }
 
@@ -437,13 +281,6 @@ public static partial class AppConfig
     }
 
 
-    public static int LongCaptureMaxHeight
-    {
-        get => Math.Clamp(GetValue(16384), 1000, 16384);
-        set => SetValue(Math.Clamp(value, 1000, 16384));
-    }
-
-
     /// <summary>
     /// 截图工具栏隐藏项，逗号分隔。空=全部显示。未写入时默认隐藏椭圆、文字、序号、重做。
     /// </summary>
@@ -524,18 +361,7 @@ public static partial class AppConfig
     }
 
 
-    /// <summary>
-    /// 截图目标显示器来源：0=前台窗口所在显示器，1=鼠标所在显示器
-    /// </summary>
-    public static int ScreenshotCaptureMonitorSource
-    {
-        get => GetValue(0);
-        set => SetValue(value);
-    }
-
-
     #endregion
-
 
 
     #region Setting Method

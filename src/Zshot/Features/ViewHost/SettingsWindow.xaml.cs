@@ -1,4 +1,4 @@
-using Microsoft.UI.Windowing;
+﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Zshot.Features.About;
@@ -23,7 +23,7 @@ public sealed partial class SettingsWindow : WindowEx
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AdaptTitleBarButtonColorToActuallTheme();
         SetDragRectangles(new RectInt32(0, 0, 100000, (int)(48 * UIScale)));
-        CenterInScreen(580, 640);
+        CenterInScreen(720, 620);
         new SystemBackdropHelper(this).TrySetMica();
         AppWindow.Closing += AppWindow_Closing;
         ((FrameworkElement)Content).Loaded += SettingsWindow_Loaded;
@@ -47,9 +47,10 @@ public sealed partial class SettingsWindow : WindowEx
             var pageType = tag switch
             {
                 "Screenshot" => typeof(ScreenshotSetting),
+                "Format" => typeof(FormatSetting),
+                "Ocr" => typeof(OcrSetting),
                 "Hotkey" => typeof(HotkeySetting),
-                "Storage" => typeof(StorageSetting),
-                "Settings" => typeof(GeneralSetting),
+                "General" => typeof(GeneralSetting),
                 "About" => typeof(AboutPage),
                 _ => typeof(ScreenshotSetting),
             };

@@ -139,15 +139,6 @@
   <data name="GameSettingPage_FullScreen" xml:space="preserve">
     <value>全屏</value>
   </data>
-  <data name="Common_Apply" xml:space="preserve">
-    <value>应用</value>
-  </data>
-  <data name="Common_Refresh" xml:space="preserve">
-    <value>刷新</value>
-  </data>
-  <data name="Common_Save" xml:space="preserve">
-    <value>保存</value>
-  </data>
   <data name="MainPage_Launcher" xml:space="preserve">
     <value>主页面</value>
   </data>
@@ -156,9 +147,6 @@
   </data>
   <data name="SettingPage_FollowSystem" xml:space="preserve">
     <value>跟随系统</value>
-  </data>
-  <data name="ScreenshotPage_ScreenshotFolderDoesNotExist" xml:space="preserve">
-    <value>截图文件夹不存在</value>
   </data>
   <data name="Common_Exit" xml:space="preserve">
     <value>退出</value>
@@ -177,15 +165,6 @@
   </data>
   <data name="Common_Clipboard" xml:space="preserve">
     <value>剪贴板</value>
-  </data>
-  <data name="ClipboardPage_NotEnabled" xml:space="preserve">
-    <value>未开启剪贴板历史功能</value>
-  </data>
-  <data name="ClipboardPage_GoToSettings" xml:space="preserve">
-    <value>前往 Windows 剪贴板设置</value>
-  </data>
-  <data name="ClipboardPage_NoImages" xml:space="preserve">
-    <value>剪贴板历史中暂无图片</value>
   </data>
   <data name="GachaImportAndExportWindow_Import" xml:space="preserve">
     <value>导入</value>
@@ -211,23 +190,11 @@
   <data name="ScreenCaptureInfoWindow_ScreenshotSaved" xml:space="preserve">
     <value>截图已保存</value>
   </data>
-  <data name="ScreenshotPage_ManageScreenshotFolders" xml:space="preserve">
-    <value>管理截图文件夹</value>
-  </data>
-  <data name="ScreenshotFolderManageDialog_AddFolder" xml:space="preserve">
-    <value>添加文件夹</value>
-  </data>
-  <data name="Common_Remove" xml:space="preserve">
-    <value>移除</value>
-  </data>
   <data name="ScreenCaptureInfoWindow_ScreenshotFailed" xml:space="preserve">
     <value>截图失败</value>
   </data>
   <data name="ScreenCaptureInfoWindow_CheckTheLogForMoreInformation" xml:space="preserve">
     <value>查看日志了解更多信息</value>
-  </data>
-  <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
-    <value>以下文件夹中的图片都会显示在图库中</value>
   </data>
   <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
     <value>在资源管理器中打开</value>
@@ -349,26 +316,11 @@
   <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
     <value>截图完成后写入下方文件夹。「仅复制」快捷键不会落盘。</value>
   </data>
-  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
-    <value>复制为 JPG</value>
-  </data>
-  <data name="ScreenshotPage_MultiSelect" xml:space="preserve">
-    <value>多选</value>
-  </data>
-  <data name="ScreenshotPage_Total0Files" xml:space="preserve">
-    <value>总计 {0} 个文件。</value>
-  </data>
   <data name="ScreenshotSetting_Lossless" xml:space="preserve">
     <value>无损</value>
   </data>
   <data name="ScreenCaptureInfoWindow_ProcessingImage" xml:space="preserve">
     <value>正在处理图像</value>
-  </data>
-  <data name="ScreenshotPage_BatchConvert" xml:space="preserve">
-    <value>批量转换</value>
-  </data>
-  <data name="ScreenshotPage_Recopy" xml:space="preserve">
-    <value>重新复制</value>
   </data>
   <data name="ImageBatchConvertWindow_Quality" xml:space="preserve">
     <value>质量</value>
@@ -427,95 +379,17 @@
   <data name="ScreenshotSetting_ColorManagement" xml:space="preserve">
     <value>色彩管理</value>
   </data>
-  <data name="Zshot_Nav_Gallery" xml:space="preserve">
-    <value>截图库</value>
-  </data>
-  <data name="Zshot_Nav_Appearance" xml:space="preserve">
-    <value>外观</value>
-  </data>
   <data name="Zshot_Nav_Hotkey" xml:space="preserve">
     <value>快捷键</value>
   </data>
   <data name="Zshot_Nav_Screenshot" xml:space="preserve">
     <value>截图</value>
   </data>
-  <data name="Zshot_Nav_Storage" xml:space="preserve">
-    <value>存储</value>
-  </data>
   <data name="Zshot_Nav_Settings" xml:space="preserve">
     <value>设置</value>
   </data>
   <data name="Zshot_Nav_About" xml:space="preserve">
     <value>关于</value>
-  </data>
-  <data name="Zshot_SplashTagline" xml:space="preserve">
-    <value>新一代 Windows 原生 HDR 截图工具</value>
-  </data>
-  <data name="Zshot_WallpaperNotFound" xml:space="preserve">
-    <value>壁纸文件不存在，已清除配置并回退到无</value>
-  </data>
-  <data name="Zshot_Theme" xml:space="preserve">
-    <value>主题</value>
-  </data>
-  <data name="Zshot_ThemeLight" xml:space="preserve">
-    <value>浅色</value>
-  </data>
-  <data name="Zshot_ThemeDark" xml:space="preserve">
-    <value>深色</value>
-  </data>
-  <data name="Zshot_Acrylic" xml:space="preserve">
-    <value>亚克力效果</value>
-  </data>
-  <data name="Zshot_AccentColor" xml:space="preserve">
-    <value>主题色</value>
-  </data>
-  <data name="Zshot_ApplyCurrentColor" xml:space="preserve">
-    <value>自定义颜色</value>
-  </data>
-  <data name="Zshot_Wallpaper" xml:space="preserve">
-    <value>壁纸</value>
-  </data>
-  <data name="Zshot_WallpaperModeNone" xml:space="preserve">
-    <value>无</value>
-  </data>
-  <data name="Zshot_WallpaperModeImage" xml:space="preserve">
-    <value>指定图片</value>
-  </data>
-  <data name="Zshot_WallpaperModeFolder" xml:space="preserve">
-    <value>文件夹随机</value>
-  </data>
-  <data name="Zshot_WallpaperModeVideo" xml:space="preserve">
-    <value>指定视频</value>
-  </data>
-  <data name="Zshot_WallpaperFolderVideoOnly" xml:space="preserve">
-    <value>视频优先</value>
-  </data>
-  <data name="Zshot_WallpaperFolderVideoOnlyDesc" xml:space="preserve">
-    <value>优先选择视频；视频无法初始化时回退到随机图片</value>
-  </data>
-  <data name="Zshot_WallpaperNowPlaying" xml:space="preserve">
-    <value>正在播放</value>
-  </data>
-  <data name="Zshot_WallpaperVideoFallbackToImage" xml:space="preserve">
-    <value>文件夹内无视频，已随机选取一张图片</value>
-  </data>
-  <data name="Zshot_WallpaperChooseImage" xml:space="preserve">
-    <value>选择图片</value>
-  </data>
-  <data name="Zshot_WallpaperChooseFolder" xml:space="preserve">
-    <value>选择文件夹</value>
-  </data>
-  <data name="Zshot_WallpaperChooseVideo" xml:space="preserve">
-    <value>选择视频</value>
-  </data>
-  <data name="Zshot_AccentFromWallpaper" xml:space="preserve">
-    <value>自动从壁纸取色</value>
-  </data>
-  <data name="Zshot_PathNone" xml:space="preserve">
-    <value>未选择</value>
-  </data>
-  <data name="Zshot_DisableCertificateValidation" xml:space="preserve">
-    <value>禁用证书校验</value>
   </data>
   <data name="Zshot_HotkeyScreenshot" xml:space="preserve">
     <value>全屏截图</value>
@@ -527,7 +401,7 @@
     <value>区域仅复制</value>
   </data>
   <data name="Zshot_HotkeyScreenshotDesc" xml:space="preserve">
-    <value>截取整块显示器（前台窗口 / 光标所在屏，可在「截图」设置切换）。</value>
+    <value>截取光标所在的整块显示器。</value>
   </data>
   <data name="Zshot_HotkeyRegionDesc" xml:space="preserve">
     <value>框选区域或单击窗口。保存文件。</value>
@@ -559,15 +433,6 @@
   <data name="Zshot_DeleteHDRIfSDRDesc" xml:space="preserve">
     <value>HDR 格式但内容为 SDR（maxCLL 不达标）时，自动转 SDR 并删除 HDR 文件，无视上方的自动转换开关。格式遵循 SDR 存储格式。</value>
   </data>
-  <data name="Zshot_MonitorSource" xml:space="preserve">
-    <value>捕获显示器</value>
-  </data>
-  <data name="Zshot_MonitorForeground" xml:space="preserve">
-    <value>前台窗口</value>
-  </data>
-  <data name="Zshot_MonitorCursor" xml:space="preserve">
-    <value>光标位置</value>
-  </data>
   <data name="Zshot_FilenameTemplate" xml:space="preserve">
     <value>文件名模板</value>
   </data>
@@ -576,9 +441,6 @@
   </data>
   <data name="Zshot_ClickToInsert" xml:space="preserve">
     <value>点击按钮在光标处添加模板，具体功能参见 </value>
-  </data>
-  <data name="Zshot_AutoStartInvalidCleared" xml:space="preserve">
-    <value>自启项指向的程序不存在，已自动清除</value>
   </data>
   <data name="Zshot_ClickToInsertSuffix" xml:space="preserve">
     <value> 文件名模板</value>
@@ -608,7 +470,7 @@
     <value>更新失败</value>
   </data>
   <data name="Zshot_TitleMaxLength" xml:space="preserve">
-    <value>标题最大字符数（0=不截断）</value>
+    <value>标题最大字符数</value>
   </data>
   <data name="Zshot_ScreenshotFolder" xml:space="preserve">
     <value>截图文件夹</value>
@@ -616,44 +478,17 @@
   <data name="Zshot_LogFolder" xml:space="preserve">
     <value>日志文件夹</value>
   </data>
-  <data name="Zshot_LogFolderRestartTip" xml:space="preserve">
-    <value>重启后生效</value>
-  </data>
-  <data name="Zshot_LogLevel" xml:space="preserve">
-    <value>日志级别</value>
-  </data>
-  <data name="Zshot_LogLevelOff" xml:space="preserve">
-    <value>关</value>
-  </data>
   <data name="Zshot_Change" xml:space="preserve">
     <value>更改</value>
   </data>
-  <data name="Zshot_StorageStats" xml:space="preserve">
-    <value>存储占用</value>
-  </data>
   <data name="Zshot_ClearCache" xml:space="preserve">
     <value>清理缓存</value>
-  </data>
-  <data name="Zshot_StatsScreenshots" xml:space="preserve">
-    <value>截图</value>
-  </data>
-  <data name="Zshot_StatsImageCache" xml:space="preserve">
-    <value>缩略图缓存</value>
-  </data>
-  <data name="Zshot_StatsWallpaper" xml:space="preserve">
-    <value>壁纸</value>
-  </data>
-  <data name="Zshot_StatsLog" xml:space="preserve">
-    <value>日志</value>
   </data>
   <data name="Zshot_SystemTray" xml:space="preserve">
     <value>系统托盘</value>
   </data>
   <data name="Zshot_AutoStart" xml:space="preserve">
     <value>开机自启</value>
-  </data>
-  <data name="Zshot_AutoStartMinimized" xml:space="preserve">
-    <value>启动时最小化到托盘</value>
   </data>
   <data name="Zshot_AboutLicense" xml:space="preserve">
     <value>MIT 许可证</value>
@@ -678,21 +513,6 @@
   </data>
   <data name="Zshot_OpenDataFolder" xml:space="preserve">
     <value>打开数据目录</value>
-  </data>
-  <data name="Zshot_BackupDatabase" xml:space="preserve">
-    <value>备份数据库</value>
-  </data>
-  <data name="Zshot_LastBackup" xml:space="preserve">
-    <value>上次备份</value>
-  </data>
-  <data name="Zshot_BackupSuccess" xml:space="preserve">
-    <value>数据库已备份</value>
-  </data>
-  <data name="Zshot_BackupFailed" xml:space="preserve">
-    <value>数据库备份失败</value>
-  </data>
-  <data name="Zshot_StatsBackup" xml:space="preserve">
-    <value>备份</value>
   </data>
   <data name="Zshot_CheckPrerelease" xml:space="preserve">
     <value>检查预发布版本</value>
@@ -721,17 +541,11 @@
   <data name="Zshot_UpdateBuildTime" xml:space="preserve">
     <value>发布时间</value>
   </data>
-  <data name="Zshot_GithubApiNoProxy" xml:space="preserve">
-    <value>GitHub API 直连（不走代理）</value>
-  </data>
   <data name="Zshot_DeltaUpdateMaxLayers" xml:space="preserve">
     <value>差分更新最大层数</value>
   </data>
   <data name="Zshot_Advanced" xml:space="preserve">
     <value>高级</value>
-  </data>
-  <data name="Zshot_RestartToTakeEffect" xml:space="preserve">
-    <value>重启后生效</value>
   </data>
   <data name="Zshot_WelcomeHello" xml:space="preserve">
     <value>嗨，你好！</value>
@@ -778,27 +592,6 @@
   <data name="Zshot_InfoCopied" xml:space="preserve">
     <value>已复制</value>
   </data>
-  <data name="Zshot_DebugExtractTitle" xml:space="preserve">
-    <value>流式解压测试</value>
-  </data>
-  <data name="Zshot_DebugSection" xml:space="preserve">
-    <value>调试</value>
-  </data>
-  <data name="Zshot_DebugSelect" xml:space="preserve">
-    <value>选择</value>
-  </data>
-  <data name="Zshot_DebugExtract" xml:space="preserve">
-    <value>解压</value>
-  </data>
-  <data name="Zshot_DebugUrlEmpty" xml:space="preserve">
-    <value>URL 和路径都不能为空</value>
-  </data>
-  <data name="Zshot_DebugExtractDone" xml:space="preserve">
-    <value>完成！</value>
-  </data>
-  <data name="Zshot_DebugExtractFailed" xml:space="preserve">
-    <value>失败：</value>
-  </data>
   <data name="Zshot_Update" xml:space="preserve">
     <value>更新源</value>
   </data>
@@ -810,9 +603,6 @@
   </data>
   <data name="Zshot_PriorityStart" xml:space="preserve">
     <value>高优先级启动</value>
-  </data>
-  <data name="Zshot_TaskInvalid" xml:space="preserve">
-    <value>高优先级启动任务指向的程序不存在，请在设置中手动关闭</value>
   </data>
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← 如要调节此选项，请关闭高优先级启动</value>
@@ -889,9 +679,6 @@
   <data name="ScreenshotSetting_Timeout" xml:space="preserve">
     <value>超时（秒）</value>
   </data>
-  <data name="ScreenshotSetting_LongCaptureMaxHeight" xml:space="preserve">
-    <value>长截图最大高度</value>
-  </data>
   <data name="Overlay_Mosaic" xml:space="preserve">
     <value>马赛克</value>
   </data>
@@ -930,5 +717,83 @@
   </data>
   <data name="Overlay_LongCaptureFailed" xml:space="preserve">
     <value>长截图失败</value>
+  </data>
+  <data name="Zshot_Nav_Format" xml:space="preserve">
+    <value>格式</value>
+  </data>
+  <data name="Zshot_GroupSave" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Zshot_GroupFileName" xml:space="preserve">
+    <value>文件名</value>
+  </data>
+  <data name="Zshot_GroupStorageFormat" xml:space="preserve">
+    <value>存储格式</value>
+  </data>
+  <data name="Zshot_GroupColor" xml:space="preserve">
+    <value>色彩</value>
+  </data>
+  <data name="Zshot_GroupHdr" xml:space="preserve">
+    <value>HDR 处理</value>
+  </data>
+  <data name="Zshot_GroupGlobalHotkey" xml:space="preserve">
+    <value>全局快捷键</value>
+  </data>
+  <data name="Zshot_GroupCommon" xml:space="preserve">
+    <value>常规</value>
+  </data>
+  <data name="Zshot_GroupStartup" xml:space="preserve">
+    <value>启动</value>
+  </data>
+  <data name="Zshot_GroupMaintenance" xml:space="preserve">
+    <value>维护</value>
+  </data>
+  <data name="Zshot_GroupUpdate" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarAlwaysOn" xml:space="preserve">
+    <value>颜色、完成、取消始终显示，不可隐藏。</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarHiddenCount" xml:space="preserve">
+    <value>已隐藏 {0} 项</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarNoneHidden" xml:space="preserve">
+    <value>全部显示</value>
+  </data>
+  <data name="Zshot_TitleMaxLengthDesc" xml:space="preserve">
+    <value>0 = 不截断</value>
+  </data>
+  <data name="Zshot_OcrEngine" xml:space="preserve">
+    <value>识别引擎</value>
+  </data>
+  <data name="Zshot_OcrEngineWindowsFallback" xml:space="preserve">
+    <value>Windows 本地识别（模型文件缺失）</value>
+  </data>
+  <data name="Zshot_ApiKeyDesc" xml:space="preserve">
+    <value>存入 Windows 凭据管理器，不写入日志。</value>
+  </data>
+  <data name="Zshot_TimeoutDesc" xml:space="preserve">
+    <value>单位：秒</value>
+  </data>
+  <data name="Zshot_PromptDesc" xml:space="preserve">
+    <value>留空使用内置提示词。</value>
+  </data>
+  <data name="Zshot_HotkeyEditHint" xml:space="preserve">
+    <value>点按键位框后直接按下组合键即可修改，按 Esc 取消，按 Delete 清除。</value>
+  </data>
+  <data name="Zshot_LanguageRestartDesc" xml:space="preserve">
+    <value>切换语言会重启 Zshot。</value>
+  </data>
+  <data name="Zshot_AutoStartDesc" xml:space="preserve">
+    <value>启动后静默驻留托盘，不显示窗口。</value>
+  </data>
+  <data name="Zshot_PriorityStartDesc" xml:space="preserve">
+    <value>以管理员权限通过计划任务启动，才能截取任务管理器等提权窗口。</value>
+  </data>
+  <data name="Zshot_ClearCacheDesc" xml:space="preserve">
+    <value>删除缩略图与临时文件，不影响已保存的截图。</value>
+  </data>
+  <data name="Zshot_ClearCacheAction" xml:space="preserve">
+    <value>清除</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-using RapidOcrNet;
+﻿using RapidOcrNet;
 using SkiaSharp;
 using Zshot.Core.Ocr;
 using System;
@@ -43,6 +43,18 @@ internal sealed class RapidOcrRecognizer : IOcrRecognizer
             _gate.Release();
         }
     }
+
+    /// <summary>模型文件是否齐全。缺失时 OCR 会退回 Windows 本地识别，设置页据此显示实际引擎。</summary>
+    public static bool ModelsAvailable
+    {
+        get
+        {
+            var models = ResolveModelSet();
+            return File.Exists(models.DetModelPath) && File.Exists(models.RecModelPath)
+                && File.Exists(models.KeysPath) && File.Exists(models.ClsModelPath);
+        }
+    }
+
 
     /// <summary>首次调用时加载模型（约几百毫秒），之后复用同一实例。</summary>
     private RapidOcr? EnsureEngine()

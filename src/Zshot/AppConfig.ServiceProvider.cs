@@ -1,4 +1,4 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -19,18 +19,8 @@ public static partial class AppConfig
     {
         if (_serviceProvider == null)
         {
-            var minLevel = AppConfig.LogLevelConfig switch
-            {
-                1 => Serilog.Events.LogEventLevel.Error,
-                2 => Serilog.Events.LogEventLevel.Warning,
-                4 => Serilog.Events.LogEventLevel.Debug,
-                _ => Serilog.Events.LogEventLevel.Information
-            };
-            var cfg = new LoggerConfiguration().Enrich.FromLogContext().MinimumLevel.Is(minLevel);
-            if (AppConfig.LogLevelConfig != 0)
-            {
-                cfg.WriteTo.File(path: LogFile, shared: true, outputTemplate: $$"""[{Timestamp:HH:mm:ss.fff}] [{Level:u4}] [{{Environment.ProcessId}}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}""");
-            }
+            var cfg = new LoggerConfiguration().Enrich.FromLogContext().MinimumLevel.Information();
+            cfg.WriteTo.File(path: LogFile, shared: true, outputTemplate: $$"""[{Timestamp:HH:mm:ss.fff}] [{Level:u4}] [{{Environment.ProcessId}}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}""");
             Log.Logger = cfg.CreateLogger();
             Log.Information($"Welcome to Zshot v{AppVersion}\r\nRuntime: {Environment.Version}\r\nCommand Line: {Environment.CommandLine}");
 

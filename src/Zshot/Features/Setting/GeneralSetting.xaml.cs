@@ -1,23 +1,18 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Navigation;
 using Zshot.Features.Codec;
-using Zshot.Features.Update;
 using Zshot.Frameworks;
 using Zshot.Helpers;
 using Zshot.Language;
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using TaskService = Microsoft.Win32.TaskScheduler.TaskService;
-using LogonTrigger = Microsoft.Win32.TaskScheduler.LogonTrigger;
-using ExecAction = Microsoft.Win32.TaskScheduler.ExecAction;
 using Windows.System;
 
 namespace Zshot.Features.Setting;
@@ -27,75 +22,40 @@ public sealed partial class GeneralSetting : PageBase
 
     private readonly ILogger<GeneralSetting> _logger = AppConfig.GetLogger<GeneralSetting>();
 
-    public string? DebugDest
-    {
-        get => AppConfig.GetValue<string?>();
-        set
-        {
-            AppConfig.SetValue(value);
-            OnPropertyChanged(nameof(DebugDest));
-            OnPropertyChanged(nameof(DebugDestDisplay));
-        }
-    }
-
-    public string DebugDestDisplay
-    {
-        get
-        {
-            string? dest = DebugDest;
-            return string.IsNullOrWhiteSpace(dest) ? Lang.Zshot_PathNone : dest!;
-        }
-    }
-
-
-    // 禁用证书校验：调试流式解压用（自签测试服务器），进程级不写 DB
-    private static bool s_disableCert;
-
-    public bool DisableCert
-    {
-        get => s_disableCert;
-        set
-        {
-            s_disableCert = value;
-            OnPropertyChanged(nameof(DisableCert));
-        }
-    }
-
-
-    // 解压状态进程级：切走设置页再回来恢复（后台任务继续跑）
-    private enum ExtractState { Idle, Running, Completed, Failed }
-
-    private static ExtractState s_extractState = ExtractState.Idle;
-    private static int s_extractPercent;
-    private static string s_extractStatus = "";
-
-    // 当前活动实例：progress handler 通过它刷新当前页面（切 tab 回来新实例能收到更新）
-    private static GeneralSetting? s_activeInstance;
-
 
     public GeneralSetting()
     {
         InitializeComponent();
-        s_activeInstance = this;
         LoadShieldIcon();
     }
 
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
-    {
-        base.OnNavigatedTo(e);
-        s_activeInstance = this;
-        RefreshExtractState();
-    }
+
+    #region Language
 
 
-    private void RefreshExtractState()
+    public int LanguageIndex
     {
-        DebugProgressBar.Value = s_extractPercent;
-        DebugProgressBar.Visibility = s_extractState == ExtractState.Running ? Visibility.Visible : Visibility.Collapsed;
-        DebugCompletedIcon.Visibility = s_extractState == ExtractState.Completed ? Visibility.Visible : Visibility.Collapsed;
-        DebugStatus.Text = s_extractStatus;
-    }
+        get;
+        set
+        {
+            if (SetProperty(ref field, value))
+            {
+                string? lang = value switch { 1 => "en-US", 2 => "zh-CN", 3 => "ja-JP", _ => null };
+                AppConfig.Language = lang;
+                AppConfig.SetLanguage(lang);
+                Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true });
+                Environment.Exit(0);
+            }
+        }
+    } = AppConfig.Language switch { "en-US" => 1, "zh-CN" => 2, "ja-JP" => 3, _ => 0 };
+
+
+    #endregion
+
+
+
+    #region Auto Start
 
 
     public bool EnableAutoStart
@@ -123,7 +83,6 @@ public sealed partial class GeneralSetting : PageBase
                 if (await UpdateAutoStartTaskAsync(false)) _priorityStart = false;
             }
         }
-        OnPropertyChanged(nameof(AutoStartMinimizedVisibility));
         OnPropertyChanged(nameof(PriorityStartVisibility));
         OnPropertyChanged(nameof(PriorityStart));
     }
@@ -136,29 +95,6 @@ public sealed partial class GeneralSetting : PageBase
         catch { return false; }
     }
 
-
-    public bool AutoStartMinimized
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value)) _ = ApplyAutoStartMinimizedAsync(value);
-        }
-    } = AppConfig.AutoStartMinimized;
-
-
-    private async Task ApplyAutoStartMinimizedAsync(bool value)
-    {
-        AppConfig.AutoStartMinimized = value;
-        if (EnableAutoStart)
-        {
-            if (PriorityStart) await UpdateAutoStartTaskAsync(true);
-            else UpdateAutoStartRegistry(true);
-        }
-    }
-
-
-    public Visibility AutoStartMinimizedVisibility => EnableAutoStart ? Visibility.Visible : Visibility.Collapsed;
 
     public Microsoft.UI.Xaml.Media.ImageSource? ShieldSource { get; set; }
 
@@ -211,60 +147,6 @@ public sealed partial class GeneralSetting : PageBase
     }
 
 
-    public int UpdateSource
-    {
-        get => AppConfig.UpdateSource;
-        set => AppConfig.UpdateSource = value;
-    }
-
-
-    /// <summary>
-    /// GitHub API 不走系统代理（仅 GitHub 源生效；CDN 源走系统代理不受影响）。改后重启生效。
-    /// </summary>
-    public bool GithubApiNoProxy
-    {
-        get => AppConfig.EnableGithubApiNoProxy;
-        set
-        {
-            AppConfig.EnableGithubApiNoProxy = value;
-            InAppToast.MainWindow?.Information(null, Lang.Zshot_RestartToTakeEffect, 3000);
-        }
-    }
-
-
-    /// <summary>
-    /// 开发者模式：显示调试组（流式解压测试）
-    /// </summary>
-    public bool DevMode
-    {
-        get => AppConfig.DevMode;
-        set
-        {
-            AppConfig.DevMode = value;
-            OnPropertyChanged(nameof(DevModeVisibility));
-        }
-    }
-
-    public Visibility DevModeVisibility => DevMode ? Visibility.Visible : Visibility.Collapsed;
-
-
-    public int LanguageIndex
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                string? lang = value switch { 1 => "en-US", 2 => "zh-CN", 3 => "ja-JP", _ => null };
-                AppConfig.Language = lang;
-                AppConfig.SetLanguage(lang);
-                Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true });
-                Environment.Exit(0);
-            }
-        }
-    } = AppConfig.Language switch { "en-US" => 1, "zh-CN" => 2, "ja-JP" => 3, _ => 0 };
-
-
     private static readonly string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "Zshot";
 
@@ -278,9 +160,8 @@ public sealed partial class GeneralSetting : PageBase
 
             if (enable)
             {
-                string launcherPath = GetLauncherPath();
-                string args = (AppConfig.AutoStartMinimized && AppConfig.EnableSystemTrayIcon) ? " --hide" : "";
-                key.SetValue(RunValueName, $"\"{launcherPath}\"{args}");
+                // 启动永远静默挂托盘，命令行不带参数
+                key.SetValue(RunValueName, $"\"{GetLauncherPath()}\"");
             }
             else
             {
@@ -303,10 +184,9 @@ public sealed partial class GeneralSetting : PageBase
         try
         {
             string launcherPath = GetLauncherPath();
-            string taskArgs = (AppConfig.AutoStartMinimized && AppConfig.EnableSystemTrayIcon) ? "--hide" : "";
             string mode = enable ? "create" : "delete";
             // 提权子进程：UAC 弹窗，admin 权限调 TaskScheduler API（同步）；await 不阻塞 UI
-            var psi = new ProcessStartInfo(Environment.ProcessPath!, $"--manage-task {mode} \"{launcherPath}\" \"{taskArgs}\"")
+            var psi = new ProcessStartInfo(Environment.ProcessPath!, $"--manage-task {mode} \"{launcherPath}\" \"\"")
             {
                 Verb = "runas",
                 UseShellExecute = true,
@@ -365,65 +245,60 @@ public sealed partial class GeneralSetting : PageBase
     }
 
 
-    [RelayCommand]
-    private async Task BrowseDest()
-    {
-        var folder = await FileDialogHelper.PickFolderAsync(this.XamlRoot);
-        if (!string.IsNullOrWhiteSpace(folder))
-        {
-            DebugDest = folder;
-        }
-    }
+    #endregion
+
+
+
+    #region Maintenance
+
+
+    public string DataFolder => AppConfig.UserDataFolder;
+
+    public string LogFolder => Path.Combine(AppConfig.LogFolder, "log");
 
 
     [RelayCommand]
-    private async Task OpenDest()
+    private async Task OpenDataFolder()
     {
-        if (string.IsNullOrWhiteSpace(DebugDest) || !Directory.Exists(DebugDest)) return;
-        await Launcher.LaunchFolderPathAsync(DebugDest);
-    }
-
-
-    [RelayCommand]
-    private async Task DebugExtract()
-    {
-        string? url = DebugUrlBox.Text?.Trim();
-        string? dest = DebugDest?.Trim();
-        if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(dest))
-        {
-            s_extractState = ExtractState.Idle;
-            s_extractStatus = Lang.Zshot_DebugUrlEmpty;
-            RefreshExtractState();
-            return;
-        }
-        s_extractState = ExtractState.Running;
-        s_extractPercent = 0;
-        s_extractStatus = "";
-        RefreshExtractState();
-
-        var progress = new Progress<(int percent, string stage)>(p =>
-        {
-            s_extractPercent = p.percent;
-            s_extractStatus = $"{p.percent}%  {p.stage}";
-            try { s_activeInstance?.RefreshExtractState(); } catch { }
-        });
         try
         {
-            await UpdateService.ExtractToDirectoryAsync(url, dest, progress, disableCert: DisableCert);
-            s_extractState = ExtractState.Completed;
-            s_extractPercent = 100;
-            s_extractStatus = Lang.Zshot_DebugExtractDone;
+            if (!string.IsNullOrWhiteSpace(DataFolder))
+            {
+                await Launcher.LaunchFolderPathAsync(DataFolder);
+            }
+        }
+        catch { }
+    }
+
+
+    [RelayCommand]
+    private async Task OpenLogFolder()
+    {
+        try
+        {
+            Directory.CreateDirectory(LogFolder);
+            await Launcher.LaunchFolderPathAsync(LogFolder);
+        }
+        catch { }
+    }
+
+
+    [RelayCommand]
+    private void ClearCache()
+    {
+        try
+        {
+            ImageThumbnail.ClearThumbnailCache();
+            InAppToast.MainWindow?.Success(Lang.ScreenshotSetting_ClearSuccessfully);
         }
         catch (Exception ex)
         {
-            s_extractState = ExtractState.Failed;
-            s_extractStatus = Lang.Zshot_DebugExtractFailed + ex.Message;
-        }
-        finally
-        {
-            try { s_activeInstance?.RefreshExtractState(); } catch { }
+            _logger.LogError(ex, "Failed to clear cache");
+            InAppToast.MainWindow?.Error(ex, Lang.ScreenshotSetting_ClearFailed);
         }
     }
 
+
+    #endregion
 
 }

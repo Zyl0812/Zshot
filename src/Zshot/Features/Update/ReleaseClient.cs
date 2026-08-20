@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -39,18 +39,33 @@ public static class ReleaseClient
     private const string LatestReleaseUrl = "https://api.github.com/repos/Zyl0812/Zshot/releases/latest";
     private const string AllReleasesUrl = "https://api.github.com/repos/Zyl0812/Zshot/releases";
 
-    private static readonly HttpClient _http = CreateClient();
+    private static readonly HttpClient _http = CreateClient(useProxy: false);
+    private static readonly HttpClient _httpViaProxy = CreateClient(useProxy: true);
     private static readonly HttpClient _cdnHttp = CreateCdnClient();
 
 
-    private static HttpClient CreateClient()
+    private static HttpClient CreateClient(bool useProxy)
     {
-        // GitHub API 不走系统代理（开关开 = UseProxy=false 直连 api.github.com）。仅 API，zip 下载走 CDN 不受影响。
-        var handler = new HttpClientHandler { UseProxy = !AppConfig.EnableGithubApiNoProxy };
-        var c = new HttpClient(handler);
+        var c = new HttpClient(new HttpClientHandler { UseProxy = useProxy });
         c.DefaultRequestHeaders.UserAgent.ParseAdd($"Zshot/{AppConfig.AppVersion}");
         c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         return c;
+    }
+
+
+    /// <summary>
+    /// 调 GitHub API：先直连，失败再走系统代理。zip 下载走 CDN，不经过这里。
+    /// </summary>
+    private static async Task<HttpResponseMessage> GetGitHubAsync(string url, CancellationToken ct)
+    {
+        try
+        {
+            return await _http.GetAsync(url, ct);
+        }
+        catch (HttpRequestException)
+        {
+            return await _httpViaProxy.GetAsync(url, ct);
+        }
     }
 
 
@@ -68,7 +83,7 @@ public static class ReleaseClient
         // 不吞网络异常：让 HttpRequestException 向上抛，调用方据此区分"无新版本"与"检查失败"
         // pre-release 用 /releases 取列表第一个（最新，含 pre-release）；正式版用 /releases/latest（跳过 pre-release）
         string url = includePrerelease ? AllReleasesUrl : LatestReleaseUrl;
-        using var resp = await _http.GetAsync(url, ct);
+        using var resp = await GetGitHubAsync(url, ct);
         resp.EnsureSuccessStatusCode();
         await using var stream = await resp.Content.ReadAsStreamAsync(ct);
 
@@ -144,7 +159,7 @@ public static class ReleaseClient
         string arch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
 
         // 拉 /releases 列表（30 条，够覆盖最近版本）
-        using var resp = await _http.GetAsync(AllReleasesUrl, ct);
+        using var resp = await GetGitHubAsync(AllReleasesUrl, ct);
         resp.EnsureSuccessStatusCode();
         await using var stream = await resp.Content.ReadAsStreamAsync(ct);
         var releases = await JsonSerializer.DeserializeAsync<GitHubReleasePayload[]>(stream, cancellationToken: ct);
@@ -307,7 +322,7 @@ public static class ReleaseClient
     {
         try
         {
-            using var resp = await _http.GetAsync($"https://api.github.com/repos/Zyl0812/Zshot/releases/tags/{tag}", ct);
+            using var resp = await GetGitHubAsync($"https://api.github.com/repos/Zyl0812/Zshot/releases/tags/{tag}", ct);
             if (!resp.IsSuccessStatusCode) return null;
             await using var stream = await resp.Content.ReadAsStreamAsync(ct);
             var payload = await JsonSerializer.DeserializeAsync<GitHubReleasePayload>(stream, cancellationToken: ct);

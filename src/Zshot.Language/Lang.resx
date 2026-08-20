@@ -139,15 +139,6 @@
   <data name="GameSettingPage_FullScreen" xml:space="preserve">
     <value>Full Screen</value>
   </data>
-  <data name="Common_Apply" xml:space="preserve">
-    <value>Apply</value>
-  </data>
-  <data name="Common_Refresh" xml:space="preserve">
-    <value>Refresh</value>
-  </data>
-  <data name="Common_Save" xml:space="preserve">
-    <value>Save</value>
-  </data>
   <data name="MainPage_Launcher" xml:space="preserve">
     <value>MainPage</value>
   </data>
@@ -156,9 +147,6 @@
   </data>
   <data name="SettingPage_FollowSystem" xml:space="preserve">
     <value>Follow System</value>
-  </data>
-  <data name="ScreenshotPage_ScreenshotFolderDoesNotExist" xml:space="preserve">
-    <value>Screenshot folder does not exist</value>
   </data>
   <data name="Common_Exit" xml:space="preserve">
     <value>Exit</value>
@@ -177,15 +165,6 @@
   </data>
   <data name="Common_Clipboard" xml:space="preserve">
     <value>Clipboard</value>
-  </data>
-  <data name="ClipboardPage_NotEnabled" xml:space="preserve">
-    <value>Clipboard history is not enabled</value>
-  </data>
-  <data name="ClipboardPage_GoToSettings" xml:space="preserve">
-    <value>Go to Windows clipboard settings</value>
-  </data>
-  <data name="ClipboardPage_NoImages" xml:space="preserve">
-    <value>No images in clipboard history</value>
   </data>
   <data name="GachaImportAndExportWindow_Import" xml:space="preserve">
     <value>Import</value>
@@ -211,23 +190,11 @@
   <data name="ScreenCaptureInfoWindow_ScreenshotSaved" xml:space="preserve">
     <value>Screenshot Saved</value>
   </data>
-  <data name="ScreenshotPage_ManageScreenshotFolders" xml:space="preserve">
-    <value>Manage Screenshot Folders</value>
-  </data>
-  <data name="ScreenshotFolderManageDialog_AddFolder" xml:space="preserve">
-    <value>Add Folder</value>
-  </data>
-  <data name="Common_Remove" xml:space="preserve">
-    <value>Remove</value>
-  </data>
   <data name="ScreenCaptureInfoWindow_ScreenshotFailed" xml:space="preserve">
     <value>Screenshot Failed</value>
   </data>
   <data name="ScreenCaptureInfoWindow_CheckTheLogForMoreInformation" xml:space="preserve">
     <value>Check the log for more information.</value>
-  </data>
-  <data name="ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery" xml:space="preserve">
-    <value>Images from the following folders will be displayed in the gallery.</value>
   </data>
   <data name="ImageViewWindow_OpenInExplorer" xml:space="preserve">
     <value>Open in Explorer</value>
@@ -349,26 +316,11 @@
   <data name="ScreenshotSetting_AutoSaveScreenshotFileDesc" xml:space="preserve">
     <value>Save the finished screenshot to the folder below. The copy-only hotkey never writes a file.</value>
   </data>
-  <data name="ImageViewWindow_CopyAsJPG" xml:space="preserve">
-    <value>Copy as JPG</value>
-  </data>
-  <data name="ScreenshotPage_MultiSelect" xml:space="preserve">
-    <value>Multi Select</value>
-  </data>
-  <data name="ScreenshotPage_Total0Files" xml:space="preserve">
-    <value>Total {0} files.</value>
-  </data>
   <data name="ScreenshotSetting_Lossless" xml:space="preserve">
     <value>Lossless</value>
   </data>
   <data name="ScreenCaptureInfoWindow_ProcessingImage" xml:space="preserve">
     <value>Processing Image</value>
-  </data>
-  <data name="ScreenshotPage_BatchConvert" xml:space="preserve">
-    <value>Batch Convert</value>
-  </data>
-  <data name="ScreenshotPage_Recopy" xml:space="preserve">
-    <value>Recopy</value>
   </data>
   <data name="ImageBatchConvertWindow_Quality" xml:space="preserve">
     <value>Quality</value>
@@ -427,95 +379,17 @@
   <data name="ScreenshotSetting_ColorManagement" xml:space="preserve">
     <value>Color Management</value>
   </data>
-  <data name="Zshot_Nav_Gallery" xml:space="preserve">
-    <value>Gallery</value>
-  </data>
-  <data name="Zshot_Nav_Appearance" xml:space="preserve">
-    <value>Appearance</value>
-  </data>
   <data name="Zshot_Nav_Hotkey" xml:space="preserve">
     <value>Hotkeys</value>
   </data>
   <data name="Zshot_Nav_Screenshot" xml:space="preserve">
     <value>Screenshot</value>
   </data>
-  <data name="Zshot_Nav_Storage" xml:space="preserve">
-    <value>Storage</value>
-  </data>
   <data name="Zshot_Nav_Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
   <data name="Zshot_Nav_About" xml:space="preserve">
     <value>About</value>
-  </data>
-  <data name="Zshot_SplashTagline" xml:space="preserve">
-    <value>Next-generation Windows-native HDR Screenshot Tool</value>
-  </data>
-  <data name="Zshot_WallpaperNotFound" xml:space="preserve">
-    <value>Wallpaper file not found. Config cleared and reset to None.</value>
-  </data>
-  <data name="Zshot_Theme" xml:space="preserve">
-    <value>Theme</value>
-  </data>
-  <data name="Zshot_ThemeLight" xml:space="preserve">
-    <value>Light</value>
-  </data>
-  <data name="Zshot_ThemeDark" xml:space="preserve">
-    <value>Dark</value>
-  </data>
-  <data name="Zshot_Acrylic" xml:space="preserve">
-    <value>Acrylic Effect</value>
-  </data>
-  <data name="Zshot_AccentColor" xml:space="preserve">
-    <value>Accent Color</value>
-  </data>
-  <data name="Zshot_ApplyCurrentColor" xml:space="preserve">
-    <value>Custom Color</value>
-  </data>
-  <data name="Zshot_Wallpaper" xml:space="preserve">
-    <value>Wallpaper</value>
-  </data>
-  <data name="Zshot_WallpaperModeNone" xml:space="preserve">
-    <value>None</value>
-  </data>
-  <data name="Zshot_WallpaperModeImage" xml:space="preserve">
-    <value>Single Image</value>
-  </data>
-  <data name="Zshot_WallpaperModeFolder" xml:space="preserve">
-    <value>Folder Random</value>
-  </data>
-  <data name="Zshot_WallpaperModeVideo" xml:space="preserve">
-    <value>Specified Video</value>
-  </data>
-  <data name="Zshot_WallpaperFolderVideoOnly" xml:space="preserve">
-    <value>Prefer Video</value>
-  </data>
-  <data name="Zshot_WallpaperFolderVideoOnlyDesc" xml:space="preserve">
-    <value>Picks videos first; falls back to a random image if the video can't initialize</value>
-  </data>
-  <data name="Zshot_WallpaperNowPlaying" xml:space="preserve">
-    <value>NowPlaying</value>
-  </data>
-  <data name="Zshot_WallpaperVideoFallbackToImage" xml:space="preserve">
-    <value>No video in folder, picked a random image instead</value>
-  </data>
-  <data name="Zshot_WallpaperChooseImage" xml:space="preserve">
-    <value>Choose Image</value>
-  </data>
-  <data name="Zshot_WallpaperChooseFolder" xml:space="preserve">
-    <value>Choose Folder</value>
-  </data>
-  <data name="Zshot_WallpaperChooseVideo" xml:space="preserve">
-    <value>Choose Video</value>
-  </data>
-  <data name="Zshot_AccentFromWallpaper" xml:space="preserve">
-    <value>Accent from Wallpaper</value>
-  </data>
-  <data name="Zshot_PathNone" xml:space="preserve">
-    <value>Not Selected</value>
-  </data>
-  <data name="Zshot_DisableCertificateValidation" xml:space="preserve">
-    <value>Disable Certificate Validation</value>
   </data>
   <data name="Zshot_HotkeyScreenshot" xml:space="preserve">
     <value>Screenshot</value>
@@ -527,7 +401,7 @@
     <value>Region Copy Only</value>
   </data>
   <data name="Zshot_HotkeyScreenshotDesc" xml:space="preserve">
-    <value>Capture the whole monitor (foreground window / cursor screen, switchable in Screenshot settings).</value>
+    <value>Captures the whole monitor the cursor is on.</value>
   </data>
   <data name="Zshot_HotkeyRegionDesc" xml:space="preserve">
     <value>Drag a region or click a window. Saves a file.</value>
@@ -559,15 +433,6 @@
   <data name="Zshot_DeleteHDRIfSDRDesc" xml:space="preserve">
     <value>When an HDR-format frame is actually SDR content (maxCLL below threshold), automatically convert to SDR and delete the HDR file. The format follows the SDR storage format.</value>
   </data>
-  <data name="Zshot_MonitorSource" xml:space="preserve">
-    <value>Capture Monitor</value>
-  </data>
-  <data name="Zshot_MonitorForeground" xml:space="preserve">
-    <value>Foreground Window</value>
-  </data>
-  <data name="Zshot_MonitorCursor" xml:space="preserve">
-    <value>Cursor Position</value>
-  </data>
   <data name="Zshot_FilenameTemplate" xml:space="preserve">
     <value>Filename Template</value>
   </data>
@@ -576,9 +441,6 @@
   </data>
   <data name="Zshot_ClickToInsert" xml:space="preserve">
     <value>Click to insert at cursor; see </value>
-  </data>
-  <data name="Zshot_AutoStartInvalidCleared" xml:space="preserve">
-    <value>Startup entry points to a missing program and has been removed</value>
   </data>
   <data name="Zshot_ClickToInsertSuffix" xml:space="preserve">
     <value> filename templates</value>
@@ -608,7 +470,7 @@
     <value>Update Failed</value>
   </data>
   <data name="Zshot_TitleMaxLength" xml:space="preserve">
-    <value>Title max length (0 = no truncation)</value>
+    <value>Max title length</value>
   </data>
   <data name="Zshot_ScreenshotFolder" xml:space="preserve">
     <value>Screenshot Folder</value>
@@ -616,44 +478,17 @@
   <data name="Zshot_LogFolder" xml:space="preserve">
     <value>Log Folder</value>
   </data>
-  <data name="Zshot_LogFolderRestartTip" xml:space="preserve">
-    <value>Restart to take effect</value>
-  </data>
-  <data name="Zshot_LogLevel" xml:space="preserve">
-    <value>Log Level</value>
-  </data>
-  <data name="Zshot_LogLevelOff" xml:space="preserve">
-    <value>Off</value>
-  </data>
   <data name="Zshot_Change" xml:space="preserve">
     <value>Change</value>
   </data>
-  <data name="Zshot_StorageStats" xml:space="preserve">
-    <value>Storage Usage</value>
-  </data>
   <data name="Zshot_ClearCache" xml:space="preserve">
     <value>Clear Cache</value>
-  </data>
-  <data name="Zshot_StatsScreenshots" xml:space="preserve">
-    <value>Screenshots</value>
-  </data>
-  <data name="Zshot_StatsImageCache" xml:space="preserve">
-    <value>Thumbnail Cache</value>
-  </data>
-  <data name="Zshot_StatsWallpaper" xml:space="preserve">
-    <value>Wallpaper</value>
-  </data>
-  <data name="Zshot_StatsLog" xml:space="preserve">
-    <value>Log</value>
   </data>
   <data name="Zshot_SystemTray" xml:space="preserve">
     <value>System Tray</value>
   </data>
   <data name="Zshot_AutoStart" xml:space="preserve">
     <value>Launch on Startup</value>
-  </data>
-  <data name="Zshot_AutoStartMinimized" xml:space="preserve">
-    <value>Start Minimized to Tray</value>
   </data>
   <data name="Zshot_AboutLicense" xml:space="preserve">
     <value>MIT License</value>
@@ -678,21 +513,6 @@
   </data>
   <data name="Zshot_OpenDataFolder" xml:space="preserve">
     <value>Open Data Folder</value>
-  </data>
-  <data name="Zshot_BackupDatabase" xml:space="preserve">
-    <value>Back Up Database</value>
-  </data>
-  <data name="Zshot_LastBackup" xml:space="preserve">
-    <value>Last Backup</value>
-  </data>
-  <data name="Zshot_BackupSuccess" xml:space="preserve">
-    <value>Database Backed Up</value>
-  </data>
-  <data name="Zshot_BackupFailed" xml:space="preserve">
-    <value>Database Backup Failed</value>
-  </data>
-  <data name="Zshot_StatsBackup" xml:space="preserve">
-    <value>Backup</value>
   </data>
   <data name="Zshot_CheckPrerelease" xml:space="preserve">
     <value>Check Pre-release Versions</value>
@@ -721,17 +541,11 @@
   <data name="Zshot_UpdateBuildTime" xml:space="preserve">
     <value>Release Time</value>
   </data>
-  <data name="Zshot_GithubApiNoProxy" xml:space="preserve">
-    <value>GitHub API direct (no proxy)</value>
-  </data>
   <data name="Zshot_DeltaUpdateMaxLayers" xml:space="preserve">
     <value>Delta Update Max Layers</value>
   </data>
   <data name="Zshot_Advanced" xml:space="preserve">
     <value>Advanced</value>
-  </data>
-  <data name="Zshot_RestartToTakeEffect" xml:space="preserve">
-    <value>Restart to take effect</value>
   </data>
   <data name="Zshot_WelcomeHello" xml:space="preserve">
     <value>Hi there!</value>
@@ -778,27 +592,6 @@
   <data name="Zshot_InfoCopied" xml:space="preserve">
     <value>Copied</value>
   </data>
-  <data name="Zshot_DebugExtractTitle" xml:space="preserve">
-    <value>Streaming Extract Test</value>
-  </data>
-  <data name="Zshot_DebugSection" xml:space="preserve">
-    <value>Debug</value>
-  </data>
-  <data name="Zshot_DebugSelect" xml:space="preserve">
-    <value>Browse</value>
-  </data>
-  <data name="Zshot_DebugExtract" xml:space="preserve">
-    <value>Extract</value>
-  </data>
-  <data name="Zshot_DebugUrlEmpty" xml:space="preserve">
-    <value>URL and path cannot be empty</value>
-  </data>
-  <data name="Zshot_DebugExtractDone" xml:space="preserve">
-    <value>Done!</value>
-  </data>
-  <data name="Zshot_DebugExtractFailed" xml:space="preserve">
-    <value>Failed: </value>
-  </data>
   <data name="Zshot_Update" xml:space="preserve">
     <value>Update source</value>
   </data>
@@ -810,9 +603,6 @@
   </data>
   <data name="Zshot_PriorityStart" xml:space="preserve">
     <value>High priority start</value>
-  </data>
-  <data name="Zshot_TaskInvalid" xml:space="preserve">
-    <value>High priority start task points to a missing program, please turn it off manually in Settings</value>
   </data>
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← To change this option, turn off high priority start first</value>
@@ -889,9 +679,6 @@
   <data name="ScreenshotSetting_Timeout" xml:space="preserve">
     <value>Timeout (seconds)</value>
   </data>
-  <data name="ScreenshotSetting_LongCaptureMaxHeight" xml:space="preserve">
-    <value>Long capture max height</value>
-  </data>
   <data name="Overlay_Mosaic" xml:space="preserve">
     <value>Mosaic</value>
   </data>
@@ -930,5 +717,83 @@
   </data>
   <data name="Overlay_LongCaptureFailed" xml:space="preserve">
     <value>Long capture failed</value>
+  </data>
+  <data name="Zshot_Nav_Format" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="Zshot_GroupSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Zshot_GroupFileName" xml:space="preserve">
+    <value>File name</value>
+  </data>
+  <data name="Zshot_GroupStorageFormat" xml:space="preserve">
+    <value>Storage format</value>
+  </data>
+  <data name="Zshot_GroupColor" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Zshot_GroupHdr" xml:space="preserve">
+    <value>HDR handling</value>
+  </data>
+  <data name="Zshot_GroupGlobalHotkey" xml:space="preserve">
+    <value>Global hotkeys</value>
+  </data>
+  <data name="Zshot_GroupCommon" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Zshot_GroupStartup" xml:space="preserve">
+    <value>Startup</value>
+  </data>
+  <data name="Zshot_GroupMaintenance" xml:space="preserve">
+    <value>Maintenance</value>
+  </data>
+  <data name="Zshot_GroupUpdate" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarAlwaysOn" xml:space="preserve">
+    <value>Color, complete and cancel are always shown.</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarHiddenCount" xml:space="preserve">
+    <value>{0} hidden</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarNoneHidden" xml:space="preserve">
+    <value>All shown</value>
+  </data>
+  <data name="Zshot_TitleMaxLengthDesc" xml:space="preserve">
+    <value>0 means no truncation.</value>
+  </data>
+  <data name="Zshot_OcrEngine" xml:space="preserve">
+    <value>Engine</value>
+  </data>
+  <data name="Zshot_OcrEngineWindowsFallback" xml:space="preserve">
+    <value>Windows OCR (model files missing)</value>
+  </data>
+  <data name="Zshot_ApiKeyDesc" xml:space="preserve">
+    <value>Stored in Windows Credential Manager, never written to logs.</value>
+  </data>
+  <data name="Zshot_TimeoutDesc" xml:space="preserve">
+    <value>Seconds</value>
+  </data>
+  <data name="Zshot_PromptDesc" xml:space="preserve">
+    <value>Leave empty to use the built-in prompt.</value>
+  </data>
+  <data name="Zshot_HotkeyEditHint" xml:space="preserve">
+    <value>Click a hotkey box and press the combination. Esc cancels, Delete clears.</value>
+  </data>
+  <data name="Zshot_LanguageRestartDesc" xml:space="preserve">
+    <value>Zshot restarts when the language changes.</value>
+  </data>
+  <data name="Zshot_AutoStartDesc" xml:space="preserve">
+    <value>Starts silently in the tray, no window.</value>
+  </data>
+  <data name="Zshot_PriorityStartDesc" xml:space="preserve">
+    <value>Runs as administrator via a scheduled task, required to capture elevated windows such as Task Manager.</value>
+  </data>
+  <data name="Zshot_ClearCacheDesc" xml:space="preserve">
+    <value>Removes thumbnails and temporary files. Saved screenshots are not affected.</value>
+  </data>
+  <data name="Zshot_ClearCacheAction" xml:space="preserve">
+    <value>Clear</value>
   </data>
 </root>

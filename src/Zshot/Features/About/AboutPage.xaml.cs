@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using Serilog;
@@ -33,13 +33,21 @@ public sealed partial class AboutPage : PageBase
     }
 
 
+    /// <summary>更新源：0 = Cloudflare CDN，1 = GitHub。</summary>
+    public int UpdateSource
+    {
+        get => AppConfig.UpdateSource;
+        set => AppConfig.UpdateSource = value;
+    }
+
+
     public AboutPage()
     {
         InitializeComponent();
 #if DEBUG
         // DEBUG 不查更新，隐藏按钮和更新相关开关（CheckUpdateAsync 直接 return null，显示「最新」是假的）
-        CheckUpdateButton.Visibility = Visibility.Collapsed;
-        PreReleaseSwitch.Visibility = Visibility.Collapsed;
+        CheckUpdateCard.Visibility = Visibility.Collapsed;
+        PreReleaseCard.Visibility = Visibility.Collapsed;
 #endif
     }
 

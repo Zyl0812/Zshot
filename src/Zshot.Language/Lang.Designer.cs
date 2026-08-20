@@ -51,15 +51,6 @@
         }
         
         /// <summary>
-        ///   查找类似 Apply 的本地化字符串。
-        /// </summary>
-        public static string Common_Apply {
-            get {
-                return ResourceManager.GetString("Common_Apply", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Cancel 的本地化字符串。
         /// </summary>
         public static string Common_Cancel {
@@ -141,65 +132,11 @@
         }
 
         /// <summary>
-        ///   查找类似 Clipboard history is not enabled 的本地化字符串。
-        /// </summary>
-        public static string ClipboardPage_NotEnabled {
-            get {
-                return ResourceManager.GetString("ClipboardPage_NotEnabled", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Go to Windows clipboard settings 的本地化字符串。
-        /// </summary>
-        public static string ClipboardPage_GoToSettings {
-            get {
-                return ResourceManager.GetString("ClipboardPage_GoToSettings", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 No images in clipboard history 的本地化字符串。
-        /// </summary>
-        public static string ClipboardPage_NoImages {
-            get {
-                return ResourceManager.GetString("ClipboardPage_NoImages", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Open Files 的本地化字符串。
         /// </summary>
         public static string Common_OpenFiles {
             get {
                 return ResourceManager.GetString("Common_OpenFiles", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Refresh 的本地化字符串。
-        /// </summary>
-        public static string Common_Refresh {
-            get {
-                return ResourceManager.GetString("Common_Refresh", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Remove 的本地化字符串。
-        /// </summary>
-        public static string Common_Remove {
-            get {
-                return ResourceManager.GetString("Common_Remove", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Save 的本地化字符串。
-        /// </summary>
-        public static string Common_Save {
-            get {
-                return ResourceManager.GetString("Common_Save", resourceCulture);
             }
         }
         
@@ -528,15 +465,6 @@
         }
         
         /// <summary>
-        ///   查找类似 Copy as JPG 的本地化字符串。
-        /// </summary>
-        public static string ImageViewWindow_CopyAsJPG {
-            get {
-                return ResourceManager.GetString("ImageViewWindow_CopyAsJPG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Copy File 的本地化字符串。
         /// </summary>
         public static string ImageViewWindow_CopyFile {
@@ -807,79 +735,6 @@
         }
         
         /// <summary>
-        ///   查找类似 Add Folder 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotFolderManageDialog_AddFolder {
-            get {
-                return ResourceManager.GetString("ScreenshotFolderManageDialog_AddFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Images from the following folders will be displayed in the gallery. 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGallery {
-            get {
-                return ResourceManager.GetString("ScreenshotFolderManageDialog_ImagesFromTheFollowingFoldersWillBeDisplayedInTheGal" +
-                        "lery", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Batch Convert 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotPage_BatchConvert {
-            get {
-                return ResourceManager.GetString("ScreenshotPage_BatchConvert", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Recopy 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotPage_Recopy {
-            get {
-                return ResourceManager.GetString("ScreenshotPage_Recopy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Manage Screenshot Folders 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotPage_ManageScreenshotFolders {
-            get {
-                return ResourceManager.GetString("ScreenshotPage_ManageScreenshotFolders", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Multi Select 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotPage_MultiSelect {
-            get {
-                return ResourceManager.GetString("ScreenshotPage_MultiSelect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Screenshot folder does not exist 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotPage_ScreenshotFolderDoesNotExist {
-            get {
-                return ResourceManager.GetString("ScreenshotPage_ScreenshotFolderDoesNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Total {0} files. 的本地化字符串。
-        /// </summary>
-        public static string ScreenshotPage_Total0Files {
-            get {
-                return ResourceManager.GetString("ScreenshotPage_Total0Files", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Auto Convert to SDR Image 的本地化字符串。
         /// </summary>
         public static string ScreenshotSetting_AutoConvertToSDRImage {
@@ -1033,47 +888,11 @@
         }
         
         /// <summary>
-        ///   查找类似 Accent Color 的本地化字符串。
-        /// </summary>
-        public static string Zshot_AccentColor {
-            get {
-                return ResourceManager.GetString("Zshot_AccentColor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Accent from Wallpaper 的本地化字符串。
-        /// </summary>
-        public static string Zshot_AccentFromWallpaper {
-            get {
-                return ResourceManager.GetString("Zshot_AccentFromWallpaper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Acrylic Effect 的本地化字符串。
-        /// </summary>
-        public static string Zshot_Acrylic {
-            get {
-                return ResourceManager.GetString("Zshot_Acrylic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Advanced 的本地化字符串。
         /// </summary>
         public static string Zshot_Advanced {
             get {
                 return ResourceManager.GetString("Zshot_Advanced", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Custom Color 的本地化字符串。
-        /// </summary>
-        public static string Zshot_ApplyCurrentColor {
-            get {
-                return ResourceManager.GetString("Zshot_ApplyCurrentColor", resourceCulture);
             }
         }
         
@@ -1092,51 +911,6 @@
         public static string Zshot_AutoStart {
             get {
                 return ResourceManager.GetString("Zshot_AutoStart", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Auto-start entry pointed to a missing exe and has been removed 的本地化字符串。
-        /// </summary>
-        public static string Zshot_AutoStartInvalidCleared {
-            get {
-                return ResourceManager.GetString("Zshot_AutoStartInvalidCleared", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Start Minimized to Tray 的本地化字符串。
-        /// </summary>
-        public static string Zshot_AutoStartMinimized {
-            get {
-                return ResourceManager.GetString("Zshot_AutoStartMinimized", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Back Up Database 的本地化字符串。
-        /// </summary>
-        public static string Zshot_BackupDatabase {
-            get {
-                return ResourceManager.GetString("Zshot_BackupDatabase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Database Backup Failed 的本地化字符串。
-        /// </summary>
-        public static string Zshot_BackupFailed {
-            get {
-                return ResourceManager.GetString("Zshot_BackupFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Database Backed Up 的本地化字符串。
-        /// </summary>
-        public static string Zshot_BackupSuccess {
-            get {
-                return ResourceManager.GetString("Zshot_BackupSuccess", resourceCulture);
             }
         }
         
@@ -1222,33 +996,6 @@
         }
         
         /// <summary>
-        ///   查找类似 Extract 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugExtract {
-            get {
-                return ResourceManager.GetString("Zshot_DebugExtract", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Done! 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugExtractDone {
-            get {
-                return ResourceManager.GetString("Zshot_DebugExtractDone", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Failed:  的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugExtractFailed {
-            get {
-                return ResourceManager.GetString("Zshot_DebugExtractFailed", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   查找类似 Update 的本地化字符串。
         /// </summary>
         public static string Zshot_Update {
@@ -1288,56 +1035,11 @@
         }
 
         /// <summary>
-        ///   查找类似 High priority start task points to a missing program. Please turn it off manually in Settings. 的本地化字符串。
-        /// </summary>
-        public static string Zshot_TaskInvalid {
-            get {
-                return ResourceManager.GetString("Zshot_TaskInvalid", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   查找类似 Turn off high priority start first 的本地化字符串。
         /// </summary>
         public static string Zshot_TurnOffPriorityFirst {
             get {
                 return ResourceManager.GetString("Zshot_TurnOffPriorityFirst", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Streaming Extract Test 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugExtractTitle {
-            get {
-                return ResourceManager.GetString("Zshot_DebugExtractTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Debug 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugSection {
-            get {
-                return ResourceManager.GetString("Zshot_DebugSection", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Browse 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugSelect {
-            get {
-                return ResourceManager.GetString("Zshot_DebugSelect", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 URL and path cannot be empty 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DebugUrlEmpty {
-            get {
-                return ResourceManager.GetString("Zshot_DebugUrlEmpty", resourceCulture);
             }
         }
 
@@ -1369,29 +1071,11 @@
         }
         
         /// <summary>
-        ///   查找类似 Disable Certificate Validation 的本地化字符串。
-        /// </summary>
-        public static string Zshot_DisableCertificateValidation {
-            get {
-                return ResourceManager.GetString("Zshot_DisableCertificateValidation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Filename Template 的本地化字符串。
         /// </summary>
         public static string Zshot_FilenameTemplate {
             get {
                 return ResourceManager.GetString("Zshot_FilenameTemplate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 GitHub API direct (no proxy) 的本地化字符串。
-        /// </summary>
-        public static string Zshot_GithubApiNoProxy {
-            get {
-                return ResourceManager.GetString("Zshot_GithubApiNoProxy", resourceCulture);
             }
         }
         
@@ -1477,15 +1161,6 @@
         }
         
         /// <summary>
-        ///   查找类似 Last Backup 的本地化字符串。
-        /// </summary>
-        public static string Zshot_LastBackup {
-            get {
-                return ResourceManager.GetString("Zshot_LastBackup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 You&apos;re on the latest version 的本地化字符串。
         /// </summary>
         public static string Zshot_LatestVersion {
@@ -1504,83 +1179,11 @@
         }
         
         /// <summary>
-        ///   查找类似 Restart to take effect 的本地化字符串。
-        /// </summary>
-        public static string Zshot_LogFolderRestartTip {
-            get {
-                return ResourceManager.GetString("Zshot_LogFolderRestartTip", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Log Level 的本地化字符串。
-        /// </summary>
-        public static string Zshot_LogLevel {
-            get {
-                return ResourceManager.GetString("Zshot_LogLevel", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Off 的本地化字符串。
-        /// </summary>
-        public static string Zshot_LogLevelOff {
-            get {
-                return ResourceManager.GetString("Zshot_LogLevelOff", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cursor Position 的本地化字符串。
-        /// </summary>
-        public static string Zshot_MonitorCursor {
-            get {
-                return ResourceManager.GetString("Zshot_MonitorCursor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Foreground Window 的本地化字符串。
-        /// </summary>
-        public static string Zshot_MonitorForeground {
-            get {
-                return ResourceManager.GetString("Zshot_MonitorForeground", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Capture Monitor 的本地化字符串。
-        /// </summary>
-        public static string Zshot_MonitorSource {
-            get {
-                return ResourceManager.GetString("Zshot_MonitorSource", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 About 的本地化字符串。
         /// </summary>
         public static string Zshot_Nav_About {
             get {
                 return ResourceManager.GetString("Zshot_Nav_About", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Appearance 的本地化字符串。
-        /// </summary>
-        public static string Zshot_Nav_Appearance {
-            get {
-                return ResourceManager.GetString("Zshot_Nav_Appearance", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Gallery 的本地化字符串。
-        /// </summary>
-        public static string Zshot_Nav_Gallery {
-            get {
-                return ResourceManager.GetString("Zshot_Nav_Gallery", resourceCulture);
             }
         }
         
@@ -1612,29 +1215,11 @@
         }
         
         /// <summary>
-        ///   查找类似 Storage 的本地化字符串。
-        /// </summary>
-        public static string Zshot_Nav_Storage {
-            get {
-                return ResourceManager.GetString("Zshot_Nav_Storage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Open Data Folder 的本地化字符串。
         /// </summary>
         public static string Zshot_OpenDataFolder {
             get {
                 return ResourceManager.GetString("Zshot_OpenDataFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Not Selected 的本地化字符串。
-        /// </summary>
-        public static string Zshot_PathNone {
-            get {
-                return ResourceManager.GetString("Zshot_PathNone", resourceCulture);
             }
         }
         
@@ -1666,15 +1251,6 @@
         }
         
         /// <summary>
-        ///   查找类似 Restart to take effect 的本地化字符串。
-        /// </summary>
-        public static string Zshot_RestartToTakeEffect {
-            get {
-                return ResourceManager.GetString("Zshot_RestartToTakeEffect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Screenshot Folder 的本地化字符串。
         /// </summary>
         public static string Zshot_ScreenshotFolder {
@@ -1693,101 +1269,11 @@
         }
         
         /// <summary>
-        ///   查找类似 Next-generation Windows-native HDR Screenshot Tool 的本地化字符串。
-        /// </summary>
-        public static string Zshot_SplashTagline {
-            get {
-                return ResourceManager.GetString("Zshot_SplashTagline", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Backup 的本地化字符串。
-        /// </summary>
-        public static string Zshot_StatsBackup {
-            get {
-                return ResourceManager.GetString("Zshot_StatsBackup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Thumbnail Cache 的本地化字符串。
-        /// </summary>
-        public static string Zshot_StatsImageCache {
-            get {
-                return ResourceManager.GetString("Zshot_StatsImageCache", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Log 的本地化字符串。
-        /// </summary>
-        public static string Zshot_StatsLog {
-            get {
-                return ResourceManager.GetString("Zshot_StatsLog", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Screenshots 的本地化字符串。
-        /// </summary>
-        public static string Zshot_StatsScreenshots {
-            get {
-                return ResourceManager.GetString("Zshot_StatsScreenshots", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Wallpaper 的本地化字符串。
-        /// </summary>
-        public static string Zshot_StatsWallpaper {
-            get {
-                return ResourceManager.GetString("Zshot_StatsWallpaper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Storage Usage 的本地化字符串。
-        /// </summary>
-        public static string Zshot_StorageStats {
-            get {
-                return ResourceManager.GetString("Zshot_StorageStats", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 System Tray 的本地化字符串。
         /// </summary>
         public static string Zshot_SystemTray {
             get {
                 return ResourceManager.GetString("Zshot_SystemTray", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Theme 的本地化字符串。
-        /// </summary>
-        public static string Zshot_Theme {
-            get {
-                return ResourceManager.GetString("Zshot_Theme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Dark 的本地化字符串。
-        /// </summary>
-        public static string Zshot_ThemeDark {
-            get {
-                return ResourceManager.GetString("Zshot_ThemeDark", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Light 的本地化字符串。
-        /// </summary>
-        public static string Zshot_ThemeLight {
-            get {
-                return ResourceManager.GetString("Zshot_ThemeLight", resourceCulture);
             }
         }
         
@@ -1896,123 +1382,6 @@
         public static string Zshot_UpdateReleasePage {
             get {
                 return ResourceManager.GetString("Zshot_UpdateReleasePage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Wallpaper 的本地化字符串。
-        /// </summary>
-        public static string Zshot_Wallpaper {
-            get {
-                return ResourceManager.GetString("Zshot_Wallpaper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Choose Folder 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperChooseFolder {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperChooseFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Choose Image 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperChooseImage {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperChooseImage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Choose Video 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperChooseVideo {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperChooseVideo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Prefer Video 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperFolderVideoOnly {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperFolderVideoOnly", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Picks videos first; falls back to a random image if the video can&apos;t initialize 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperFolderVideoOnlyDesc {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperFolderVideoOnlyDesc", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   查找类似 Now Playing 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperNowPlaying {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperNowPlaying", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Folder Random 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperModeFolder {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperModeFolder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Single Image 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperModeImage {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperModeImage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 None 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperModeNone {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperModeNone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Specified Video 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperModeVideo {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperModeVideo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Wallpaper file not found. Config cleared and reset to None. 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperNotFound {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 No video in folder, picked a random image instead 的本地化字符串。
-        /// </summary>
-        public static string Zshot_WallpaperVideoFallbackToImage {
-            get {
-                return ResourceManager.GetString("Zshot_WallpaperVideoFallbackToImage", resourceCulture);
             }
         }
         
@@ -2166,7 +1535,6 @@
         public static string ScreenshotSetting_Model => ResourceManager.GetString("ScreenshotSetting_Model", resourceCulture);
         public static string ScreenshotSetting_TargetLanguage => ResourceManager.GetString("ScreenshotSetting_TargetLanguage", resourceCulture);
         public static string ScreenshotSetting_Timeout => ResourceManager.GetString("ScreenshotSetting_Timeout", resourceCulture);
-        public static string ScreenshotSetting_LongCaptureMaxHeight => ResourceManager.GetString("ScreenshotSetting_LongCaptureMaxHeight", resourceCulture);
         public static string Overlay_Mosaic => ResourceManager.GetString("Overlay_Mosaic", resourceCulture);
         public static string Overlay_MosaicFine => ResourceManager.GetString("Overlay_MosaicFine", resourceCulture);
         public static string Overlay_MosaicMedium => ResourceManager.GetString("Overlay_MosaicMedium", resourceCulture);
@@ -2180,5 +1548,31 @@
         public static string Overlay_CapturedSegments => ResourceManager.GetString("Overlay_CapturedSegments", resourceCulture);
         public static string Overlay_MaxHeightReached => ResourceManager.GetString("Overlay_MaxHeightReached", resourceCulture);
         public static string Overlay_LongCaptureFailed => ResourceManager.GetString("Overlay_LongCaptureFailed", resourceCulture);
+        public static string Zshot_Nav_Format => ResourceManager.GetString("Zshot_Nav_Format", resourceCulture);
+        public static string Zshot_GroupSave => ResourceManager.GetString("Zshot_GroupSave", resourceCulture);
+        public static string Zshot_GroupFileName => ResourceManager.GetString("Zshot_GroupFileName", resourceCulture);
+        public static string Zshot_GroupStorageFormat => ResourceManager.GetString("Zshot_GroupStorageFormat", resourceCulture);
+        public static string Zshot_GroupColor => ResourceManager.GetString("Zshot_GroupColor", resourceCulture);
+        public static string Zshot_GroupHdr => ResourceManager.GetString("Zshot_GroupHdr", resourceCulture);
+        public static string Zshot_GroupGlobalHotkey => ResourceManager.GetString("Zshot_GroupGlobalHotkey", resourceCulture);
+        public static string Zshot_GroupCommon => ResourceManager.GetString("Zshot_GroupCommon", resourceCulture);
+        public static string Zshot_GroupStartup => ResourceManager.GetString("Zshot_GroupStartup", resourceCulture);
+        public static string Zshot_GroupMaintenance => ResourceManager.GetString("Zshot_GroupMaintenance", resourceCulture);
+        public static string Zshot_GroupUpdate => ResourceManager.GetString("Zshot_GroupUpdate", resourceCulture);
+        public static string ScreenshotSetting_ToolbarAlwaysOn => ResourceManager.GetString("ScreenshotSetting_ToolbarAlwaysOn", resourceCulture);
+        public static string ScreenshotSetting_ToolbarHiddenCount => ResourceManager.GetString("ScreenshotSetting_ToolbarHiddenCount", resourceCulture);
+        public static string ScreenshotSetting_ToolbarNoneHidden => ResourceManager.GetString("ScreenshotSetting_ToolbarNoneHidden", resourceCulture);
+        public static string Zshot_TitleMaxLengthDesc => ResourceManager.GetString("Zshot_TitleMaxLengthDesc", resourceCulture);
+        public static string Zshot_OcrEngine => ResourceManager.GetString("Zshot_OcrEngine", resourceCulture);
+        public static string Zshot_OcrEngineWindowsFallback => ResourceManager.GetString("Zshot_OcrEngineWindowsFallback", resourceCulture);
+        public static string Zshot_ApiKeyDesc => ResourceManager.GetString("Zshot_ApiKeyDesc", resourceCulture);
+        public static string Zshot_TimeoutDesc => ResourceManager.GetString("Zshot_TimeoutDesc", resourceCulture);
+        public static string Zshot_PromptDesc => ResourceManager.GetString("Zshot_PromptDesc", resourceCulture);
+        public static string Zshot_HotkeyEditHint => ResourceManager.GetString("Zshot_HotkeyEditHint", resourceCulture);
+        public static string Zshot_LanguageRestartDesc => ResourceManager.GetString("Zshot_LanguageRestartDesc", resourceCulture);
+        public static string Zshot_AutoStartDesc => ResourceManager.GetString("Zshot_AutoStartDesc", resourceCulture);
+        public static string Zshot_PriorityStartDesc => ResourceManager.GetString("Zshot_PriorityStartDesc", resourceCulture);
+        public static string Zshot_ClearCacheDesc => ResourceManager.GetString("Zshot_ClearCacheDesc", resourceCulture);
+        public static string Zshot_ClearCacheAction => ResourceManager.GetString("Zshot_ClearCacheAction", resourceCulture);
     }
 }

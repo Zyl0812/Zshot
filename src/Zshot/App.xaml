@@ -1,4 +1,4 @@
-<Application x:Class="Zshot.App"
+﻿<Application x:Class="Zshot.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Zshot">
@@ -9,6 +9,13 @@
             </ResourceDictionary.MergedDictionaries>
 
             <ThemeShadow x:Key="ThemeShadow" />
+
+            <!--  设置页分组标题：组间距 24，标题到首张卡 8  -->
+            <Style x:Key="GroupHeaderStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Margin" Value="0,24,0,8" />
+            </Style>
 
             <AcrylicBrush x:Key="CustomAcrylicBrush"
                           FallbackColor="#F52C2C2C"

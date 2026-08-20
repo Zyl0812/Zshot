@@ -1,4 +1,4 @@
-using Microsoft.Graphics.Canvas;
+﻿using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Display;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -18,7 +18,6 @@ internal sealed class LongCaptureRunner
 {
     public async Task<CanvasRenderTarget?> RunAsync(
         Rect regionOnVirtualScreen,
-        int maxHeight,
         Action<string> setStatus,
         Task<bool> userDecision,
         CancellationToken cancellationToken)
@@ -29,8 +28,8 @@ internal sealed class LongCaptureRunner
             return null;
         }
 
-        maxHeight = Math.Clamp(maxHeight, 1000, 16384);
-        var buffer = new LongImageBuffer(maxHeight);
+        // 高度上限就是 D3D 纹理上限，没有可调空间
+        var buffer = new LongImageBuffer(16384);
         int width = (int)firstFrame.SizeInPixels.Width;
         int height = (int)firstFrame.SizeInPixels.Height;
         if (!buffer.TryAppend(height))

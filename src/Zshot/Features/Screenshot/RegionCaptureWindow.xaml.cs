@@ -1,4 +1,4 @@
-using Microsoft.Graphics.Canvas;
+﻿using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.UI.Xaml;
@@ -1202,7 +1202,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
             var runner = new LongCaptureRunner();
             var image = await runner.RunAsync(
                 region,
-                AppConfig.LongCaptureMaxHeight,
                 status => LongCaptureStatus.Text = status,
                 _longDecision.Task,
                 _longCts.Token);

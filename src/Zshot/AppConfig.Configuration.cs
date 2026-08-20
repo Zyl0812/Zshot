@@ -1,4 +1,4 @@
-using Zshot.Features.Database;
+﻿using Zshot.Features.Database;
 using Zshot.Helpers;
 using System;
 using System.Globalization;
@@ -53,8 +53,6 @@ public static partial class AppConfig
         // 首次启动不再弹欢迎页；托盘优先，直接建库。
         DatabaseService.SetDatabase(UserDataFolder);
 
-        // 应用强调色与语言
-        AccentColorHelper.ChangeAppAccentColor(AccentColor);
         SetLanguage(Language);
 
         // DB 后读用户配置的 LogFolder 覆盖（首次 DB 没值，保持默认）

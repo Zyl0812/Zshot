@@ -3,10 +3,12 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices.WindowsRuntime;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
+using Microsoft.UI.Xaml.Media;
 using Zshot.Core.Overlay;
 using Zshot.Features.Screenshot;
 using Zshot.Frameworks;
@@ -19,242 +21,13 @@ namespace Zshot.Features.Setting;
 public sealed partial class ScreenshotSetting : PageBase
 {
 
+    private TextBox? _lastFocusedTemplateBox;
 
-    public int ScreenshotSDRFormat
+    private static readonly string[] _tokens =
     {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.ScreenCaptureSDRFormat = value;
-            }
-        }
-    } = AppConfig.ScreenCaptureSDRFormat;
-
-
-    public int ScreenshotHDRFormat
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.ScreenCaptureHDRFormat = value;
-            }
-        }
-    } = AppConfig.ScreenCaptureHDRFormat;
-
-
-    public int ScreenshotQuality
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.ScreenCaptureEncodeQuality = value;
-            }
-        }
-    } = AppConfig.ScreenCaptureEncodeQuality;
-
-
-    private bool _enableColorManagement = AppConfig.EnableScreenshotColorManagement;
-    public bool EnableScreenshotColorManagement
-    {
-        get => _enableColorManagement;
-        set
-        {
-            if (value && !_enableColorManagement)
-            {
-                // 打开前先校验主显示器 primaries；畸形（VM/无 ICC）则弹 Error 并弹回关，避免截图编码时 lcms2 崩溃
-                _ = TryEnableColorManagementAsync();
-                return;
-            }
-            if (SetProperty(ref _enableColorManagement, value))
-            {
-                AppConfig.EnableScreenshotColorManagement = value;
-            }
-        }
-    }
-
-
-    private async Task TryEnableColorManagementAsync()
-    {
-        bool ok = await ScreenCaptureService.CanEnableColorManagementAsync();
-        if (ok)
-        {
-            _enableColorManagement = true;
-            AppConfig.EnableScreenshotColorManagement = true;
-            OnPropertyChanged(nameof(EnableScreenshotColorManagement));
-        }
-        else
-        {
-            InAppToast.MainWindow?.Error((string?)null, Lang.Zshot_ColorManagementUnavailable, 7000);
-            OnPropertyChanged(nameof(EnableScreenshotColorManagement));  // 刷新绑定，UI 弹回关
-        }
-    }
-
-
-    public bool AutoConvertScreenshotToSDR
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.AutoConvertScreenshotToSDR = value;
-            }
-        }
-    } = AppConfig.AutoConvertScreenshotToSDR;
-
-
-    public bool DeleteHDRIfSDRContent
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.DeleteHDRIfSDRContent = value;
-            }
-        }
-    } = AppConfig.DeleteHDRIfSDRContent;
-
-
-    public bool AutoCopyScreenshotToClipboard
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.AutoCopyScreenshotToClipboard = value;
-            }
-        }
-    } = AppConfig.AutoCopyScreenshotToClipboard;
-
-
-    public bool AutoSaveScreenshotToFile
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.AutoSaveScreenshotToFile = value;
-            }
-        }
-    } = AppConfig.AutoSaveScreenshotToFile;
-
-
-    public string ScreenshotFolderPath { get; set => SetProperty(ref field, value); } = AppConfig.ScreenshotFolder ?? "";
-
-
-    [RelayCommand]
-    private async Task ChangeScreenshotFolder()
-    {
-        string? folder = await FileDialogHelper.PickFolderAsync(this.XamlRoot);
-        if (Directory.Exists(folder))
-        {
-            ScreenshotFolderPath = folder;
-            AppConfig.ScreenshotFolder = folder;
-        }
-    }
-
-
-    [RelayCommand]
-    private async Task OpenScreenshotFolder()
-    {
-        if (Directory.Exists(ScreenshotFolderPath))
-        {
-            await Launcher.LaunchFolderPathAsync(ScreenshotFolderPath);
-        }
-    }
-
-
-    public int CaptureMonitorSource
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.ScreenshotCaptureMonitorSource = value;
-            }
-        }
-    } = AppConfig.ScreenshotCaptureMonitorSource;
-
-
-    public double TranslationTimeoutSeconds
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.TranslationTimeoutSeconds = (int)value;
-            }
-        }
-    } = AppConfig.TranslationTimeoutSeconds;
-
-
-    public string TranslationBaseUrl
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.TranslationBaseUrl = value;
-            }
-        }
-    } = AppConfig.TranslationBaseUrl;
-
-
-    public string TranslationModel
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.TranslationModel = value;
-            }
-        }
-    } = AppConfig.TranslationModel;
-
-
-    public string TranslationTargetLanguage
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.TranslationTargetLanguage = value;
-            }
-        }
-    } = AppConfig.TranslationTargetLanguage;
-
-
-    public string TranslationPrompt
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.TranslationPrompt = value;
-            }
-        }
-    } = AppConfig.TranslationPrompt;
-
-
-    public double LongCaptureMaxHeight
-    {
-        get; set
-        {
-            if (SetProperty(ref field, value))
-            {
-                AppConfig.LongCaptureMaxHeight = (int)value;
-            }
-        }
-    } = AppConfig.LongCaptureMaxHeight;
-
-
-    public ObservableCollection<OverlayToolbarItemOption> ToolbarItems { get; } = [];
+        "process", "processPath", "title", "timestamp", "time", "date",
+        "year", "month", "day", "hour", "minute", "second", "width", "height",
+    };
 
 
     public ScreenshotSetting()
@@ -268,12 +41,20 @@ public sealed partial class ScreenshotSetting : PageBase
         }
 
         InitializeComponent();
-        string? key = SecretStorageService.Load("apiKey");
-        if (!string.IsNullOrEmpty(key))
-        {
-            ApiKeyBox.Password = key;
-        }
+        _lastFocusedTemplateBox = FileNameTextBox;
+        BuildPlaceholderLinks();
+        UpdateHiddenCount();
     }
+
+
+
+    #region Overlay Toolbar
+
+
+    public ObservableCollection<OverlayToolbarItemOption> ToolbarItems { get; } = [];
+
+
+    public string HiddenCountText { get; set => SetProperty(ref field, value); } = "";
 
 
     private void OverlayToolbarItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -285,6 +66,14 @@ public sealed partial class ScreenshotSetting : PageBase
 
         AppConfig.OverlayToolbarHidden = OverlayToolbarCatalog.SerializeHidden(
             ToolbarItems.Where(item => !item.IsVisible).Select(item => item.Id));
+        UpdateHiddenCount();
+    }
+
+
+    private void UpdateHiddenCount()
+    {
+        int hidden = ToolbarItems.Count(item => !item.IsVisible);
+        HiddenCountText = hidden == 0 ? Lang.ScreenshotSetting_ToolbarNoneHidden : string.Format(Lang.ScreenshotSetting_ToolbarHiddenCount, hidden);
     }
 
 
@@ -311,11 +100,191 @@ public sealed partial class ScreenshotSetting : PageBase
     } ?? id;
 
 
-    private void ApiKeyBox_LostFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    #endregion
+
+
+
+    #region Save
+
+
+    public bool AutoSaveScreenshotToFile
     {
-        SecretStorageService.Save("apiKey", ApiKeyBox.Password);
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.AutoSaveScreenshotToFile = value;
+            }
+        }
+    } = AppConfig.AutoSaveScreenshotToFile;
+
+
+    public bool AutoCopyScreenshotToClipboard
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.AutoCopyScreenshotToClipboard = value;
+            }
+        }
+    } = AppConfig.AutoCopyScreenshotToClipboard;
+
+
+    public string ScreenshotFolderPath { get; set => SetProperty(ref field, value); } = ResolveScreenshotFolder();
+
+
+    private static string ResolveScreenshotFolder()
+    {
+        string? folder = AppConfig.ScreenshotFolder;
+        if (string.IsNullOrWhiteSpace(folder))
+        {
+            folder = Path.Join(AppConfig.LogFolder, "Screenshots");
+        }
+        try { Directory.CreateDirectory(folder); } catch { }
+        return folder;
     }
 
+
+    [RelayCommand]
+    private async Task ChangeScreenshotFolder()
+    {
+        string? folder = await FileDialogHelper.PickFolderAsync(this.XamlRoot);
+        if (Directory.Exists(folder))
+        {
+            ScreenshotFolderPath = folder;
+            AppConfig.ScreenshotFolder = folder;
+        }
+    }
+
+
+    [RelayCommand]
+    private async Task OpenScreenshotFolder()
+    {
+        if (Directory.Exists(ScreenshotFolderPath))
+        {
+            await Launcher.LaunchFolderPathAsync(ScreenshotFolderPath);
+        }
+    }
+
+
+    #endregion
+
+
+
+    #region File Name Template
+
+
+    public string FileNamePattern
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.ScreenshotFileNamePattern = value;
+                FileNamePreview = BuildPreview(value);
+            }
+        }
+    } = AppConfig.ScreenshotFileNamePattern;
+
+
+    public string FileNamePreview { get; set => SetProperty(ref field, value); } = BuildPreview(AppConfig.ScreenshotFileNamePattern);
+
+
+    public string RegionFileNamePattern
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.RegionScreenshotFileNamePattern = value;
+                RegionFileNamePreview = BuildPreview(value);
+            }
+        }
+    } = AppConfig.RegionScreenshotFileNamePattern;
+
+
+    public string RegionFileNamePreview { get; set => SetProperty(ref field, value); } = BuildPreview(AppConfig.RegionScreenshotFileNamePattern);
+
+
+    public int FileNameTitleMaxLength
+    {
+        get; set
+        {
+            if (SetProperty(ref field, value))
+            {
+                AppConfig.ScreenshotFileNameTitleMaxLength = value;
+                FileNamePreview = BuildPreview(FileNamePattern);
+                RegionFileNamePreview = BuildPreview(RegionFileNamePattern);
+            }
+        }
+    } = AppConfig.ScreenshotFileNameTitleMaxLength;
+
+
+    private static string BuildPreview(string pattern)
+    {
+        return ScreenCaptureService.BuildFileName("explorer", "explorer.exe", "StarRail", DateTimeOffset.Now, 3840, 2160, pattern) + ".png";
+    }
+
+
+    private void BuildPlaceholderLinks()
+    {
+        PlaceholderTextBlock.Inlines.Clear();
+        // 第一行：说明 + GitHub 链接
+        PlaceholderTextBlock.Inlines.Add(new Run { Text = Lang.Zshot_ClickToInsert });
+        var help = new Hyperlink { NavigateUri = new Uri(GetHelpUrl()) };
+        help.Inlines.Add(new Run { Text = "Github" + Lang.Zshot_ClickToInsertSuffix });
+        PlaceholderTextBlock.Inlines.Add(help);
+        PlaceholderTextBlock.Inlines.Add(new LineBreak());
+        // 按钮区：每个占位符一个链接（文字不带 {}，点击插入 {token}）
+        for (int i = 0; i < _tokens.Length; i++)
+        {
+            if (i > 0)
+            {
+                PlaceholderTextBlock.Inlines.Add(new Run { Text = "  " });
+            }
+            string token = "{" + _tokens[i] + "}";
+            var link = new Hyperlink { UnderlineStyle = UnderlineStyle.None };
+            link.Inlines.Add(new Run
+            {
+                Text = _tokens[i],
+                FontFamily = new FontFamily("Consolas, Cascadia Code, Microsoft YaHei UI"),
+            });
+            link.Click += (_, _) => InsertToken(token);
+            PlaceholderTextBlock.Inlines.Add(link);
+        }
+    }
+
+
+    private static string GetHelpUrl()
+    {
+        const string repo = "https://github.com/Zyl0812/Zshot";
+        // 文档只维护中英两份：中文是根 README，其余语言走 docs/README.en.md
+        return AppConfig.Language switch
+        {
+            "zh-CN" or "zh-TW" => $"{repo}#文件名模板",
+            _ => $"{repo}/blob/main/docs/README.en.md#filename-templates",
+        };
+    }
+
+
+    private void TemplateTextBox_GotFocus(object sender, RoutedEventArgs e)
+    {
+        _lastFocusedTemplateBox = (TextBox)sender;
+    }
+
+
+    private void InsertToken(string token)
+    {
+        var box = _lastFocusedTemplateBox ?? FileNameTextBox;
+        int pos = box.SelectionStart;
+        box.Text = box.Text.Insert(pos, token);
+        box.SelectionStart = pos + token.Length;
+        box.Focus(FocusState.Programmatic);
+    }
+
+
+    #endregion
 
 }
 
