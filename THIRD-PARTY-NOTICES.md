@@ -31,6 +31,7 @@ The following libraries are used by Zshot. Their licenses are those of the respe
 - ComputeSharp.D2D1.WinUI
 - SkiaSharp (MIT) — pulled in by RapidOcrNet as its image backend
 - Microsoft.ML.OnnxRuntime (MIT) — OCR inference runtime
+- Inno Setup — Windows installer builder
 
 ## OCR (Apache License 2.0)
 

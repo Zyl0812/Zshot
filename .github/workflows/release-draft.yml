@@ -66,6 +66,8 @@ jobs:
           prerelease: ${{ inputs.prerelease }}
           files: |
             x64/Zshot-${{ needs.build.outputs.vl }}-win-x64.zip
+            x64/Zshot-${{ needs.build.outputs.vl }}-win-x64-setup.exe
             arm64/Zshot-${{ needs.build.outputs.vl }}-win-arm64.zip
+            arm64/Zshot-${{ needs.build.outputs.vl }}-win-arm64-setup.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -38,6 +38,8 @@ Zshot 基于 [Starshot](https://github.com/loliri/Starshot) 二次开发，继�
 
 ## 快速上手
 
+在 [Releases](../../releases) 下载与你的系统架构对应的 `setup.exe` 安装包；如果不想安装，也可以下载 ZIP，完整解压后运行根目录的 `Zshot.exe`。
+
 装好后程序静默进托盘，直接按热键即可：
 
 | 热键 | 动作 |
