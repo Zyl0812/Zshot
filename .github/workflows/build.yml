@@ -216,7 +216,7 @@ jobs:
           # 读 release 历史（tag + prerelease 字段，倒序；/releases 默认不含 draft）
           # 不从版本号判断正式/预览——只认 release.prerelease 字段
           $raw = gh api repos/${{ github.repository }}/releases 2>$null
-          $releases = if ($LASTEXITCODE -eq 0 -and $raw) { $raw | ConvertFrom-Json } else { $null }
+          $releases = if ($LASTEXITCODE -eq 0 -and $raw) { @($raw | ConvertFrom-Json) } else { $null }
           if (-not $releases) { Write-Host "No releases, skipping delta"; exit 0 }
 
           # 上一个 stable（prerelease=false 最近的）
