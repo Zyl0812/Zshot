@@ -50,7 +50,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private const int HtTransparent = -1;
 
     public Rect SelectionRect { get; private set; }
-    public bool IsConfirmed { get; private set; }
     // 确认时从 _displayBitmap（冻结帧，已 tonemap 的 SDR）裁出的选区，供剪贴板直接复用，不再二次 tonemap
     public CanvasRenderTarget? SdrCrop { get; private set; }
 
@@ -179,7 +178,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
         // 重置交互状态（为本次截图清场）
         SelectionRect = default;
-        IsConfirmed = false;
         SdrCrop = null;
         _positionOnClick = default;
         _isMouseDown = false;
@@ -721,7 +719,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
         CancelLongCaptureInternal(restorePhase: false);
         SetExcludeFromCapture(false);
         HideChrome();
-        IsConfirmed = result.Confirmed;
         if (result.Confirmed && result.FlattenedSdr is null)
         {
             try { result = new RegionOverlayResult { End = result.End, FlattenedSdr = FlattenSelection() }; } catch { }
@@ -752,21 +749,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
         int vh = User32.GetSystemMetrics((User32.SystemMetric)79);
         User32.SetWindowPos(WindowHandle, IntPtr.Zero, vx, vy, vw, vh, User32.SetWindowPosFlags.SWP_NOZORDER);
         Activate();
-    }
-
-    // 从 _displayBitmap 裁出选区为 B8G8R8A8 SDR（CF_DIB 要 BGRA）
-    private CanvasRenderTarget CropDisplayToBgra()
-    {
-        var srcRect = GetPhysicalSourceRect();
-        int w = (int)srcRect.Width;
-        int h = (int)srcRect.Height;
-        var device = CanvasDevice.GetSharedDevice();
-        var rt = new CanvasRenderTarget(device, w, h, 96, DirectXPixelFormat.B8G8R8A8UIntNormalized, CanvasAlphaMode.Premultiplied);
-        using (var ds = rt.CreateDrawingSession())
-        {
-            ds.DrawImage(_displayBitmap, new Windows.Foundation.Rect(0, 0, w, h), srcRect, 1f, CanvasImageInterpolation.Linear);
-        }
-        return rt;
     }
 
     private void RegionCaptureWindow_Closed(object sender, WindowEventArgs e)
@@ -874,7 +856,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
     {
         _selectionFromDrag = fromDrag;
         _phase = OverlayPhase.SelectionActive;
-        IsConfirmed = true;
         _isMouseDown = false;
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Arrow);
         ToolbarBorder.Visibility = Visibility.Visible;
@@ -886,7 +867,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private void HandleEditingPressed(Point pos, PointerRoutedEventArgs e)
     {
         var point = new EditorPoint(pos.X, pos.Y);
-        var bounds = CanvasBounds();
         var hit = SelectionInteraction.HitTest(ToEditorRect(SelectionRect), point, HandleSize);
         bool canResize = hit is not SelectionHitKind.None and not SelectionHitKind.Inside;
         bool canMove = hit == SelectionHitKind.Inside && _editor.Tool == "select" &&
