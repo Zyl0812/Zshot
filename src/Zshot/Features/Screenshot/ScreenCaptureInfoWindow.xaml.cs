@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graphics.Canvas;
@@ -88,6 +88,8 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
 
 
 
+    // 不变式：总数只由 CaptureStart 递增，完成数只由 CaptureSuccess / CaptureCopySuccess 递增。
+    // 每条截图路径必须恰好调一次 CaptureStart，否则 complete 永真（进度环、N/M、编码中不隐藏全部失效）。
     private int _captureImageCount;
 
     private int _finishedImageCount;
@@ -209,7 +211,6 @@ public sealed partial class ScreenCaptureInfoWindow : WindowEx
             IsSuccess = true;
             IsError = false;
             _isCopy = true;
-            _captureImageCount++;
             _finishedImageCount++;
             CropImage(bitmap, GetDpiForMonitor(displayId), maxCLL);
             _cancellationTokenSource?.Cancel();

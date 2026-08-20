@@ -112,8 +112,6 @@ internal class ScreenCaptureService
                 sdrWhiteLevel = (float)colorInfo.SdrWhiteLevelInNits;
             }
 
-            _infoWindow ??= new ScreenCaptureInfoWindow();
-            _infoWindow.CaptureStart(displayId, canvasBitmap, maxCLL);
             captureStarted = true;
 
             string windowTitle = "";
@@ -320,9 +318,19 @@ internal class ScreenCaptureService
                 AppConfig.AutoSaveScreenshotToFile,
                 AppConfig.AutoCopyScreenshotToClipboard);
 
+            Interlocked.Exchange(ref _isCapturing, 0);
+            guardReleased = true;
+
             CanvasBitmap export = sdrCrop;
             bool writeFile = decision.WriteFile;
             bool copy = decision.CopyToClipboard;
+
+            // 区域截图自己走 SaveSdrExportAsync，不经 SaveCaptureAsync 的提示条分支，这里补开条
+            if (writeFile || copy)
+            {
+                _infoWindow ??= new ScreenCaptureInfoWindow();
+                _infoWindow.CaptureStart(regionDisplayId, export, maxCLL);
+            }
 
             if (hdr && writeFile && cropped is not null)
             {
@@ -340,14 +348,13 @@ internal class ScreenCaptureService
                 await CopyCaptureToClipboardAsync(export, force: true);
             }
 
-            _infoWindow ??= new ScreenCaptureInfoWindow();
             if (writeFile && sdrPath is not null)
             {
-                _infoWindow.CaptureSuccess(regionDisplayId, export, sdrPath, maxCLL);
+                _infoWindow?.CaptureSuccess(regionDisplayId, export, sdrPath, maxCLL);
             }
             else if (copy)
             {
-                _infoWindow.CaptureCopySuccess(regionDisplayId, export, maxCLL);
+                _infoWindow?.CaptureCopySuccess(regionDisplayId, export, maxCLL);
             }
 
             _logger.LogInformation("Region screenshot saved");
@@ -383,12 +390,22 @@ internal class ScreenCaptureService
             ? ScreenshotSavePolicy.GetFullscreenClipboardKind(AppConfig.AutoSaveScreenshotToFile, AppConfig.AutoCopyScreenshotToClipboard, copyOnlyHotkey: false)
             : ClipboardExportKind.None;
 
+        // 提示条：确定这次真会产出（写文件或进剪贴板）才开条，否则 CaptureStart 没有配对的 Success，转圈不会停
+        if (notifyInfoWindow && (writeFile || clipboardKind is not ClipboardExportKind.None))
+        {
+            _infoWindow ??= new ScreenCaptureInfoWindow();
+            _infoWindow.CaptureStart(displayId, bitmap, maxCLL);
+        }
+
         if (!writeFile)
         {
             if (clipboardKind is ClipboardExportKind.SdrBitmap)
             {
                 await CopySdrBitmapToClipboardAsync(bitmap, sdrWhiteLevel);
-                _infoWindow?.CaptureCopySuccess(displayId, bitmap, maxCLL);
+                if (notifyInfoWindow)
+                {
+                    _infoWindow?.CaptureCopySuccess(displayId, bitmap, maxCLL);
+                }
             }
             return;
         }
@@ -423,13 +440,7 @@ internal class ScreenCaptureService
             writeColorProfile = true;
         }
 
-        string? targetFolder = AppConfig.ScreenshotFolder;
-        if (string.IsNullOrWhiteSpace(targetFolder))
-        {
-            targetFolder = Path.Join(AppConfig.UserDataFolder, "Screenshots");
-        }
-        string screenshotFolder = Path.GetFullPath(targetFolder);
-        Directory.CreateDirectory(screenshotFolder);
+        string screenshotFolder = ResolveScreenshotFolder();
 
         // 扩展名：HDR 输出走 HDR 格式；SDR（含 deleteHDR）走 SDR 格式
         string extension = outputIsHDR
@@ -449,28 +460,11 @@ internal class ScreenCaptureService
             if (deleteHDR)
             {
                 using CanvasRenderTarget sdrBitmap = TonemapToSdr(bitmap, sdrWhiteLevel);
-                if (extension is "png")
-                    await ImageSaver.SaveAsPngAsync(sdrBitmap, ms, ColorPrimaries.BT709, xmpData, false);
-                else if (extension is "avif")
-                    await ImageSaver.SaveAsAvifAsync(sdrBitmap, ms, ColorPrimaries.BT709, quality, xmpData, false);
-                else
-                    await ImageSaver.SaveAsJxlAsync(sdrBitmap, ms, ColorPrimaries.BT709, distance, xmpData, false);
-            }
-            else if (extension is "png")
-            {
-                await ImageSaver.SaveAsPngAsync(bitmap, ms, colorPrimaries, xmpData, writeColorProfile);
-            }
-            else if (extension is "avif")
-            {
-                await ImageSaver.SaveAsAvifAsync(bitmap, ms, colorPrimaries, quality, xmpData, writeColorProfile);
-            }
-            else if (extension is "jxl")
-            {
-                await ImageSaver.SaveAsJxlAsync(bitmap, ms, colorPrimaries, distance, xmpData, writeColorProfile);
+                await EncodeAsync(sdrBitmap, ms, extension, ColorPrimaries.BT709, xmpData, false, quality, distance);
             }
             else
             {
-                throw new NotSupportedException($"Unsupported image format: {extension}");
+                await EncodeAsync(bitmap, ms, extension, colorPrimaries, xmpData, writeColorProfile, quality, distance);
             }
         }
         finally
@@ -532,14 +526,7 @@ internal class ScreenCaptureService
 
     private async Task<string> SaveSdrExportAsync(CanvasBitmap bitmap, string processName, string processExeName, string windowTitle, DateTimeOffset frameTime, bool isRegion)
     {
-        string? targetFolder = AppConfig.ScreenshotFolder;
-        if (string.IsNullOrWhiteSpace(targetFolder))
-        {
-            targetFolder = Path.Join(AppConfig.UserDataFolder, "Screenshots");
-        }
-
-        string screenshotFolder = Path.GetFullPath(targetFolder);
-        Directory.CreateDirectory(screenshotFolder);
+        string screenshotFolder = ResolveScreenshotFolder();
         string extension = AppConfig.ScreenCaptureSDRFormat switch { 1 => "avif", 2 => "jxl", _ => "png" };
         string filePath = Path.Combine(screenshotFolder,
             $"{BuildFileName(processName, processExeName, windowTitle, frameTime, bitmap.SizeInPixels.Width, bitmap.SizeInPixels.Height, isRegion ? AppConfig.RegionScreenshotFileNamePattern : null)}.{extension}");
@@ -553,18 +540,7 @@ internal class ScreenCaptureService
         await _encodeSlim.WaitAsync();
         try
         {
-            if (extension is "png")
-            {
-                await ImageSaver.SaveAsPngAsync(bitmap, ms, ColorPrimaries.BT709, xmpData, false);
-            }
-            else if (extension is "avif")
-            {
-                await ImageSaver.SaveAsAvifAsync(bitmap, ms, ColorPrimaries.BT709, quality, xmpData, false);
-            }
-            else
-            {
-                await ImageSaver.SaveAsJxlAsync(bitmap, ms, ColorPrimaries.BT709, distance, xmpData, false);
-            }
+            await EncodeAsync(bitmap, ms, extension, ColorPrimaries.BT709, xmpData, false, quality, distance);
         }
         finally
         {
@@ -575,6 +551,31 @@ internal class ScreenCaptureService
         ms.Seek(0, SeekOrigin.Begin);
         await ms.CopyToAsync(fs);
         return filePath;
+    }
+
+    /// <summary>按扩展名分派编码器。主保存与区域 SDR 导出共用，避免两处三分支各写一遍。</summary>
+    private static Task EncodeAsync(CanvasBitmap bitmap, Stream stream, string extension,
+        ColorPrimaries colorPrimaries, byte[] xmpData, bool writeColorProfile, int quality, float distance)
+        => extension switch
+        {
+            "png" => ImageSaver.SaveAsPngAsync(bitmap, stream, colorPrimaries, xmpData, writeColorProfile),
+            "avif" => ImageSaver.SaveAsAvifAsync(bitmap, stream, colorPrimaries, quality, xmpData, writeColorProfile),
+            "jxl" => ImageSaver.SaveAsJxlAsync(bitmap, stream, colorPrimaries, distance, xmpData, writeColorProfile),
+            _ => throw new NotSupportedException($"Unsupported image format: {extension}"),
+        };
+
+
+    private static string ResolveScreenshotFolder()
+    {
+        string? targetFolder = AppConfig.ScreenshotFolder;
+        if (string.IsNullOrWhiteSpace(targetFolder))
+        {
+            targetFolder = Path.Join(AppConfig.UserDataFolder, "Screenshots");
+        }
+
+        string screenshotFolder = Path.GetFullPath(targetFolder);
+        Directory.CreateDirectory(screenshotFolder);
+        return screenshotFolder;
     }
 
 

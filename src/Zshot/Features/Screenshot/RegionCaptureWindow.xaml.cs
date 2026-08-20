@@ -1231,7 +1231,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
             AppConfig.AutoCopyScreenshotToClipboard);
         if (!decision.CanEndSession)
         {
-            HintText.Text = "请先保存或复制";
+            HintText.Text = Lang.Overlay_SaveOrCopyFirst;
             HintText.Visibility = Visibility.Visible;
             return;
         }
