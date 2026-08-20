@@ -865,6 +865,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
         PointerCursor.SetCursorShape(Canvas, InputSystemCursorShape.Arrow);
         ToolbarBorder.Visibility = Visibility.Visible;
         LongCaptureBar.Visibility = Visibility.Collapsed;
+        ApplyToolbarVisibility();
         LayoutChrome();
         RootGrid.Focus(FocusState.Programmatic);
     }
@@ -1062,8 +1063,30 @@ public sealed partial class RegionCaptureWindow : WindowEx
 
     private void SyncToolChrome()
     {
-        ColorChipBorder.Visibility = _editor.Tool is "select" or "" ? Visibility.Collapsed : Visibility.Visible;
+        var hidden = OverlayToolbarCatalog.ParseHidden(AppConfig.OverlayToolbarHidden);
+        bool showColor = OverlayToolbarCatalog.IsVisible(OverlayToolbarCatalog.Color, hidden)
+            && _editor.Tool is not "select" and not "";
+        ColorChipBorder.Visibility = showColor ? Visibility.Visible : Visibility.Collapsed;
         LayoutChrome();
+    }
+
+    private void ApplyToolbarVisibility()
+    {
+        var hidden = OverlayToolbarCatalog.ParseHidden(AppConfig.OverlayToolbarHidden);
+        foreach (var child in ToolbarPanel.Children)
+        {
+            if (child is FrameworkElement { Tag: string id } element)
+            {
+                element.Visibility = OverlayToolbarCatalog.IsVisible(id, hidden)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
+        if (!OverlayToolbarCatalog.IsVisible(_editor.Tool, hidden))
+        {
+            _editor.Tool = OverlayToolbarCatalog.Select;
+        }
     }
 
     private void ResultClose_Click(object sender, RoutedEventArgs e)
@@ -1076,8 +1099,6 @@ public sealed partial class RegionCaptureWindow : WindowEx
     private void Redo_Click(object sender, RoutedEventArgs e) => _editor.Redo();
 
     private void Clear_Click(object sender, RoutedEventArgs e) => _editor.Clear();
-
-    private void Copy_Click(object sender, RoutedEventArgs e) => RequestExport(OverlayExportAction.CopyOnly);
 
     private void Save_Click(object sender, RoutedEventArgs e) => RequestExport(OverlayExportAction.Save);
 
@@ -1216,6 +1237,7 @@ public sealed partial class RegionCaptureWindow : WindowEx
         SetExcludeFromCapture(false);
         ToolbarBorder.Visibility = Visibility.Visible;
         LongCaptureBar.Visibility = Visibility.Collapsed;
+        ApplyToolbarVisibility();
         LayoutChrome();
     }
 

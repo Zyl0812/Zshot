@@ -181,11 +181,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
                     BorderThickness="1"
                     CornerRadius="22"
                     Visibility="Collapsed">
-                <StackPanel Orientation="Horizontal" Spacing="2">
+                <StackPanel x:Name="ToolbarPanel" Orientation="Horizontal" Spacing="2">
                     <Button x:Name="ColorSwatchButton"
                             Style="{StaticResource OverlayIconButton}"
                             Click="ColorSwatch_Click"
                             CornerRadius="18"
+                            Tag="color"
                             ToolTipService.ToolTip="颜色 / 线宽">
                         <Border x:Name="ColorSwatch"
                                 Width="16"
@@ -220,28 +221,25 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
                     <Button Style="{StaticResource OverlayIconButton}" Click="Tool_Click" Tag="number" ToolTipService.ToolTip="序号">
                         <FontIcon FontSize="16" Glyph="&#xE8FD;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Undo_Click" ToolTipService.ToolTip="撤销">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Undo_Click" Tag="undo" ToolTipService.ToolTip="撤销">
                         <FontIcon FontSize="16" Glyph="&#xE7A7;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Redo_Click" ToolTipService.ToolTip="重做">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Redo_Click" Tag="redo" ToolTipService.ToolTip="重做">
                         <FontIcon FontSize="16" Glyph="&#xE7A6;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Clear_Click" ToolTipService.ToolTip="清空">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Clear_Click" Tag="clear" ToolTipService.ToolTip="清空">
                         <FontIcon FontSize="16" Glyph="&#xE74D;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Ocr_Click" ToolTipService.ToolTip="OCR">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Ocr_Click" Tag="ocr" ToolTipService.ToolTip="OCR">
                         <FontIcon FontSize="16" Glyph="&#xE8EC;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Translate_Click" ToolTipService.ToolTip="翻译">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Translate_Click" Tag="translate" ToolTipService.ToolTip="翻译">
                         <FontIcon FontSize="16" Glyph="&#xE8C1;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="LongCapture_Click" ToolTipService.ToolTip="长截图">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="LongCapture_Click" Tag="longCapture" ToolTipService.ToolTip="长截图">
                         <FontIcon FontSize="16" Glyph="&#xE8A4;" />
                     </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Copy_Click" ToolTipService.ToolTip="复制">
-                        <FontIcon FontSize="16" Glyph="&#xE8C8;" />
-                    </Button>
-                    <Button Style="{StaticResource OverlayIconButton}" Click="Save_Click" ToolTipService.ToolTip="保存">
+                    <Button Style="{StaticResource OverlayIconButton}" Click="Save_Click" Tag="save" ToolTipService.ToolTip="保存">
                         <FontIcon FontSize="16" Glyph="&#xE74E;" />
                     </Button>
                     <Button Style="{StaticResource OverlayAccentButton}"

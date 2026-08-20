@@ -817,6 +817,60 @@
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← To change this option, turn off high priority start first</value>
   </data>
+  <data name="ScreenshotSetting_Toolbar" xml:space="preserve">
+    <value>Toolbar</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarDesc" xml:space="preserve">
+    <value>Choose which buttons appear on the capture toolbar. Order is fixed.</value>
+  </data>
+  <data name="Overlay_Color" xml:space="preserve">
+    <value>Color / stroke</value>
+  </data>
+  <data name="Overlay_Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Overlay_Rect" xml:space="preserve">
+    <value>Rectangle</value>
+  </data>
+  <data name="Overlay_Ellipse" xml:space="preserve">
+    <value>Ellipse</value>
+  </data>
+  <data name="Overlay_Line" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="Overlay_Arrow" xml:space="preserve">
+    <value>Arrow</value>
+  </data>
+  <data name="Overlay_Pen" xml:space="preserve">
+    <value>Pen</value>
+  </data>
+  <data name="Overlay_Text" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="Overlay_Number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="Overlay_Undo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="Overlay_Redo" xml:space="preserve">
+    <value>Redo</value>
+  </data>
+  <data name="Overlay_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Overlay_Ocr" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="Overlay_Translate" xml:space="preserve">
+    <value>Translate</value>
+  </data>
+  <data name="Overlay_LongCapture" xml:space="preserve">
+    <value>Long capture</value>
+  </data>
+  <data name="Overlay_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
   <data name="ScreenshotSetting_Ocr" xml:space="preserve">
     <value>OCR</value>
   </data>

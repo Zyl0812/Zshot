@@ -817,6 +817,60 @@
   <data name="Zshot_TurnOffPriorityFirst" xml:space="preserve">
     <value>← このオプションを変更するには、先に高優先起動をオフにしてください</value>
   </data>
+  <data name="ScreenshotSetting_Toolbar" xml:space="preserve">
+    <value>ツールバー</value>
+  </data>
+  <data name="ScreenshotSetting_ToolbarDesc" xml:space="preserve">
+    <value>スクリーンショットのツールバーに表示するボタンを選びます。並び順は固定です。</value>
+  </data>
+  <data name="Overlay_Color" xml:space="preserve">
+    <value>色 / 線幅</value>
+  </data>
+  <data name="Overlay_Select" xml:space="preserve">
+    <value>選択</value>
+  </data>
+  <data name="Overlay_Rect" xml:space="preserve">
+    <value>四角形</value>
+  </data>
+  <data name="Overlay_Ellipse" xml:space="preserve">
+    <value>楕円</value>
+  </data>
+  <data name="Overlay_Line" xml:space="preserve">
+    <value>直線</value>
+  </data>
+  <data name="Overlay_Arrow" xml:space="preserve">
+    <value>矢印</value>
+  </data>
+  <data name="Overlay_Pen" xml:space="preserve">
+    <value>ペン</value>
+  </data>
+  <data name="Overlay_Text" xml:space="preserve">
+    <value>テキスト</value>
+  </data>
+  <data name="Overlay_Number" xml:space="preserve">
+    <value>番号</value>
+  </data>
+  <data name="Overlay_Undo" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="Overlay_Redo" xml:space="preserve">
+    <value>やり直し</value>
+  </data>
+  <data name="Overlay_Clear" xml:space="preserve">
+    <value>クリア</value>
+  </data>
+  <data name="Overlay_Ocr" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="Overlay_Translate" xml:space="preserve">
+    <value>翻訳</value>
+  </data>
+  <data name="Overlay_LongCapture" xml:space="preserve">
+    <value>スクロールキャプチャ</value>
+  </data>
+  <data name="Overlay_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
   <data name="ScreenshotSetting_Ocr" xml:space="preserve">
     <value>OCR</value>
   </data>

@@ -5,6 +5,7 @@
              xmlns:cwc="using:CommunityToolkit.WinUI.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:lang="using:Zshot.Language"
+             xmlns:local="using:Zshot.Features.Setting"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sf="using:Zshot.Frameworks"
              x:DefaultBindMode="OneWay"
@@ -17,6 +18,29 @@
             <TextBlock FontSize="20"
                        FontWeight="SemiBold"
                        Text="{x:Bind lang:Lang.Zshot_Nav_Screenshot}" />
+
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="20" Text="{x:Bind lang:Lang.ScreenshotSetting_Toolbar}" />
+                <TextBlock FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind lang:Lang.ScreenshotSetting_ToolbarDesc}"
+                           TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{x:Bind ToolbarItems}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VariableSizedWrapGrid Orientation="Horizontal"
+                                                   MaximumRowsOrColumns="4"
+                                                   ItemWidth="148" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local:OverlayToolbarItemOption">
+                            <CheckBox Content="{x:Bind Label}"
+                                      IsChecked="{x:Bind IsVisible, Mode=TwoWay}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
 
 
             <!--  格式与质量  -->

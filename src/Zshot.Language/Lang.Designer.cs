@@ -2142,6 +2142,24 @@
             }
         }
 
+        public static string ScreenshotSetting_Toolbar => ResourceManager.GetString("ScreenshotSetting_Toolbar", resourceCulture);
+        public static string ScreenshotSetting_ToolbarDesc => ResourceManager.GetString("ScreenshotSetting_ToolbarDesc", resourceCulture);
+        public static string Overlay_Color => ResourceManager.GetString("Overlay_Color", resourceCulture);
+        public static string Overlay_Select => ResourceManager.GetString("Overlay_Select", resourceCulture);
+        public static string Overlay_Rect => ResourceManager.GetString("Overlay_Rect", resourceCulture);
+        public static string Overlay_Ellipse => ResourceManager.GetString("Overlay_Ellipse", resourceCulture);
+        public static string Overlay_Line => ResourceManager.GetString("Overlay_Line", resourceCulture);
+        public static string Overlay_Arrow => ResourceManager.GetString("Overlay_Arrow", resourceCulture);
+        public static string Overlay_Pen => ResourceManager.GetString("Overlay_Pen", resourceCulture);
+        public static string Overlay_Text => ResourceManager.GetString("Overlay_Text", resourceCulture);
+        public static string Overlay_Number => ResourceManager.GetString("Overlay_Number", resourceCulture);
+        public static string Overlay_Undo => ResourceManager.GetString("Overlay_Undo", resourceCulture);
+        public static string Overlay_Redo => ResourceManager.GetString("Overlay_Redo", resourceCulture);
+        public static string Overlay_Clear => ResourceManager.GetString("Overlay_Clear", resourceCulture);
+        public static string Overlay_Ocr => ResourceManager.GetString("Overlay_Ocr", resourceCulture);
+        public static string Overlay_Translate => ResourceManager.GetString("Overlay_Translate", resourceCulture);
+        public static string Overlay_LongCapture => ResourceManager.GetString("Overlay_LongCapture", resourceCulture);
+        public static string Overlay_Save => ResourceManager.GetString("Overlay_Save", resourceCulture);
         public static string ScreenshotSetting_Ocr => ResourceManager.GetString("ScreenshotSetting_Ocr", resourceCulture);
         public static string ScreenshotSetting_OcrWindows => ResourceManager.GetString("ScreenshotSetting_OcrWindows", resourceCulture);
         public static string ScreenshotSetting_Translation => ResourceManager.GetString("ScreenshotSetting_Translation", resourceCulture);

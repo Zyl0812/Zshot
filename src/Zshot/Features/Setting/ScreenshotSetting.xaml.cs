@@ -1,9 +1,13 @@
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
+using Zshot.Core.Overlay;
 using Zshot.Features.Screenshot;
 using Zshot.Frameworks;
 using Zshot.Helpers;
@@ -250,8 +254,19 @@ public sealed partial class ScreenshotSetting : PageBase
     } = AppConfig.LongCaptureMaxHeight;
 
 
+    public ObservableCollection<OverlayToolbarItemOption> ToolbarItems { get; } = [];
+
+
     public ScreenshotSetting()
     {
+        var hidden = OverlayToolbarCatalog.ParseHidden(AppConfig.OverlayToolbarHidden);
+        foreach (var id in OverlayToolbarCatalog.Customizable)
+        {
+            var item = new OverlayToolbarItemOption(id, LabelFor(id), !hidden.Contains(id));
+            item.PropertyChanged += OverlayToolbarItem_PropertyChanged;
+            ToolbarItems.Add(item);
+        }
+
         InitializeComponent();
         string? key = SecretStorageService.Load("apiKey");
         if (!string.IsNullOrEmpty(key))
@@ -261,10 +276,67 @@ public sealed partial class ScreenshotSetting : PageBase
     }
 
 
+    private void OverlayToolbarItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(OverlayToolbarItemOption.IsVisible))
+        {
+            return;
+        }
+
+        AppConfig.OverlayToolbarHidden = OverlayToolbarCatalog.SerializeHidden(
+            ToolbarItems.Where(item => !item.IsVisible).Select(item => item.Id));
+    }
+
+
+    private static string LabelFor(string id) => id switch
+    {
+        OverlayToolbarCatalog.Color => Lang.Overlay_Color,
+        OverlayToolbarCatalog.Select => Lang.Overlay_Select,
+        OverlayToolbarCatalog.Rect => Lang.Overlay_Rect,
+        OverlayToolbarCatalog.Ellipse => Lang.Overlay_Ellipse,
+        OverlayToolbarCatalog.Line => Lang.Overlay_Line,
+        OverlayToolbarCatalog.Arrow => Lang.Overlay_Arrow,
+        OverlayToolbarCatalog.Pen => Lang.Overlay_Pen,
+        OverlayToolbarCatalog.Text => Lang.Overlay_Text,
+        OverlayToolbarCatalog.Mosaic => Lang.Overlay_Mosaic,
+        OverlayToolbarCatalog.Number => Lang.Overlay_Number,
+        OverlayToolbarCatalog.Undo => Lang.Overlay_Undo,
+        OverlayToolbarCatalog.Redo => Lang.Overlay_Redo,
+        OverlayToolbarCatalog.Clear => Lang.Overlay_Clear,
+        OverlayToolbarCatalog.Ocr => Lang.Overlay_Ocr,
+        OverlayToolbarCatalog.Translate => Lang.Overlay_Translate,
+        OverlayToolbarCatalog.LongCapture => Lang.Overlay_LongCapture,
+        OverlayToolbarCatalog.Save => Lang.Overlay_Save,
+        _ => id,
+    } ?? id;
+
+
     private void ApiKeyBox_LostFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         SecretStorageService.Save("apiKey", ApiKeyBox.Password);
     }
 
 
+}
+
+public sealed class OverlayToolbarItemOption : ObservableObject
+{
+    private bool _isVisible;
+
+    public OverlayToolbarItemOption(string id, string label, bool isVisible)
+    {
+        Id = id;
+        Label = label;
+        _isVisible = isVisible;
+    }
+
+    public string Id { get; }
+
+    public string Label { get; }
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set => SetProperty(ref _isVisible, value);
+    }
 }

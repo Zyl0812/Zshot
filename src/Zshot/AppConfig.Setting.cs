@@ -1,4 +1,5 @@
 using Dapper;
+using Zshot.Core.Overlay;
 using Zshot.Features.Database;
 using System;
 using System.Collections.Generic;
@@ -440,6 +441,16 @@ public static partial class AppConfig
     {
         get => Math.Clamp(GetValue(16384), 1000, 16384);
         set => SetValue(Math.Clamp(value, 1000, 16384));
+    }
+
+
+    /// <summary>
+    /// 截图工具栏隐藏项，逗号分隔。空=全部显示。未写入时默认隐藏椭圆、文字、序号、重做。
+    /// </summary>
+    public static string OverlayToolbarHidden
+    {
+        get => GetValue(OverlayToolbarCatalog.DefaultHiddenValue) ?? OverlayToolbarCatalog.DefaultHiddenValue;
+        set => SetValue(value);
     }
 
 
